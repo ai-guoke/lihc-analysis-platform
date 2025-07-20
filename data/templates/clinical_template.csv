@@ -1,0 +1,6 @@
+,sample_id,age,gender,stage,grade,os_time,os_status
+0,SAMPLE_001,65,Male,Stage I,G2,1825,0
+1,SAMPLE_002,58,Female,Stage II,G3,945,1
+2,SAMPLE_003,72,Male,Stage III,G2,365,1
+3,SAMPLE_004,45,Female,Stage I,G1,2190,0
+4,SAMPLE_005,69,Male,Stage II,G3,1460,0

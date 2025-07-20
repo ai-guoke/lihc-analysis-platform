@@ -1,0 +1,6 @@
+,sample_id,gene,mutation_type,variant_class
+0,SAMPLE_001,TP53,Missense,SNP
+1,SAMPLE_002,CTNNB1,Nonsense,SNP
+2,SAMPLE_003,KRAS,Missense,SNP
+3,SAMPLE_001,PIK3CA,Missense,SNP
+4,SAMPLE_004,EGFR,Frame_Shift,INDEL

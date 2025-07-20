@@ -1,0 +1,208 @@
+# Test Configuration for LIHC Platform
+
+[tool.pytest.ini_options]
+# Minimum pytest version required
+minversion = "7.0"
+
+# Test discovery patterns
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Output options
+addopts = [
+    "-ra",                      # Show all test results
+    "--strict-markers",         # Treat unknown markers as errors
+    "--strict-config",          # Treat config errors as errors
+    "--disable-warnings",       # Disable pytest warnings
+    "--tb=short",               # Short traceback format
+    "--cov=src",                # Coverage for src directory
+    "--cov-report=term-missing", # Show missing lines in terminal
+    "--cov-report=html:htmlcov", # Generate HTML coverage report
+    "--cov-report=xml:coverage.xml", # Generate XML coverage report
+    "--cov-fail-under=80",      # Fail if coverage below 80%
+    "--cov-branch",             # Include branch coverage
+    "--junitxml=junit.xml",     # Generate JUnit XML report
+    "-v",                       # Verbose output
+]
+
+# Test markers
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "api: marks tests as API tests",
+    "database: marks tests that require database",
+    "network: marks tests that require network access",
+    "heavy: marks tests that use significant resources",
+]
+
+# Timeout settings
+timeout = 300
+timeout_method = "thread"
+
+# Filter warnings
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore:.*:pytest.PytestUnraisableExceptionWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/.venv/*",
+    "setup.py",
+    "conftest.py",
+    "*/alembic/versions/*",
+]
+branch = true
+data_file = ".coverage"
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    "pragma: no cover",
+    
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+    
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+    
+    # Don't complain about abstract methods
+    "@(abc\\.)?abstractmethod",
+    
+    # Don't complain about type checking code
+    "if TYPE_CHECKING:",
+]
+
+ignore_errors = true
+precision = 2
+show_missing = true
+skip_covered = false
+skip_empty = false
+
+[tool.coverage.html]
+directory = "htmlcov"
+show_contexts = true
+title = "LIHC Platform Coverage Report"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+# Black configuration
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+  | alembic/versions
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+known_first_party = ["src"]
+known_third_party = ["pytest", "pandas", "numpy", "fastapi"]
+
+# flake8 configuration
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "E266", "E501", "W503"]
+max-complexity = 15
+select = ["B", "C", "E", "F", "W", "T4", "B9"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+    ".eggs",
+    "*.egg",
+    "alembic/versions",
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+ignore_missing_imports = true
+
+# Exclude test directories from type checking in CI
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pandas.*",
+    "numpy.*",
+    "matplotlib.*",
+    "seaborn.*",
+    "plotly.*",
+    "dash.*",
+    "networkx.*",
+    "lifelines.*",
+    "scipy.*",
+    "sklearn.*",
+    "umap.*",
+    "scanpy.*",
+    "anndata.*",
+    "pyvis.*",
+    "biopython.*",
+    "streamlit.*",
+    "uvicorn.*",
+    "sqlalchemy.*",
+    "alembic.*",
+    "celery.*",
+    "redis.*"
+]
+ignore_missing_imports = true

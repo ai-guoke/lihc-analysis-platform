@@ -1,0 +1,30 @@
+{
+  "VEGFR2": {
+    "gene_name": "VEGFR2",
+    "full_name": "Vascular Endothelial Growth Factor Receptor 2",
+    "linchpin_score": 0.809,
+    "biological_function": "Angiogenesis regulation",
+    "cancer_relevance": "Tumor vascularization",
+    "druggability": "High",
+    "known_drugs": [
+      "Sunitinib",
+      "Sorafenib"
+    ],
+    "clinical_trials": 15,
+    "evidence_strength": "Strong"
+  },
+  "TNF": {
+    "gene_name": "TNF",
+    "full_name": "Tumor Necrosis Factor",
+    "linchpin_score": 0.755,
+    "biological_function": "Inflammatory response",
+    "cancer_relevance": "Tumor microenvironment",
+    "druggability": "High",
+    "known_drugs": [
+      "Adalimumab",
+      "Infliximab"
+    ],
+    "clinical_trials": 12,
+    "evidence_strength": "Strong"
+  }
+}

@@ -1,0 +1,6 @@
+gene1,gene2,correlation,dimension1,dimension2
+TP53,PIK3CA,0.65,tumor_cells,tumor_cells
+MYC,RAS,-0.58,tumor_cells,tumor_cells
+TNF,IL6,0.72,cytokines,cytokines
+VEGFA,EGFR,0.68,cytokines,tumor_cells
+COL1A1,MMP1,0.61,stromal_cells,ecm

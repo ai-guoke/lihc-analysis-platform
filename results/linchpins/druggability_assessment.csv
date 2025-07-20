@@ -1,0 +1,9 @@
+gene_id,druggability_score,known_drugs,drug_class
+VEGFR2,0.95,"Sunitinib, Sorafenib",Kinase inhibitor
+TNF,0.88,"Adalimumab, Infliximab",Monoclonal antibody
+TP53,0.75,"APR-246, PRIMA-1",Small molecule
+IDH1,0.82,Ivosidenib,Metabolic inhibitor
+IL6,0.85,"Tocilizumab, Siltuximab",Monoclonal antibody
+EGFR,0.92,"Erlotinib, Gefitinib",Kinase inhibitor
+KRAS,0.45,"AMG 510, MRTX849",Covalent inhibitor
+TGFB1,0.78,Galunisertib,Kinase inhibitor

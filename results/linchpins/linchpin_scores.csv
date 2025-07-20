@@ -1,0 +1,11 @@
+gene_id,linchpin_score,prognostic_score,network_hub_score,cross_domain_score,regulator_score,druggable
+VEGFR2,0.809,0.85,0.92,0.75,0.68,True
+TNF,0.755,0.78,0.81,0.72,0.65,True
+TP53,0.735,0.82,0.79,0.68,0.88,True
+IDH1,0.732,0.75,0.74,0.71,0.62,True
+IL6,0.731,0.73,0.76,0.7,0.61,True
+EGFR,0.718,0.71,0.78,0.69,0.6,True
+MYC,0.695,0.68,0.72,0.67,0.85,False
+PIK3CA,0.682,0.65,0.69,0.66,0.59,False
+KRAS,0.671,0.63,0.68,0.65,0.58,True
+TGFB1,0.658,0.61,0.64,0.63,0.57,True

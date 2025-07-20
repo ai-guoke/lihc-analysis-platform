@@ -1,0 +1,147 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "LIHC Analysis Performance",
+    "tags": ["lihc", "analysis", "performance"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Analysis Queue Length",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "lihc_analysis_queue_length",
+            "legendFormat": "Queue Length"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "thresholds"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Analysis Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(lihc_analysis_completed_total[1h]) / rate(lihc_analysis_started_total[1h]) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 95}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Average Analysis Duration",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(lihc_analysis_duration_seconds)",
+            "legendFormat": "Avg Duration"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Analysis Types Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (analysis_type) (lihc_analysis_started_total)",
+            "legendFormat": "{{analysis_type}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Resource Usage During Analysis",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "lihc_cpu_usage_percent",
+            "legendFormat": "CPU Usage %"
+          },
+          {
+            "expr": "lihc_memory_usage_percent",
+            "legendFormat": "Memory Usage %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Failed Analyses by Error Type",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sum by (error_type) (increase(lihc_analysis_failed_total[1h]))",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "analysis_type",
+          "type": "query",
+          "query": "label_values(lihc_analysis_started_total, analysis_type)",
+          "refresh": 1,
+          "includeAll": true,
+          "allValue": ".*"
+        }
+      ]
+    },
+    "annotations": {
+      "list": []
+    },
+    "links": []
+  },
+  "folderId": null,
+  "overwrite": true
+}

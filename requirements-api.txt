@@ -1,0 +1,40 @@
+# API Requirements for LIHC Platform Phase 3
+# REST API and WebSocket support
+
+# FastAPI framework (compatible versions)
+fastapi>=0.104.1,<0.111.0
+uvicorn[standard]>=0.24.0,<0.30.0
+
+# Authentication and security
+python-jose[cryptography]>=3.3.0,<3.4.0
+passlib[bcrypt]>=1.7.4,<1.8.0
+python-multipart>=0.0.6,<0.0.10
+
+# Database and storage
+sqlalchemy>=2.0.23,<2.1.0
+alembic>=1.13.0,<1.14.0
+asyncpg>=0.29.0,<0.30.0  # PostgreSQL async driver
+aiosqlite>=0.19.0,<0.21.0  # SQLite async driver
+
+# WebSocket support
+websockets>=11.0.3,<12.1.0
+python-socketio>=5.10.0,<5.12.0
+
+# Background tasks
+celery>=5.3.4,<5.4.0
+redis>=5.0.1,<5.1.0
+
+# Data validation and serialization
+pydantic>=2.5.0,<2.8.0
+pydantic-settings>=2.1.0,<2.4.0
+
+# Additional utilities
+python-dotenv>=1.0.0,<1.1.0
+email-validator>=2.1.0,<2.2.0
+aiofiles>=23.2.1,<24.2.0
+httpx>=0.25.2,<0.28.0
+
+# Enhanced dashboard requirements (compatible with main requirements)
+dash>=2.6.0,<2.15.0
+dash-bootstrap-components>=1.2.0,<1.6.0
+websocket-client>=1.6.4,<1.9.0

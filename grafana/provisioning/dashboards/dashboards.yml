@@ -1,0 +1,14 @@
+# Grafana Dashboard Configuration for LIHC Platform
+
+apiVersion: 1
+
+providers:
+  - name: 'LIHC Platform Dashboards'
+    orgId: 1
+    folder: 'LIHC Platform'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
