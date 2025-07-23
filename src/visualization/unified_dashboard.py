@@ -452,6 +452,35 @@ class UnifiedLIHCDashboard:
                 ], style={"textAlign": "center"})
             ], className="card"),
             
+            # Quick scoring guide
+            html.Div([
+                html.H3("📊 评分指标快速指南", className="card-title"),
+                html.P("平台使用三个核心指标评估基因作为治疗靶点的潜力：", className="mb-3"),
+                html.Div([
+                    html.Div([
+                        html.H5("🎯 Linchpin Score", className="text-primary"),
+                        html.P("综合评分 (0-1)", className="small font-weight-bold"),
+                        html.P("整合多维度分析结果的最终评分，分数越高表示作为治疗靶点的潜力越大", className="small")
+                    ], className="metric-card"),
+                    
+                    html.Div([
+                        html.H5("📈 Prognostic Score", className="text-success"),
+                        html.P("预后评分 (0-1)", className="small font-weight-bold"),
+                        html.P("基于Cox回归分析，反映基因表达与患者生存期的关联强度", className="small")
+                    ], className="metric-card"),
+                    
+                    html.Div([
+                        html.H5("🕸️ Network Hub Score", className="text-info"),
+                        html.P("网络中心性评分 (0-1)", className="small font-weight-bold"),
+                        html.P("在分子相互作用网络中的重要程度，反映基因的连接和调控影响力", className="small")
+                    ], className="metric-card")
+                ], className="metric-grid"),
+                html.P([
+                    html.Strong("💡 使用提示: "),
+                    "在Demo页面查看详细的计算方法和数据来源说明"
+                ], className="text-muted small mt-3")
+            ], className="card"),
+            
             # Platform features
             html.Div([
                 html.H3("✨ Platform Capabilities", className="card-title"),
@@ -558,6 +587,69 @@ class UnifiedLIHCDashboard:
         top_10 = df.head(10)
         
         return html.Div([
+            # Add scoring explanation first
+            html.Div([
+                html.H4("📊 评分指标说明", className="mb-3"),
+                
+                # Linchpin Score explanation
+                html.Div([
+                    html.H6("🎯 Linchpin Score (关键节点评分)", className="text-primary"),
+                    html.P([
+                        "综合评分，整合多个维度的重要性指标。",
+                        html.Br(),
+                        html.Strong("计算公式: "),
+                        "Linchpin Score = 0.4×预后评分 + 0.3×网络中心性评分 + 0.2×跨维度连接性 + 0.1×调控重要性"
+                    ], className="small mb-2"),
+                    html.P([
+                        html.Strong("数据来源: "),
+                        "多维度生物学分析整合结果"
+                    ], className="small text-muted mb-3")
+                ]),
+                
+                # Prognostic Score explanation  
+                html.Div([
+                    html.H6("📈 Prognostic Score (预后评分)", className="text-success"),
+                    html.P([
+                        "基于Cox回归分析的生存预测能力评分。",
+                        html.Br(),
+                        html.Strong("计算方法: "),
+                        "Cox(survival_time, gene_expression) → hazard_ratio → normalized_score"
+                    ], className="small mb-2"),
+                    html.P([
+                        html.Strong("数据来源: "),
+                        "临床生存数据 + 基因表达数据的统计关联分析"
+                    ], className="small text-muted mb-3")
+                ]),
+                
+                # Network Hub Score explanation
+                html.Div([
+                    html.H6("🕸️ Network Hub Score (网络中心性评分)", className="text-info"),
+                    html.P([
+                        "在分子相互作用网络中的重要程度评分。",
+                        html.Br(),
+                        html.Strong("计算方法: "),
+                        "degree_centrality + betweenness_centrality + closeness_centrality 综合标准化"
+                    ], className="small mb-2"),
+                    html.P([
+                        html.Strong("数据来源: "),
+                        "基因表达相关性网络 + 蛋白质相互作用网络(STRING数据库)"
+                    ], className="small text-muted mb-3")
+                ]),
+                
+                # Interpretation guide
+                html.Div([
+                    html.H6("📋 分数解读指南", className="text-warning"),
+                    html.Ul([
+                        html.Li("分数范围: 0.0 - 1.0 (分数越高，作为治疗靶点的潜力越大)"),
+                        html.Li("🥇 优秀靶点 (≥0.8): 强烈推荐，具有强证据支持"),
+                        html.Li("🥈 良好靶点 (0.6-0.8): 值得关注，证据较强"),
+                        html.Li("🥉 潜在靶点 (0.4-0.6): 需要进一步验证"),
+                        html.Li("❓ 证据不足 (<0.4): 不推荐作为治疗靶点")
+                    ], className="small")
+                ], className="mt-3")
+                
+            ], className="alert alert-light border p-3 mb-4"),
+            
             html.H3("🎯 Top Linchpin Molecules", className="card-title"),
             
             # Top 3 highlight
@@ -581,15 +673,44 @@ class UnifiedLIHCDashboard:
                 ], className="metric-card")
             ], className="metric-grid"),
             
-            # Full table
+            # Full table with enhanced column descriptions
             dash_table.DataTable(
                 data=top_10.to_dict('records'),
                 columns=[
-                    {"name": "Gene", "id": "gene_id"},
-                    {"name": "Linchpin Score", "id": "linchpin_score", "type": "numeric", "format": {"specifier": ".3f"}},
-                    {"name": "Prognostic Score", "id": "prognostic_score", "type": "numeric", "format": {"specifier": ".3f"}},
-                    {"name": "Network Hub Score", "id": "network_hub_score", "type": "numeric", "format": {"specifier": ".3f"}}
+                    {
+                        "name": ["Gene", "基因名称"], 
+                        "id": "gene_id",
+                        "presentation": "markdown"
+                    },
+                    {
+                        "name": ["Linchpin Score", "关键节点评分 (综合评分)"], 
+                        "id": "linchpin_score", 
+                        "type": "numeric", 
+                        "format": {"specifier": ".3f"}
+                    },
+                    {
+                        "name": ["Prognostic Score", "预后评分 (生存预测)"], 
+                        "id": "prognostic_score", 
+                        "type": "numeric", 
+                        "format": {"specifier": ".3f"}
+                    },
+                    {
+                        "name": ["Network Hub Score", "网络中心性评分 (连接重要性)"], 
+                        "id": "network_hub_score", 
+                        "type": "numeric", 
+                        "format": {"specifier": ".3f"}
+                    }
                 ],
+                tooltip_data=[
+                    {
+                        "gene_id": {"value": f"基因符号: {row['gene_id']}", "type": "text"},
+                        "linchpin_score": {"value": f"综合评分: {row.get('linchpin_score', 0):.3f}\n计算方法: 多维度指标加权平均\n权重: 预后40% + 网络30% + 连接20% + 调控10%", "type": "text"},
+                        "prognostic_score": {"value": f"预后评分: {row.get('prognostic_score', 0):.3f}\n基于Cox回归分析\n反映基因表达与患者生存的关联强度", "type": "text"},
+                        "network_hub_score": {"value": f"网络中心性: {row.get('network_hub_score', 0):.3f}\n基于网络拓扑分析\n度中心性 + 介数中心性 + 接近中心性", "type": "text"}
+                    } for row in top_10.to_dict('records')
+                ],
+                tooltip_delay=0,
+                tooltip_duration=None,
                 style_cell={'textAlign': 'left', 'padding': '10px'},
                 style_header={'fontWeight': 'bold'},
                 style_data_conditional=[
