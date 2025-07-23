@@ -546,8 +546,85 @@ class UnifiedLIHCDashboard:
                         html.Small("Therapeutic target prioritization")
                     ], className="metric-card"),
                 ], className="metric-grid")
-            ], className="card")
+            ], className="card"),
+            
+            # Add trend analysis
+            self.create_trend_analysis_preview()
         ], className="fade-in")
+    
+    def create_trend_analysis_preview(self):
+        """Create trend analysis preview for overview page"""
+        # Generate sample trend data for demonstration
+        months = pd.date_range('2020-01', '2024-12', freq='M')
+        
+        # Simulate platform usage trends
+        usage_data = {
+            'date': months,
+            'analyses_count': np.cumsum(np.random.poisson(15, len(months))),
+            'success_rate': np.random.uniform(0.85, 0.95, len(months)),
+            'avg_linchpin_score': np.random.uniform(0.65, 0.85, len(months))
+        }
+        
+        df = pd.DataFrame(usage_data)
+        
+        # Create trend charts
+        trend_fig = make_subplots(
+            rows=2, cols=2,
+            subplot_titles=('Platform Usage Growth', 'Analysis Success Rate', 
+                          'Average Linchpin Scores', 'Monthly Analysis Distribution'),
+            specs=[[{"secondary_y": False}, {"secondary_y": False}],
+                   [{"secondary_y": False}, {"type": "histogram"}]]
+        )
+        
+        # Usage growth
+        trend_fig.add_trace(
+            go.Scatter(x=df['date'], y=df['analyses_count'],
+                      mode='lines+markers', name='Total Analyses',
+                      line=dict(color='#1f77b4', width=3)),
+            row=1, col=1
+        )
+        
+        # Success rate
+        trend_fig.add_trace(
+            go.Scatter(x=df['date'], y=df['success_rate'],
+                      mode='lines+markers', name='Success Rate',
+                      line=dict(color='#2ca02c', width=3)),
+            row=1, col=2
+        )
+        
+        # Average scores
+        trend_fig.add_trace(
+            go.Scatter(x=df['date'], y=df['avg_linchpin_score'],
+                      mode='lines+markers', name='Avg Linchpin Score',
+                      line=dict(color='#ff7f0e', width=3)),
+            row=2, col=1
+        )
+        
+        # Distribution
+        trend_fig.add_trace(
+            go.Histogram(x=df['analyses_count'].diff().dropna(),
+                        name='Monthly Growth', nbinsx=15,
+                        marker_color='#d62728'),
+            row=2, col=2
+        )
+        
+        trend_fig.update_layout(
+            height=500,
+            title_text="📈 Platform Analytics Dashboard",
+            title_x=0.5,
+            showlegend=False,
+            font=dict(size=11),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        return html.Div([
+            html.H3("📈 Platform Trends & Analytics", className="card-title"),
+            dcc.Graph(figure=trend_fig, config={'displayModeBar': False}),
+            html.P([
+                "实时追踪平台使用情况和分析质量趋势，帮助持续优化算法性能和用户体验。"
+            ], className="text-muted small mt-2")
+        ], className="card")
     
     def create_demo_content(self):
         """Create demo results page"""
@@ -720,8 +797,162 @@ class UnifiedLIHCDashboard:
                         'fontWeight': 'bold'
                     }
                 ]
-            )
+            ),
+            
+            # Add comprehensive charts
+            self.create_score_comparison_charts(df)
         ], className="card")
+    
+    def create_score_comparison_charts(self, linchpin_data):
+        """Create comprehensive score comparison charts"""
+        if linchpin_data is None or len(linchpin_data) == 0:
+            return html.Div("No data available for visualization", className="text-muted")
+        
+        # Convert to DataFrame if needed
+        if isinstance(linchpin_data, list):
+            df = pd.DataFrame(linchpin_data)
+        else:
+            df = linchpin_data.copy()
+        
+        top_20 = df.head(20)
+        
+        # 1. Linchpin Score Bar Chart
+        bar_fig = px.bar(
+            top_20, 
+            x='gene_id', 
+            y='linchpin_score',
+            title='Top 20 Linchpin Scores Comparison',
+            labels={'gene_id': 'Gene', 'linchpin_score': 'Linchpin Score'},
+            color='linchpin_score',
+            color_continuous_scale='Viridis'
+        )
+        bar_fig.update_layout(
+            height=400,
+            xaxis_tickangle=-45,
+            font=dict(size=12),
+            title_x=0.5,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        bar_fig.update_traces(
+            texttemplate='%{y:.3f}',
+            textposition='outside'
+        )
+        
+        # 2. Multi-Score Radar Chart for Top 5
+        top_5 = top_20.head(5)
+        radar_fig = go.Figure()
+        
+        for i, row in top_5.iterrows():
+            radar_fig.add_trace(go.Scatterpolar(
+                r=[
+                    row.get('linchpin_score', 0),
+                    row.get('prognostic_score', 0),
+                    row.get('network_hub_score', 0),
+                    row.get('cross_dimensional_score', 0.5),  # Default if not available
+                    row.get('regulator_score', 0.3)  # Default if not available
+                ],
+                theta=['Linchpin', 'Prognostic', 'Network Hub', 'Cross-Dimensional', 'Regulatory'],
+                fill='toself',
+                name=row['gene_id']
+            ))
+            
+        radar_fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 1]
+                )),
+            showlegend=True,
+            title="Top 5 Genes Multi-Dimensional Score Profile",
+            height=500,
+            title_x=0.5,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        # 3. Scatter Plot: Prognostic vs Network Hub Score
+        scatter_fig = px.scatter(
+            top_20,
+            x='prognostic_score',
+            y='network_hub_score',
+            size='linchpin_score',
+            color='linchpin_score',
+            hover_name='gene_id',
+            title='Prognostic vs Network Hub Score Correlation',
+            labels={
+                'prognostic_score': 'Prognostic Score',
+                'network_hub_score': 'Network Hub Score',
+                'linchpin_score': 'Linchpin Score'
+            },
+            color_continuous_scale='RdYlBu_r'
+        )
+        scatter_fig.update_layout(
+            height=400,
+            title_x=0.5,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        # 4. Score Distribution Box Plot
+        score_data = []
+        for score_type in ['linchpin_score', 'prognostic_score', 'network_hub_score']:
+            if score_type in top_20.columns:
+                for value in top_20[score_type]:
+                    score_data.append({
+                        'Score Type': score_type.replace('_', ' ').title(),
+                        'Value': value
+                    })
+        
+        if score_data:
+            box_df = pd.DataFrame(score_data)
+            box_fig = px.box(
+                box_df,
+                x='Score Type',
+                y='Value',
+                title='Score Distribution Analysis',
+                color='Score Type'
+            )
+            box_fig.update_layout(
+                height=400,
+                title_x=0.5,
+                font=dict(size=12),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                showlegend=False
+            )
+        else:
+            box_fig = go.Figure()
+            box_fig.add_annotation(text="No data available", x=0.5, y=0.5)
+        
+        return html.Div([
+            html.H4("📊 综合评分对比分析", className="card-title mb-4"),
+            
+            # Chart grid
+            html.Div([
+                # Bar chart
+                html.Div([
+                    dcc.Graph(figure=bar_fig, config={'displayModeBar': False})
+                ], className="col-12 mb-4"),
+                
+                # Radar and Scatter charts
+                html.Div([
+                    html.Div([
+                        dcc.Graph(figure=radar_fig, config={'displayModeBar': False})
+                    ], className="col-6"),
+                    html.Div([
+                        dcc.Graph(figure=scatter_fig, config={'displayModeBar': False})
+                    ], className="col-6"),
+                ], className="row mb-4"),
+                
+                # Box plot
+                html.Div([
+                    dcc.Graph(figure=box_fig, config={'displayModeBar': False})
+                ], className="col-12")
+            ], className="row")
+        ], className="card p-4")
     
     def create_multidim_overview(self, stage1_data):
         """Create multi-dimensional analysis overview"""
@@ -757,8 +988,131 @@ class UnifiedLIHCDashboard:
                     html.P(f"{len(stage1_data.get('cytokines', []))} signals"),
                     html.Small("Signaling molecules")
                 ], className="metric-card")
-            ], className="metric-grid")
+            ], className="metric-grid"),
+            
+            # Add multidimensional charts
+            self.create_multidim_charts(stage1_data)
         ], className="card")
+    
+    def create_multidim_charts(self, stage1_data):
+        """Create multi-dimensional analysis charts"""
+        # Prepare data for visualization
+        dimensions = {
+            'Tumor Cells': len(stage1_data.get('tumor_cells', [])),
+            'Immune Cells': len(stage1_data.get('immune_cells', [])),
+            'Stromal Cells': len(stage1_data.get('stromal_cells', [])),
+            'ECM': len(stage1_data.get('ecm', [])),
+            'Cytokines': len(stage1_data.get('cytokines', []))
+        }
+        
+        # 1. Pie Chart for dimension distribution
+        pie_fig = px.pie(
+            values=list(dimensions.values()),
+            names=list(dimensions.keys()),
+            title='Gene Distribution Across Biological Dimensions',
+            color_discrete_sequence=px.colors.qualitative.Set3
+        )
+        pie_fig.update_traces(
+            textposition='inside',
+            textinfo='percent+label',
+            hovertemplate='<b>%{label}</b><br>Genes: %{value}<br>Percentage: %{percent}<extra></extra>'
+        )
+        pie_fig.update_layout(
+            height=400,
+            title_x=0.5,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        # 2. Bar Chart with different styling
+        bar_fig = px.bar(
+            x=list(dimensions.keys()),
+            y=list(dimensions.values()),
+            title='Gene Count by Biological Dimension',
+            labels={'x': 'Biological Dimension', 'y': 'Number of Genes'},
+            color=list(dimensions.values()),
+            color_continuous_scale='Blues'
+        )
+        bar_fig.update_layout(
+            height=400,
+            title_x=0.5,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_tickangle=-45
+        )
+        bar_fig.update_traces(
+            texttemplate='%{y}',
+            textposition='outside'
+        )
+        
+        # 3. Sunburst Chart for hierarchical view
+        sunburst_data = []
+        total_genes = sum(dimensions.values())
+        
+        for dim_name, count in dimensions.items():
+            sunburst_data.append({
+                'ids': dim_name,
+                'labels': dim_name,
+                'parents': '',
+                'values': count
+            })
+            
+            # Add subcategories for demonstration
+            subcategories = {
+                'Tumor Cells': ['Oncogenes', 'Suppressors'],
+                'Immune Cells': ['T-cells', 'B-cells'],
+                'Stromal Cells': ['Fibroblasts', 'Endothelial'],
+                'ECM': ['Collagens', 'Proteoglycans'],
+                'Cytokines': ['Interleukins', 'Growth Factors']
+            }
+            
+            if dim_name in subcategories:
+                for i, subcat in enumerate(subcategories[dim_name]):
+                    sunburst_data.append({
+                        'ids': f"{dim_name}_{subcat}",
+                        'labels': subcat,
+                        'parents': dim_name,
+                        'values': count // len(subcategories[dim_name]) + (1 if i == 0 else 0)
+                    })
+        
+        sunburst_df = pd.DataFrame(sunburst_data)
+        sunburst_fig = px.sunburst(
+            sunburst_df,
+            ids='ids',
+            labels='labels',
+            parents='parents',
+            values='values',
+            title='Hierarchical View of Biological Dimensions'
+        )
+        sunburst_fig.update_layout(
+            height=500,
+            title_x=0.5,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        return html.Div([
+            html.H4("📊 多维度分析可视化", className="card-title mb-4"),
+            html.Div([
+                # Pie and Bar charts
+                html.Div([
+                    html.Div([
+                        dcc.Graph(figure=pie_fig, config={'displayModeBar': False})
+                    ], className="col-6"),
+                    html.Div([
+                        dcc.Graph(figure=bar_fig, config={'displayModeBar': False})
+                    ], className="col-6"),
+                ], className="row mb-4"),
+                
+                # Sunburst chart
+                html.Div([
+                    dcc.Graph(figure=sunburst_fig, config={'displayModeBar': False})
+                ], className="col-12")
+            ], className="row")
+        ], className="card p-4 mt-4")
     
     def create_network_preview(self):
         """Create network analysis preview"""
@@ -784,8 +1138,170 @@ class UnifiedLIHCDashboard:
                     html.P("8", className="metric-value"),
                     html.Small("Functional clusters")
                 ], className="metric-card")
-            ], className="metric-grid")
+            ], className="metric-grid"),
+            
+            # Add network visualization charts
+            self.create_network_charts()
         ], className="card")
+    
+    def create_network_charts(self):
+        """Create network analysis charts"""
+        network_data = self.demo_data.get('stage2', {}).get('centrality', [])
+        
+        if not network_data:
+            # Create sample network data for demonstration
+            genes = ['TP53', 'EGFR', 'VEGFA', 'MYC', 'KRAS', 'PIK3CA', 'PTEN', 'CTNNB1', 'RB1', 'APC']
+            network_data = []
+            
+            for i, gene in enumerate(genes):
+                network_data.append({
+                    'gene_id': gene,
+                    'degree_centrality': np.random.uniform(0.3, 0.9),
+                    'betweenness_centrality': np.random.uniform(0.1, 0.8),
+                    'closeness_centrality': np.random.uniform(0.4, 0.9),
+                    'x': np.random.uniform(-1, 1),
+                    'y': np.random.uniform(-1, 1)
+                })
+        
+        df = pd.DataFrame(network_data)
+        
+        # 1. Network Graph Visualization
+        network_fig = go.Figure()
+        
+        # Add edges (connections between nodes)
+        edge_x = []
+        edge_y = []
+        for i in range(len(df)):
+            for j in range(i+1, min(i+4, len(df))):  # Connect to next 3 nodes
+                x0, y0 = df.iloc[i]['x'], df.iloc[i]['y']
+                x1, y1 = df.iloc[j]['x'], df.iloc[j]['y']
+                edge_x.extend([x0, x1, None])
+                edge_y.extend([y0, y1, None])
+        
+        network_fig.add_trace(go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=1, color='rgba(125, 125, 125, 0.5)'),
+            hoverinfo='none',
+            mode='lines',
+            name='Connections'
+        ))
+        
+        # Add nodes
+        network_fig.add_trace(go.Scatter(
+            x=df['x'],
+            y=df['y'],
+            mode='markers+text',
+            hovertemplate='<b>%{text}</b><br>Degree: %{customdata[0]:.3f}<br>Betweenness: %{customdata[1]:.3f}<br>Closeness: %{customdata[2]:.3f}<extra></extra>',
+            text=df['gene_id'],
+            textposition="middle center",
+            customdata=df[['degree_centrality', 'betweenness_centrality', 'closeness_centrality']].values,
+            marker=dict(
+                size=df['degree_centrality'] * 50 + 20,
+                color=df['betweenness_centrality'],
+                colorscale='Viridis',
+                colorbar=dict(title="Betweenness Centrality"),
+                line=dict(width=2, color='white')
+            ),
+            name='Genes'
+        ))
+        
+        network_fig.update_layout(
+            title='Gene Interaction Network',
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(b=20,l=5,r=5,t=40),
+            annotations=[ dict(
+                text="Node size = Degree Centrality<br>Color = Betweenness Centrality",
+                showarrow=False,
+                xref="paper", yref="paper",
+                x=0.005, y=-0.002,
+                xanchor='left', yanchor='bottom',
+                font=dict(size=12)
+            )],
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            height=500,
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        # 2. Centrality Comparison Chart
+        centrality_data = []
+        for _, row in df.iterrows():
+            centrality_data.extend([
+                {'Gene': row['gene_id'], 'Centrality Type': 'Degree', 'Value': row['degree_centrality']},
+                {'Gene': row['gene_id'], 'Centrality Type': 'Betweenness', 'Value': row['betweenness_centrality']},
+                {'Gene': row['gene_id'], 'Centrality Type': 'Closeness', 'Value': row['closeness_centrality']}
+            ])
+        
+        centrality_df = pd.DataFrame(centrality_data)
+        
+        centrality_fig = px.bar(
+            centrality_df,
+            x='Gene',
+            y='Value',
+            color='Centrality Type',
+            barmode='group',
+            title='Network Centrality Measures Comparison',
+            labels={'Value': 'Centrality Score', 'Gene': 'Gene Symbol'}
+        )
+        centrality_fig.update_layout(
+            height=400,
+            title_x=0.5,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_tickangle=-45
+        )
+        
+        # 3. Centrality Distribution Histograms
+        hist_fig = make_subplots(
+            rows=1, cols=3,
+            subplot_titles=('Degree Centrality', 'Betweenness Centrality', 'Closeness Centrality')
+        )
+        
+        hist_fig.add_trace(
+            go.Histogram(x=df['degree_centrality'], name='Degree', nbinsx=10),
+            row=1, col=1
+        )
+        hist_fig.add_trace(
+            go.Histogram(x=df['betweenness_centrality'], name='Betweenness', nbinsx=10),
+            row=1, col=2
+        )
+        hist_fig.add_trace(
+            go.Histogram(x=df['closeness_centrality'], name='Closeness', nbinsx=10),
+            row=1, col=3
+        )
+        
+        hist_fig.update_layout(
+            height=300,
+            title_text="Centrality Score Distributions",
+            title_x=0.5,
+            showlegend=False,
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        return html.Div([
+            html.H4("📊 网络分析可视化", className="card-title mb-4"),
+            html.Div([
+                # Network graph
+                html.Div([
+                    dcc.Graph(figure=network_fig, config={'displayModeBar': False})
+                ], className="col-12 mb-4"),
+                
+                # Centrality comparison and distributions
+                html.Div([
+                    html.Div([
+                        dcc.Graph(figure=centrality_fig, config={'displayModeBar': False})
+                    ], className="col-8"),
+                    html.Div([
+                        dcc.Graph(figure=hist_fig, config={'displayModeBar': False})
+                    ], className="col-4"),
+                ], className="row")
+            ], className="row")
+        ], className="card p-4 mt-4")
     
     def create_upload_content(self):
         """Create data upload interface"""
