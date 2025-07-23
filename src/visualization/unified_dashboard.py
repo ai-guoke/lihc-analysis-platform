@@ -564,19 +564,19 @@ class UnifiedLIHCDashboard:
             html.Div([
                 html.Div([
                     html.H4("🥇 #1 Target"),
-                    html.H5(str(top_10.iloc[0]['feature']) if len(top_10) > 0 else "N/A"),
+                    html.H5(str(top_10.iloc[0]['gene_id']) if len(top_10) > 0 else "N/A"),
                     html.P(f"Score: {top_10.iloc[0].get('linchpin_score', 0):.3f}" if len(top_10) > 0 else "N/A")
                 ], className="metric-card"),
                 
                 html.Div([
                     html.H4("🥈 #2 Target"),
-                    html.H5(str(top_10.iloc[1]['feature']) if len(top_10) > 1 else "N/A"),
+                    html.H5(str(top_10.iloc[1]['gene_id']) if len(top_10) > 1 else "N/A"),
                     html.P(f"Score: {top_10.iloc[1].get('linchpin_score', 0):.3f}" if len(top_10) > 1 else "N/A")
                 ], className="metric-card"),
                 
                 html.Div([
                     html.H4("🥉 #3 Target"),
-                    html.H5(str(top_10.iloc[2]['feature']) if len(top_10) > 2 else "N/A"),
+                    html.H5(str(top_10.iloc[2]['gene_id']) if len(top_10) > 2 else "N/A"),
                     html.P(f"Score: {top_10.iloc[2].get('linchpin_score', 0):.3f}" if len(top_10) > 2 else "N/A")
                 ], className="metric-card")
             ], className="metric-grid"),
@@ -585,10 +585,10 @@ class UnifiedLIHCDashboard:
             dash_table.DataTable(
                 data=top_10.to_dict('records'),
                 columns=[
-                    {"name": "Feature", "id": "feature"},
-                    {"name": "Dimension", "id": "dimension"} if "dimension" in top_10.columns else {"name": "Type", "id": "type"},
+                    {"name": "Gene", "id": "gene_id"},
                     {"name": "Linchpin Score", "id": "linchpin_score", "type": "numeric", "format": {"specifier": ".3f"}},
-                    {"name": "P-value", "id": "p_value", "type": "numeric", "format": {"specifier": ".2e"}} if "p_value" in top_10.columns else {"name": "Score", "id": "prognostic_score", "type": "numeric", "format": {"specifier": ".3f"}}
+                    {"name": "Prognostic Score", "id": "prognostic_score", "type": "numeric", "format": {"specifier": ".3f"}},
+                    {"name": "Network Hub Score", "id": "network_hub_score", "type": "numeric", "format": {"specifier": ".3f"}}
                 ],
                 style_cell={'textAlign': 'left', 'padding': '10px'},
                 style_header={'fontWeight': 'bold'},
@@ -714,6 +714,11 @@ class UnifiedLIHCDashboard:
     def create_templates_content(self):
         """Create templates page"""
         return html.Div([
+            # Download components for each template
+            dcc.Download(id="download-clinical-template"),
+            dcc.Download(id="download-expression-template"),
+            dcc.Download(id="download-mutation-template"),
+            
             html.Div([
                 html.H2("📝 Data Templates", className="card-title"),
                 html.P("Download templates to format your data correctly")
@@ -723,7 +728,7 @@ class UnifiedLIHCDashboard:
                 html.Div([
                     html.H4("📊 Clinical Data Template"),
                     html.P("Patient survival and clinical information"),
-                    html.Button("Download", className="btn-secondary"),
+                    html.Button("Download", id="btn-clinical-template", className="btn-secondary"),
                     html.Hr(),
                     html.Small("Required: sample_id, os_time, os_status")
                 ], className="metric-card"),
@@ -731,7 +736,7 @@ class UnifiedLIHCDashboard:
                 html.Div([
                     html.H4("🧬 Expression Data Template"),
                     html.P("Gene expression matrix"),
-                    html.Button("Download", className="btn-secondary"),
+                    html.Button("Download", id="btn-expression-template", className="btn-secondary"),
                     html.Hr(),
                     html.Small("Format: Genes as rows, samples as columns")
                 ], className="metric-card"),
@@ -739,7 +744,7 @@ class UnifiedLIHCDashboard:
                 html.Div([
                     html.H4("🔬 Mutation Data Template"),
                     html.P("Somatic mutation information"),
-                    html.Button("Download", className="btn-secondary"),
+                    html.Button("Download", id="btn-mutation-template", className="btn-secondary"),
                     html.Hr(),
                     html.Small("Required: sample_id, gene, mutation_type")
                 ], className="metric-card")
@@ -834,6 +839,43 @@ class UnifiedLIHCDashboard:
                         all_valid = False
                 
                 return html.Div(status_items), not all_valid
+        
+        # Template download callbacks
+        @self.app.callback(
+            Output("download-clinical-template", "data"),
+            [Input("btn-clinical-template", "n_clicks")],
+            prevent_initial_call=True
+        )
+        def download_clinical_template(n_clicks):
+            if n_clicks:
+                template_path = self.path_manager.get_data_path('templates', 'clinical_template.csv')
+                if template_path.exists():
+                    return dcc.send_file(str(template_path), filename="clinical_template.csv")
+            return dash.no_update
+        
+        @self.app.callback(
+            Output("download-expression-template", "data"),
+            [Input("btn-expression-template", "n_clicks")],
+            prevent_initial_call=True
+        )
+        def download_expression_template(n_clicks):
+            if n_clicks:
+                template_path = self.path_manager.get_data_path('templates', 'expression_template.csv')
+                if template_path.exists():
+                    return dcc.send_file(str(template_path), filename="expression_template.csv")
+            return dash.no_update
+        
+        @self.app.callback(
+            Output("download-mutation-template", "data"),
+            [Input("btn-mutation-template", "n_clicks")],
+            prevent_initial_call=True
+        )
+        def download_mutation_template(n_clicks):
+            if n_clicks:
+                template_path = self.path_manager.get_data_path('templates', 'mutation_template.csv')
+                if template_path.exists():
+                    return dcc.send_file(str(template_path), filename="mutation_template.csv")
+            return dash.no_update
     
     def run(self, debug=False, port=8050, host='0.0.0.0'):
         """Run the unified dashboard"""

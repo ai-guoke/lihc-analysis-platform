@@ -42,12 +42,12 @@ COPY . .
 
 # Create necessary directories
 RUN mkdir -p logs uploads results temp cache data config \
-    data/raw data/processed data/external \
+    data/raw data/processed data/external data/user_uploads \
     results/tables results/networks results/linchpins results/figures \
     results/user_analyses notebooks
 
 # Make scripts executable
-RUN chmod +x demo.py run_pipeline.py demo_phase2.py demo_phase3.py
+RUN chmod +x main.py
 
 # Change ownership to lihc user
 RUN chown -R lihc:lihc /app
@@ -55,11 +55,11 @@ RUN chown -R lihc:lihc /app
 # Switch to non-root user
 USER lihc
 
-# Expose ports (API and Dashboard)
-EXPOSE 8050 8051
+# Expose ports (Dashboard)
+EXPOSE 8050
 
 # Development command
-CMD ["python", "-m", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8050", "--reload"]
+CMD ["python", "main.py", "--dashboard", "--port", "8050"]
 
 # Production stage
 FROM base as production
@@ -67,13 +67,14 @@ FROM base as production
 # Copy only necessary files
 COPY src/ ./src/
 COPY main.py ./
-COPY run_pipeline.py ./
 COPY pyproject.toml ./
 COPY Makefile ./
+COPY config/ ./config/
+COPY data/templates/ ./data/templates/
 
 # Create necessary directories
 RUN mkdir -p logs uploads results temp cache data config \
-    data/raw data/processed data/external \
+    data/raw data/processed data/external data/user_uploads \
     results/tables results/networks results/linchpins results/figures \
     results/user_analyses
 
@@ -93,5 +94,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE 8050
 
-# Production command
-CMD ["python", "-m", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8050", "--workers", "4"]
+# Production command - use the unified dashboard
+CMD ["python", "main.py", "--dashboard", "--port", "8050"]

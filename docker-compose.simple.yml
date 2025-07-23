@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Main LIHC Platform service
+  lihc-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: lihc-platform
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+      - ./config:/app/config
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    driver: bridge
