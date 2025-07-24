@@ -30,9 +30,19 @@ try:
     from src.utils.common import PathManager, ResultsLoader, DataValidator, ConfigManager, ExceptionHandler
     from src.data_processing.data_upload_manager import DataUploadManager, UserDataAnalyzer
     from src.analysis.survival_analysis import SurvivalAnalyzer, create_demo_survival_data
+    from src.utils.i18n import i18n
 except ImportError as e:
     print(f"Warning: Could not import some modules: {e}")
     # Fallback to basic functionality
+    # Create a minimal i18n fallback
+    class MockI18n:
+        def get_text(self, key, fallback=None):
+            return fallback or key
+        def set_language(self, lang):
+            return True
+        def get_current_language(self):
+            return 'zh'
+    i18n = MockI18n()
 
 class UnifiedLIHCDashboard:
     """Unified dashboard combining all features"""
@@ -383,6 +393,7 @@ class UnifiedLIHCDashboard:
             dcc.Store(id='user-session-store'),
             dcc.Store(id='upload-status-store'),
             dcc.Store(id='demo-data-store', data=self.serialize_demo_data()),
+            dcc.Store(id='language-store', data='zh'),  # Default to Chinese
             
             # Main container
             html.Div([
@@ -418,29 +429,45 @@ class UnifiedLIHCDashboard:
     def create_header(self):
         """Create dashboard header"""
         return html.Div([
-            html.H1("🧬 LIHC Multi-dimensional Analysis Platform"),
-            html.P("Advanced therapeutic target discovery through integrated omics analysis")
-        ], className="header")
+            html.Div([
+                html.H1(id="header-title"),
+                html.P(id="header-subtitle")
+            ], style={'flex': '1'}),
+            
+            # Language switcher
+            html.Div([
+                html.Button([
+                    html.Span("🌐", style={'marginRight': '5px'}),
+                    html.Span(id="lang-button-text")
+                ], id="language-switcher", className="btn-secondary", 
+                   style={
+                       'background': 'rgba(255,255,255,0.2)',
+                       'border': '1px solid rgba(255,255,255,0.3)',
+                       'color': 'white',
+                       'fontSize': '0.9rem'
+                   })
+            ], style={'display': 'flex', 'alignItems': 'center'})
+        ], className="header", style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'})
     
     def create_navigation(self):
         """Create navigation tabs"""
         return html.Div([
             html.Div([
-                html.Button([html.Span("🏠"), "Overview"], 
+                html.Button([html.Span("🏠"), html.Span(id="nav-overview-text")], 
                            id="nav-overview", className="nav-tab active"),
-                html.Button([html.Span("📊"), "Demo Results"], 
+                html.Button([html.Span("📊"), html.Span(id="nav-demo-text")], 
                            id="nav-demo", className="nav-tab"),
-                html.Button([html.Span("📤"), "Upload Data"], 
+                html.Button([html.Span("📤"), html.Span(id="nav-upload-text")], 
                            id="nav-upload", className="nav-tab"),
-                html.Button([html.Span("🎯"), "Linchpins"], 
+                html.Button([html.Span("🎯"), html.Span(id="nav-linchpins-text")], 
                            id="nav-linchpins", className="nav-tab"),
-                html.Button([html.Span("🕸️"), "Networks"], 
+                html.Button([html.Span("🕸️"), html.Span(id="nav-networks-text")], 
                            id="nav-networks", className="nav-tab"),
-                html.Button([html.Span("🌳"), "Multi-dimensional"], 
+                html.Button([html.Span("🌳"), html.Span(id="nav-multidim-text")], 
                            id="nav-multidim", className="nav-tab"),
-                html.Button([html.Span("📈"), "Survival Analysis"], 
+                html.Button([html.Span("📈"), html.Span(id="nav-survival-text")], 
                            id="nav-survival", className="nav-tab"),
-                html.Button([html.Span("📝"), "Templates"], 
+                html.Button([html.Span("📝"), html.Span(id="nav-templates-text")], 
                            id="nav-templates", className="nav-tab"),
             ], className="nav-tabs")
         ], className="nav-container")
@@ -450,58 +477,56 @@ class UnifiedLIHCDashboard:
         return html.Div([
             # Hero section
             html.Div([
-                html.H2("🎯 From Biomarker Lists to Strategic Targets", className="card-title"),
+                html.H2(i18n.get_text('from_biomarker_to_targets'), className="card-title"),
                 html.P([
-                    "Transform traditional parallel analysis into integrated linchpin discovery. ",
-                    "Our platform identifies the most critical therapeutic targets by analyzing ",
-                    "5 biological dimensions simultaneously."
+                    i18n.get_text('platform_intro')
                 ], style={"fontSize": "1.1rem", "marginBottom": "1.5rem"}),
                 
                 html.Div([
-                    html.Button([html.Span("🚀"), "Explore Demo"], 
+                    html.Button([html.Span("🚀"), i18n.get_text('explore_demo')], 
                                id="demo-btn", className="btn-primary", 
                                style={"marginRight": "1rem"}),
-                    html.Button([html.Span("📤"), "Upload Data"], 
+                    html.Button([html.Span("📤"), i18n.get_text('upload_data')], 
                                id="upload-btn", className="btn-secondary"),
                 ], style={"textAlign": "center"})
             ], className="card"),
             
             # Quick scoring guide
             html.Div([
-                html.H3("📊 评分指标快速指南", className="card-title"),
-                html.P("平台使用三个核心指标评估基因作为治疗靶点的潜力：", className="mb-3"),
+                html.H3(i18n.get_text('scoring_guide'), className="card-title"),
+                html.P(i18n.get_text('scoring_intro'), className="mb-3"),
                 html.Div([
                     html.Div([
-                        html.H5("🎯 Linchpin Score", className="text-primary"),
-                        html.P("综合评分 (0-1)", className="small font-weight-bold"),
-                        html.P("整合多维度分析结果的最终评分，分数越高表示作为治疗靶点的潜力越大", className="small")
+                        html.H5([html.Span("🎯 "), i18n.get_text('linchpin_score')], className="text-primary"),
+                        html.P(i18n.get_text('linchpin_desc'), className="small font-weight-bold"),
+                        html.P(i18n.get_text('linchpin_detail'), className="small")
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H5("📈 Prognostic Score", className="text-success"),
-                        html.P("预后评分 (0-1)", className="small font-weight-bold"),
-                        html.P("基于Cox回归分析，反映基因表达与患者生存期的关联强度", className="small")
+                        html.H5([html.Span("📈 "), i18n.get_text('prognostic_score')], className="text-success"),
+                        html.P(i18n.get_text('prognostic_desc'), className="small font-weight-bold"),
+                        html.P(i18n.get_text('prognostic_detail'), className="small")
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H5("🕸️ Network Hub Score", className="text-info"),
-                        html.P("网络中心性评分 (0-1)", className="small font-weight-bold"),
-                        html.P("在分子相互作用网络中的重要程度，反映基因的连接和调控影响力", className="small")
+                        html.H5([html.Span("🕸️ "), i18n.get_text('network_hub_score')], className="text-info"),
+                        html.P(i18n.get_text('network_desc'), className="small font-weight-bold"),
+                        html.P(i18n.get_text('network_detail'), className="small")
                     ], className="metric-card")
                 ], className="metric-grid"),
                 html.P([
-                    html.Strong("💡 使用提示: "),
-                    "在Demo页面查看详细的计算方法和数据来源说明"
+                    html.Strong([html.Span("💡 "), i18n.get_text('usage_tip'), ": "]),
+                    i18n.get_text('usage_detail')
                 ], className="text-muted small mt-3")
             ], className="card"),
             
             # Platform features
             html.Div([
-                html.H3("✨ Platform Capabilities", className="card-title"),
+                html.H3([html.Span("✨ "), i18n.get_text('platform_capabilities')], className="card-title"),
                 html.Div([
                     html.Div([
-                        html.H4("🧬 Multi-dimensional Analysis"),
-                        html.P("Simultaneous analysis across tumor, immune, stromal, ECM, and cytokine dimensions"),
+                        html.H4([html.Span("🧬 "), i18n.get_text('multidim_analysis')]),
+                        html.P(i18n.get_text('multidim_desc')),
                         html.Ul([
                             html.Li("Cox proportional hazards modeling"),
                             html.Li("Immune infiltration deconvolution"),
@@ -510,8 +535,8 @@ class UnifiedLIHCDashboard:
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H4("🕸️ Network Integration"),
-                        html.P("Cross-dimensional network analysis for hub identification"),
+                        html.H4([html.Span("🕸️ "), i18n.get_text('network_integration')]),
+                        html.P(i18n.get_text('network_integration_desc')),
                         html.Ul([
                             html.Li("WGCNA-style module detection"),
                             html.Li("Network centrality analysis"),
@@ -520,8 +545,8 @@ class UnifiedLIHCDashboard:
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H4("🎯 Linchpin Scoring"),
-                        html.P("Composite scoring system for therapeutic prioritization"),
+                        html.H4([html.Span("🎯 "), i18n.get_text('linchpin_scoring')]),
+                        html.P(i18n.get_text('linchpin_scoring_desc')),
                         html.Ul([
                             html.Li("Prognostic importance (40%)"),
                             html.Li("Network centrality (30%)"),
@@ -534,29 +559,29 @@ class UnifiedLIHCDashboard:
             
             # Analysis workflow
             html.Div([
-                html.H3("⚡ Analysis Workflow", className="card-title"),
+                html.H3([html.Span("⚡ "), i18n.get_text('analysis_workflow')], className="card-title"),
                 html.Div([
                     html.Div([
-                        html.H4("1️⃣ Data Upload"),
-                        html.P("Clinical, expression, and mutation data"),
-                        html.Small("Multiple format support")
+                        html.H4("1️⃣ " + i18n.get_text('data_upload')),
+                        html.P(i18n.get_text('data_upload_desc')),
+                        html.Small(i18n.get_text('multiple_formats'))
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H4("2️⃣ Multi-dimensional Analysis"),
-                        html.P("Parallel analysis across 5 dimensions"),
+                        html.H4("2️⃣ " + i18n.get_text('multidim_analysis_step')),
+                        html.P(i18n.get_text('multidim_desc_step')),
                         html.Small("Prognostic factor identification")
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H4("3️⃣ Network Integration"),
-                        html.P("Cross-dimensional network construction"),
+                        html.H4("3️⃣ " + i18n.get_text('network_integration_step')),
+                        html.P(i18n.get_text('network_desc_step')),
                         html.Small("Hub and module detection")
                     ], className="metric-card"),
                     
                     html.Div([
-                        html.H4("4️⃣ Linchpin Discovery"),
-                        html.P("Composite scoring and ranking"),
+                        html.H4("4️⃣ " + i18n.get_text('linchpin_discovery')),
+                        html.P(i18n.get_text('linchpin_desc_step')),
                         html.Small("Therapeutic target prioritization")
                     ], className="metric-card"),
                 ], className="metric-grid")
@@ -812,42 +837,42 @@ class UnifiedLIHCDashboard:
     def create_survival_preview(self):
         """Create survival analysis preview"""
         return html.Div([
-            html.H3("📈 Survival Analysis", className="card-title"),
+            html.H3(["📈 ", i18n.get_text('survival_analysis')], className="card-title"),
             html.Div([
                 html.Div([
-                    html.H4("🎯 Target Genes"),
+                    html.H4(["🎯 ", i18n.get_text('target_genes')]),
                     html.P("8", className="metric-value"),
-                    html.Small("Available for analysis")
+                    html.Small(i18n.get_text('available_for_analysis'))
                 ], className="metric-card"),
                 
                 html.Div([
-                    html.H4("👥 Patient Cohort"),
+                    html.H4(["👥 ", i18n.get_text('patient_cohort')]),
                     html.P("200", className="metric-value"),
-                    html.Small("TCGA-LIHC samples")
+                    html.Small(i18n.get_text('tcga_samples'))
                 ], className="metric-card"),
                 
                 html.Div([
-                    html.H4("📊 Analysis Types"),
+                    html.H4(["📊 ", i18n.get_text('analysis_types')]),
                     html.P("2", className="metric-value"),
-                    html.Small("OS & RFS endpoints")
+                    html.Small(i18n.get_text('os_rfs_endpoints'))
                 ], className="metric-card"),
                 
                 html.Div([
-                    html.H4("📈 Kaplan-Meier"),
+                    html.H4(["📈 ", i18n.get_text('kaplan_meier')]),
                     html.P("✓", className="metric-value"),
-                    html.Small("With Log-rank test")
+                    html.Small(i18n.get_text('with_logrank_test'))
                 ], className="metric-card")
             ], className="metric-grid"),
             
             html.Div([
                 html.P([
-                    "🔬 ", html.Strong("功能特色:"), " 为目标基因生成Kaplan-Meier生存曲线，支持总生存期(OS)和无复发生存期(RFS)分析。"
+                    "🔬 ", html.Strong([i18n.get_text('functional_features'), ":"], ), " ", i18n.get_text('survival_features_desc')
                 ], className="small mb-2"),
                 html.P([
-                    "📊 ", html.Strong("分析方法:"), " 根据基因表达中位数分组，Log-rank检验比较组间差异，P<0.05为统计显著。"
+                    "📊 ", html.Strong([i18n.get_text('analysis_method'), ":"], ), " ", i18n.get_text('analysis_method_desc')
                 ], className="small mb-2"),
                 html.Div([
-                    html.Button([html.Span("📈"), "Try Survival Analysis"], 
+                    html.Button([html.Span("📈"), i18n.get_text('try_survival_analysis')], 
                                id="survival-preview-btn", className="btn-primary btn-sm")
                 ], style={'textAlign': 'center', 'marginTop': '15px'})
             ], style={'marginTop': '15px'})
@@ -868,13 +893,13 @@ class UnifiedLIHCDashboard:
         
         return html.Div([
             html.Div([
-                html.H3("📊 Score Comparison Analysis", className="card-title"),
-                html.P("Professional chart-based comparative analysis for more intuitive data presentation")
+                html.H3(["📊 ", i18n.get_text('score_comparison_analysis')], className="card-title"),
+                html.P(i18n.get_text('professional_chart_desc'))
             ], className="card"),
             
             # Bar chart comparison
             html.Div([
-                html.H4("📈 Score Comparison Bar Chart", className="card-title"),
+                html.H4(["📈 ", i18n.get_text('score_comparison_bar')], className="card-title"),
                 dcc.Graph(
                     figure=self._create_score_bar_chart(top_15),
                     config={'displayModeBar': True}
@@ -883,7 +908,7 @@ class UnifiedLIHCDashboard:
             
             # Radar chart for top 5
             html.Div([
-                html.H4("🕸️ Multi-dimensional Radar Chart", className="card-title"),
+                html.H4(["🕸️ ", i18n.get_text('multidim_radar')], className="card-title"),
                 dcc.Graph(
                     figure=self._create_score_radar_chart(top_15.head(5)),
                     config={'displayModeBar': True}
@@ -892,7 +917,7 @@ class UnifiedLIHCDashboard:
             
             # Scatter plot analysis
             html.Div([
-                html.H4("🎯 Score Correlation Scatter Plot", className="card-title"),
+                html.H4(["🎯 ", i18n.get_text('score_correlation_scatter')], className="card-title"),
                 dcc.Graph(
                     figure=self._create_score_scatter_plot(top_15),
                     config={'displayModeBar': True}
@@ -907,13 +932,13 @@ class UnifiedLIHCDashboard:
         
         return html.Div([
             html.Div([
-                html.H3("🌳 Multi-dimensional Analysis Charts", className="card-title"),
-                html.P("Comprehensive visualization of five biological dimensions")  
+                html.H3(["🌳 ", i18n.get_text('multidim_analysis_charts')], className="card-title"),
+                html.P(i18n.get_text('comprehensive_viz'))  
             ], className="card"),
             
             # Dimension sizes pie chart
             html.Div([
-                html.H4("📊 Dimension Distribution", className="card-title"),
+                html.H4(["📊 ", i18n.get_text('dimension_distribution')], className="card-title"),
                 dcc.Graph(
                     figure=self._create_dimension_pie_chart(stage1_data),
                     config={'displayModeBar': True}
@@ -922,7 +947,7 @@ class UnifiedLIHCDashboard:
             
             # Dimension comparison bar chart
             html.Div([
-                html.H4("📈 Dimension Comparison", className="card-title"),
+                html.H4(["📈 ", i18n.get_text('dimension_comparison')], className="card-title"),
                 dcc.Graph(
                     figure=self._create_dimension_bar_chart(stage1_data),
                     config={'displayModeBar': True}
@@ -940,15 +965,24 @@ class UnifiedLIHCDashboard:
         
         return html.Div([
             html.Div([
-                html.H3("🕸️ Network Analysis Charts", className="card-title"),
-                html.P("Interactive network visualization and centrality analysis")
+                html.H3(["🕸️ ", i18n.get_text('network_analysis_charts')], className="card-title"),
+                html.P(i18n.get_text('interactive_network_viz'))
             ], className="card"),
             
-            # Network centrality distribution
+            # Network centrality comparison
             html.Div([
-                html.H4("📊 Centrality Distribution", className="card-title"),
+                html.H4(["📊 ", i18n.get_text('centrality_distribution')], className="card-title"),
                 dcc.Graph(
                     figure=self._create_centrality_chart(network_data),
+                    config={'displayModeBar': True}
+                )
+            ], className="card"),
+            
+            # Network topology overview
+            html.Div([
+                html.H4(["🕸️ Network Topology Overview"], className="card-title"),
+                dcc.Graph(
+                    figure=self._create_network_topology_chart(network_data),
                     config={'displayModeBar': True}
                 )
             ], className="card")
@@ -1138,14 +1172,68 @@ class UnifiedLIHCDashboard:
         if len(df) == 0:
             return go.Figure()
         
+        # Create subplots for different centrality measures
+        from plotly.subplots import make_subplots
+        
+        # Check which centrality columns are available
+        centrality_cols = {
+            'degree_centrality': 'Degree Centrality',
+            'betweenness_centrality': 'Betweenness Centrality', 
+            'closeness_centrality': 'Closeness Centrality',
+            'eigenvector_centrality': 'Eigenvector Centrality'
+        }
+        
+        available_cols = [col for col in centrality_cols.keys() if col in df.columns]
+        
+        if not available_cols:
+            return go.Figure()
+        
+        # Create a bar chart showing top genes by degree centrality
+        if 'degree_centrality' in df.columns and 'gene_id' in df.columns:
+            # Sort by degree centrality and take top 10
+            top_genes = df.nlargest(10, 'degree_centrality')
+            
+            fig = go.Figure()
+            
+            # Add bars for each centrality measure
+            colors = ['#007AFF', '#34C759', '#FF9500', '#FF3B30']
+            
+            for i, (col, label) in enumerate(centrality_cols.items()):
+                if col in df.columns:
+                    fig.add_trace(go.Bar(
+                        name=label,
+                        x=top_genes['gene_id'],
+                        y=top_genes[col],
+                        marker_color=colors[i % len(colors)],
+                        opacity=0.8
+                    ))
+            
+            fig.update_layout(
+                title="Network Centrality Comparison (Top 10 Genes)",
+                xaxis_title="Genes",
+                yaxis_title="Centrality Score",
+                barmode='group',
+                height=500,
+                template="plotly_white",
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1
+                )
+            )
+            
+            return fig
+        
+        # Fallback: create a simple histogram if gene_id not available
         fig = go.Figure()
         
-        # Add histogram for centrality distribution
-        if 'centrality' in df.columns:
+        if available_cols:
             fig.add_trace(go.Histogram(
-                x=df['centrality'],
-                nbinsx=20,
-                name='Centrality Distribution',
+                x=df[available_cols[0]],
+                nbinsx=15,
+                name=centrality_cols[available_cols[0]],
                 marker_color='#007AFF'
             ))
         
@@ -1159,21 +1247,102 @@ class UnifiedLIHCDashboard:
         
         return fig
     
+    def _create_network_topology_chart(self, network_data):
+        """Create network topology overview chart"""
+        if isinstance(network_data, list) and len(network_data) > 0:
+            df = pd.DataFrame(network_data)
+        elif hasattr(network_data, 'columns'):
+            df = network_data
+        else:
+            return go.Figure()
+        
+        if len(df) == 0 or 'gene_id' not in df.columns:
+            return go.Figure()
+        
+        # Create a network-style scatter plot showing gene relationships
+        fig = go.Figure()
+        
+        # Use degree centrality as main positioning factor
+        if 'degree_centrality' in df.columns:
+            # Create a circular layout based on degree centrality
+            import numpy as np
+            n_nodes = len(df)
+            angles = np.linspace(0, 2*np.pi, n_nodes, endpoint=False)
+            
+            # Position nodes in circle, with size based on centrality
+            x_pos = np.cos(angles) * (df['degree_centrality'] * 2 + 0.5)
+            y_pos = np.sin(angles) * (df['degree_centrality'] * 2 + 0.5)
+            
+            # Add network nodes
+            fig.add_trace(go.Scatter(
+                x=x_pos,
+                y=y_pos,
+                mode='markers+text',
+                text=df['gene_id'],
+                textposition="middle center",
+                marker=dict(
+                    size=df['degree_centrality'] * 40 + 10,
+                    color=df.get('betweenness_centrality', df['degree_centrality']),
+                    colorscale='Viridis',
+                    showscale=True,
+                    colorbar=dict(title="Centrality Score"),
+                    line=dict(width=2, color='white')
+                ),
+                name='Network Nodes',
+                hovertemplate=(
+                    "<b>%{text}</b><br>" +
+                    "Degree Centrality: %{marker.size}<br>" +
+                    "Position: (%{x:.2f}, %{y:.2f})<br>" +
+                    "<extra></extra>"
+                )
+            ))
+            
+            # Add some edges for top connected nodes
+            top_nodes = df.nlargest(5, 'degree_centrality')
+            edge_x = []
+            edge_y = []
+            
+            for i in range(len(top_nodes)-1):
+                edge_x.extend([x_pos[i], x_pos[i+1], None])
+                edge_y.extend([y_pos[i], y_pos[i+1], None])
+            
+            # Add edges
+            fig.add_trace(go.Scatter(
+                x=edge_x,
+                y=edge_y,
+                mode='lines',
+                line=dict(width=1, color='rgba(100,100,100,0.3)'),
+                hoverinfo='none',
+                name='Network Edges',
+                showlegend=False
+            ))
+        
+        fig.update_layout(
+            title="Network Topology Overview",
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            height=500,
+            template="plotly_white",
+            showlegend=True
+        )
+        
+        return fig
+    
     def create_upload_content(self):
         """Create data upload interface"""
         return html.Div([
             html.Div([
-                html.H2("📤 Upload Your Data", className="card-title"),
-                html.P("Upload your LIHC dataset for personalized analysis")
+                html.H2(["📤 ", i18n.get_text('upload_title')], className="card-title"),
+                html.P(i18n.get_text('upload_subtitle'))
             ], className="card"),
             
             # Upload instructions
             html.Div([
-                html.H4("📋 Data Requirements"),
+                html.H4(["📋 ", i18n.get_text('data_requirements')]),
                 html.Ul([
-                    html.Li("📊 Clinical Data: Patient survival and clinical information (required)"),
-                    html.Li("🧬 Expression Data: Gene expression matrix (required)"),
-                    html.Li("🔬 Mutation Data: Somatic mutation information (optional)")
+                    html.Li(["📊 ", i18n.get_text('clinical_data'), ": ", i18n.get_text('clinical_desc')]),
+                    html.Li(["🧬 ", i18n.get_text('expression_data'), ": ", i18n.get_text('expression_desc')]),
+                    html.Li(["🔬 ", i18n.get_text('mutation_data'), ": ", i18n.get_text('mutation_desc')])
                 ])
             ], className="card"),
             
@@ -1183,8 +1352,8 @@ class UnifiedLIHCDashboard:
                     id='upload-data',
                     children=html.Div([
                         html.H3("📁", style={"fontSize": "3rem", "margin": "0"}),
-                        html.P("Drag & drop files here or click to browse"),
-                        html.Small("Supports: CSV, TSV, Excel, ZIP")
+                        html.P(i18n.get_text('drag_drop_files')),
+                        html.Small(i18n.get_text('supported_formats'))
                     ]),
                     className="upload-zone",
                     multiple=True
@@ -1196,7 +1365,7 @@ class UnifiedLIHCDashboard:
             
             # Analysis button
             html.Div([
-                html.Button([html.Span("🚀"), "Run Analysis"], 
+                html.Button([html.Span("🚀"), i18n.get_text('run_analysis')], 
                            id="run-analysis-btn", className="btn-primary", disabled=True)
             ], className="card", style={"textAlign": "center"}),
             
@@ -1209,23 +1378,23 @@ class UnifiedLIHCDashboard:
         if not self.survival_analyzer:
             return html.Div([
                 html.Div([
-                    html.H2("📈 Survival Analysis", className="card-title"),
+                    html.H2(["📈 ", i18n.get_text('survival_analysis')], className="card-title"),
                     html.P("Survival analysis functionality is not available", className="text-muted")
                 ], className="card")
             ], className="fade-in")
         
         return html.Div([
             html.Div([
-                html.H2("📈 Survival Analysis", className="card-title"),
+                html.H2(["📈 ", i18n.get_text('survival_analysis')], className="card-title"),
                 html.P("Kaplan-Meier survival curves with Log-rank test for gene expression analysis")
             ], className="card"),
             
             # Gene selection interface
             html.Div([
-                html.H4("🎯 Gene Selection", className="card-title"),
+                html.H4(["🎯 ", i18n.get_text('gene_selection')], className="card-title"),
                 html.Div([
                     html.Div([
-                        html.Label("Target Gene:", className="form-label"),
+                        html.Label([i18n.get_text('target_gene'), ":"], className="form-label"),
                         dcc.Dropdown(
                             id="survival-gene-dropdown",
                             options=[
@@ -1245,7 +1414,7 @@ class UnifiedLIHCDashboard:
                     ], className="col-6"),
                     
                     html.Div([
-                        html.Label("Dataset:", className="form-label"),
+                        html.Label([i18n.get_text('dataset'), ":"], className="form-label"),
                         dcc.Dropdown(
                             id="survival-dataset-dropdown",
                             options=[
@@ -1259,38 +1428,38 @@ class UnifiedLIHCDashboard:
                 ], className="row"),
                 
                 html.Div([
-                    html.Button([html.Span("📊"), "Generate Survival Curves"], 
+                    html.Button([html.Span("📊"), i18n.get_text('generate_survival_curves')], 
                                id="run-survival-btn", className="btn-primary")
                 ], style={'textAlign': 'center', 'marginTop': '20px'})
             ], className="card"),
             
             # Analysis explanation
             html.Div([
-                html.H4("📋 Analysis Method", className="card-title"),
+                html.H4(["📋 ", i18n.get_text('analysis_method')], className="card-title"),
                 html.Div([
                     html.Div([
-                        html.H6("📊 Grouping Strategy", className="text-primary"),
-                        html.P("Patients are divided into High and Low expression groups based on the median expression level of the selected gene.")
+                        html.H6(["📊 ", i18n.get_text('grouping_strategy')], className="text-primary"),
+                        html.P(i18n.get_text('grouping_desc'))
                     ], className="col-6"),
                     
                     html.Div([
-                        html.H6("📈 Analysis Endpoints", className="text-success"),
+                        html.H6(["📈 ", i18n.get_text('analysis_endpoints')], className="text-success"),
                         html.Ul([
-                            html.Li("Overall Survival (OS): Time from diagnosis to death"),
-                            html.Li("Recurrence-Free Survival (RFS): Time to disease recurrence")
+                            html.Li([i18n.get_text('overall_survival'), ": ", i18n.get_text('os_desc')]),
+                            html.Li([i18n.get_text('recurrence_free_survival'), ": ", i18n.get_text('rfs_desc')])
                         ])
                     ], className="col-6"),
                 ], className="row"),
                 
                 html.Div([
                     html.Div([
-                        html.H6("📉 Kaplan-Meier Method", className="text-info"),
-                        html.P("Non-parametric survival probability estimation accounting for censored observations.")
+                        html.H6(["📉 ", i18n.get_text('kaplan_meier_method')], className="text-info"),
+                        html.P(i18n.get_text('km_desc'))
                     ], className="col-6"),
                     
                     html.Div([
-                        html.H6("📊 Log-rank Test", className="text-warning"),
-                        html.P("Statistical comparison of survival curves between expression groups (p < 0.05 considered significant).")
+                        html.H6(["📊 ", i18n.get_text('logrank_test')], className="text-warning"),
+                        html.P(i18n.get_text('logrank_desc'))
                     ], className="col-6"),
                 ], className="row")
             ], className="card"),
@@ -1309,39 +1478,93 @@ class UnifiedLIHCDashboard:
             dcc.Download(id="download-mutation-template"),
             
             html.Div([
-                html.H2("📝 Data Templates", className="card-title"),
-                html.P("Download templates to format your data correctly")
+                html.H2(["📝 ", i18n.get_text('templates_title')], className="card-title"),
+                html.P(i18n.get_text('templates_subtitle'))
             ], className="card"),
             
             html.Div([
                 html.Div([
-                    html.H4("📊 Clinical Data Template"),
-                    html.P("Patient survival and clinical information"),
-                    html.Button("Download", id="btn-clinical-template", className="btn-secondary"),
+                    html.H4(["📊 ", i18n.get_text('clinical_template')]),
+                    html.P(i18n.get_text('clinical_template_desc')),
+                    html.Button(i18n.get_text('download'), id="btn-clinical-template", className="btn-secondary"),
                     html.Hr(),
-                    html.Small("Required: sample_id, os_time, os_status")
+                    html.Small([i18n.get_text('required_fields'), ": sample_id, os_time, os_status"])
                 ], className="metric-card"),
                 
                 html.Div([
-                    html.H4("🧬 Expression Data Template"),
-                    html.P("Gene expression matrix"),
-                    html.Button("Download", id="btn-expression-template", className="btn-secondary"),
+                    html.H4(["🧬 ", i18n.get_text('expression_template')]),
+                    html.P(i18n.get_text('expression_template_desc')),
+                    html.Button(i18n.get_text('download'), id="btn-expression-template", className="btn-secondary"),
                     html.Hr(),
-                    html.Small("Format: Genes as rows, samples as columns")
+                    html.Small(i18n.get_text('format_desc'))
                 ], className="metric-card"),
                 
                 html.Div([
-                    html.H4("🔬 Mutation Data Template"),
-                    html.P("Somatic mutation information"),
-                    html.Button("Download", id="btn-mutation-template", className="btn-secondary"),
+                    html.H4(["🔬 ", i18n.get_text('mutation_template')]),
+                    html.P(i18n.get_text('mutation_template_desc')),
+                    html.Button(i18n.get_text('download'), id="btn-mutation-template", className="btn-secondary"),
                     html.Hr(),
-                    html.Small("Required: sample_id, gene, mutation_type")
+                    html.Small([i18n.get_text('required_fields'), ": sample_id, gene, mutation_type"])
                 ], className="metric-card")
             ], className="metric-grid")
         ], className="fade-in")
     
     def setup_callbacks(self):
         """Setup dashboard callbacks"""
+        
+        # Language switching callback
+        @self.app.callback(
+            [Output("language-store", "data"),
+             Output("header-title", "children"),
+             Output("header-subtitle", "children"),
+             Output("lang-button-text", "children"),
+             Output("nav-overview-text", "children"),
+             Output("nav-demo-text", "children"),
+             Output("nav-upload-text", "children"),
+             Output("nav-linchpins-text", "children"),
+             Output("nav-networks-text", "children"),
+             Output("nav-multidim-text", "children"),
+             Output("nav-survival-text", "children"),
+             Output("nav-templates-text", "children")],
+            [Input("language-switcher", "n_clicks")],
+            [State("language-store", "data")],
+            prevent_initial_call=False
+        )
+        def toggle_language(n_clicks, current_lang):
+            # Initialize language on first load
+            if n_clicks is None:
+                i18n.set_language(current_lang or 'zh')
+                current_lang = current_lang or 'zh'
+            else:
+                # Toggle language
+                new_lang = 'en' if current_lang == 'zh' else 'zh'
+                i18n.set_language(new_lang)
+                current_lang = new_lang
+            
+            # Update all text elements
+            if current_lang == 'zh':
+                lang_button_text = "EN"
+                header_title = "🧬 LIHC多维度预后分析系统"
+                header_subtitle = "基于多维度网络分析的肝癌预后分析平台"
+            else:
+                lang_button_text = "中文"
+                header_title = "🧬 LIHC Multi-dimensional Analysis Platform"
+                header_subtitle = "Advanced therapeutic target discovery through integrated omics analysis"
+            
+            return (
+                current_lang,
+                header_title,
+                header_subtitle,
+                lang_button_text,
+                i18n.get_text('nav_overview'),
+                i18n.get_text('nav_demo'),
+                i18n.get_text('nav_upload'),
+                i18n.get_text('nav_linchpins'),
+                i18n.get_text('nav_networks'),
+                i18n.get_text('nav_multidim'),
+                i18n.get_text('nav_survival'),
+                i18n.get_text('nav_templates')
+            )
         
         @self.app.callback(
             Output("main-content", "children"),
@@ -1352,15 +1575,27 @@ class UnifiedLIHCDashboard:
              Input("nav-networks", "n_clicks"),
              Input("nav-multidim", "n_clicks"),
              Input("nav-survival", "n_clicks"),
-             Input("nav-templates", "n_clicks")],
+             Input("nav-templates", "n_clicks"),
+             Input("language-store", "data")],  # Add language as trigger
             prevent_initial_call=False
         )
         def update_content(*args):
             ctx = dash.callback_context
+            current_lang = args[-1]  # Last argument is language
+            i18n.set_language(current_lang or 'zh')
+            
             if not ctx.triggered:
                 return self.create_overview_content()
             
-            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            # Check if language changed
+            trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            if trigger_id == 'language-store':
+                # Language changed, refresh current page content
+                # We need to determine which page we're currently on
+                # For now, default to overview
+                return self.create_overview_content()
+            
+            button_id = trigger_id
             
             content_map = {
                 "nav-overview": self.create_overview_content,
