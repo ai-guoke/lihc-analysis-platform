@@ -39,8 +39,8 @@ markers = [
 ]
 
 # Timeout settings
-timeout = 300
-timeout_method = "thread"
+# timeout = 300
+# timeout_method = "thread"
 
 # Filter warnings
 filterwarnings = [

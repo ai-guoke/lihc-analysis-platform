@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  lihc-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: lihc-platform-dev
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+      - ./config:/app/config
+      - ./src:/app/src  # 挂载源代码用于开发
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - ENVIRONMENT=development
+    command: python main.py --dashboard --port 8050 --debug
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+networks:
+  default:
+    driver: bridge

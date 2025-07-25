@@ -1,0 +1,16 @@
+services:
+  lihc-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile.minimal
+    container_name: lihc-platform-minimal
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

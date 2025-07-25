@@ -9,6 +9,8 @@ The ClosedLoop algorithm integrates multiple lines of evidence:
 4. Methylation regulation analysis
 5. Mutation frequency analysis
 
+Enhanced version with complete causal network construction and scoring
+
 Final causal score is calculated as weighted combination of all evidence types.
 """
 
@@ -28,8 +30,12 @@ import networkx as nx
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import warnings
 
-from ..utils.logging_system import LIHCLogger
-from ..utils.enhanced_config import get_analysis_config
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from utils.logging_system import LIHCLogger
+from utils.enhanced_config import get_analysis_config
 
 
 class EvidenceType(Enum):

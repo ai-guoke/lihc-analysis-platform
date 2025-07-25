@@ -450,25 +450,23 @@ class UnifiedLIHCDashboard:
         ], className="header", style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'})
     
     def create_navigation(self):
-        """Create navigation tabs"""
+        """Create navigation tabs with improved organization"""
         return html.Div([
             html.Div([
                 html.Button([html.Span("🏠"), html.Span(id="nav-overview-text")], 
                            id="nav-overview", className="nav-tab active"),
-                html.Button([html.Span("📊"), html.Span(id="nav-demo-text")], 
-                           id="nav-demo", className="nav-tab"),
-                html.Button([html.Span("📤"), html.Span(id="nav-upload-text")], 
-                           id="nav-upload", className="nav-tab"),
-                html.Button([html.Span("🎯"), html.Span(id="nav-linchpins-text")], 
-                           id="nav-linchpins", className="nav-tab"),
-                html.Button([html.Span("🕸️"), html.Span(id="nav-networks-text")], 
-                           id="nav-networks", className="nav-tab"),
-                html.Button([html.Span("🌳"), html.Span(id="nav-multidim-text")], 
-                           id="nav-multidim", className="nav-tab"),
+                html.Button([html.Span("📊"), html.Span(id="nav-results-text")], 
+                           id="nav-results", className="nav-tab"),
+                html.Button([html.Span("📤"), html.Span(id="nav-data-text")], 
+                           id="nav-data", className="nav-tab"),
                 html.Button([html.Span("📈"), html.Span(id="nav-survival-text")], 
                            id="nav-survival", className="nav-tab"),
-                html.Button([html.Span("📝"), html.Span(id="nav-templates-text")], 
-                           id="nav-templates", className="nav-tab"),
+                html.Button([html.Span("🧬"), html.Span(id="nav-multiomics-text")], 
+                           id="nav-multiomics", className="nav-tab"),
+                html.Button([html.Span("🔄"), html.Span(id="nav-closedloop-text")], 
+                           id="nav-closedloop", className="nav-tab"),
+                html.Button([html.Span("⚙️"), html.Span(id="nav-help-text")], 
+                           id="nav-help", className="nav-tab"),
             ], className="nav-tabs")
         ], className="nav-container")
     
@@ -588,18 +586,42 @@ class UnifiedLIHCDashboard:
             ], className="card")
         ], className="fade-in")
     
-    def create_demo_content(self):
-        """Create demo results page"""
+    def create_results_content(self):
+        """Create unified analysis results page combining demo, linchpins, networks, and multidim"""
         linchpin_data = self.demo_data.get('stage3', {}).get('linchpin_scores', [])
         stage1_data = self.demo_data.get('stage1', {})
         
         return html.Div([
             html.Div([
-                html.H2("📊 Demo Analysis Results", className="card-title"),
-                html.P("Comprehensive TCGA-LIHC analysis demonstrating platform capabilities")
+                html.H2("📊 综合分析结果", className="card-title"),
+                html.P("肝癌多维度分析平台的完整分析结果展示")
             ], className="card"),
             
-            # Top linchpins
+            # Analysis navigation tabs within results
+            html.Div([
+                html.Div([
+                    html.Button([html.Span("🎯"), " ", i18n.get_text('key_targets', '关键靶点')], 
+                               id="results-tab-linchpins", className="btn-secondary"),
+                    html.Button([html.Span("🕸️"), " ", i18n.get_text('network_analysis')], 
+                               id="results-tab-networks", className="btn-secondary"),
+                    html.Button([html.Span("🌳"), " ", i18n.get_text('multidim_analysis')], 
+                               id="results-tab-multidim", className="btn-secondary"),
+                    html.Button([html.Span("📈"), " ", i18n.get_text('comprehensive_charts', '综合图表')], 
+                               id="results-tab-charts", className="btn-secondary"),
+                ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'})
+            ]),
+            
+            # Content area that changes based on sub-tab selection
+            html.Div(id="results-sub-content", children=[
+                # Default content - overview of all results
+                self.create_results_overview(linchpin_data, stage1_data)
+            ])
+        ], className="fade-in")
+    
+    def create_results_overview(self, linchpin_data, stage1_data):
+        """Create overview of all analysis results"""
+        return html.Div([
+            # Top linchpins showcase
             self.create_linchpin_showcase(linchpin_data),
             
             # Multi-dimensional overview
@@ -608,14 +630,324 @@ class UnifiedLIHCDashboard:
             # Network analysis preview
             self.create_network_preview(),
             
-            # Survival analysis preview
-            self.create_survival_preview(),
-            
             # Add comprehensive chart-based comparative analysis
             self.create_score_comparison_charts(linchpin_data),
             self.create_multidim_charts(stage1_data),
             self.create_network_charts()
+        ])
+    
+    def create_data_management_content(self):
+        """Create unified data management page combining upload and templates"""
+        return html.Div([
+            html.Div([
+                html.H2(["📤 ", i18n.get_text('data_center', '数据管理中心')], className="card-title"),
+                html.P(i18n.get_text('data_management_desc', '数据上传、模板下载和数据质量管理的统一界面'))
+            ], className="card"),
+            
+            # Data management tabs
+            html.Div([
+                html.Div([
+                    html.Button([html.Span("📤"), " ", i18n.get_text('data_upload', '数据上传')], 
+                               id="data-tab-upload", className="btn-secondary"),
+                    html.Button([html.Span("📝"), " ", i18n.get_text('data_templates', '数据模板')], 
+                               id="data-tab-templates", className="btn-secondary"),
+                    html.Button([html.Span("🔍"), " ", i18n.get_text('data_validation', '数据验证')], 
+                               id="data-tab-validation", className="btn-secondary"),
+                ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'})
+            ]),
+            
+            # Content area for data management
+            html.Div(id="data-sub-content", children=[
+                # Default content - upload interface
+                self.create_upload_interface()
+            ])
         ], className="fade-in")
+    
+    def create_upload_interface(self):
+        """Create data upload interface"""
+        return html.Div([
+            # Upload instructions
+            html.Div([
+                html.H4(["📋 ", "数据要求"]),
+                html.Ul([
+                    html.Li(["📊 ", "临床数据", ": ", "患者生存时间、状态等临床信息"]),
+                    html.Li(["🧬 ", "表达数据", ": ", "基因表达矩阵 (样本 × 基因)"]),
+                    html.Li(["🔬 ", "突变数据", ": ", "基因突变注释信息"])
+                ])
+            ], className="card"),
+            
+            # Upload zone
+            html.Div([
+                dcc.Upload(
+                    id='upload-data',
+                    children=html.Div([
+                        html.H3("📁", style={"fontSize": "3rem", "margin": "0"}),
+                        html.P("拖拽文件到此处或点击选择文件"),
+                        html.Small("支持格式: CSV, TSV, XLSX, ZIP")
+                    ]),
+                    className="upload-zone",
+                    multiple=True
+                )
+            ], className="card"),
+            
+            # Upload status
+            html.Div(id="upload-status"),
+            
+            # Analysis button
+            html.Div([
+                html.Button([html.Span("🚀"), "开始分析"], 
+                           id="run-analysis-btn", className="btn-primary", disabled=True)
+            ], className="card", style={"textAlign": "center"}),
+            
+            # Progress
+            html.Div(id="analysis-progress")
+        ])
+    
+    def create_multiomics_content(self):
+        """Create multi-omics integration page"""
+        return html.Div([
+            html.Div([
+                html.H2([html.Span("🧬 "), i18n.get_text('multiomics_integration')], className="card-title"),
+                html.P(i18n.get_text('multiomics_desc'))
+            ], className="card"),
+            
+            # Integration methods
+            html.Div([
+                html.H3([html.Span("🔧 "), i18n.get_text('integration_methods')], className="card-title"),
+                html.Div([
+                    # Concatenation
+                    html.Div([
+                        html.H4(i18n.get_text('concatenation')),
+                        html.P(i18n.get_text('concat_desc')),
+                        html.Ul([
+                            html.Li(i18n.get_text('simple_fast', "Simple and fast")),
+                            html.Li(i18n.get_text('preserves_features', "Preserves all features")),
+                            html.Li(i18n.get_text('high_dimensional', "High-dimensional output"))
+                        ])
+                    ], className="metric-card"),
+                    
+                    # SNF
+                    html.Div([
+                        html.H4(i18n.get_text('snf')),
+                        html.P(i18n.get_text('snf_desc')),
+                        html.Ul([
+                            html.Li(i18n.get_text('network_based', "Network-based integration")),
+                            html.Li(i18n.get_text('robust_noise', "Robust to noise")),
+                            html.Li(i18n.get_text('captures_similarity', "Captures sample similarities"))
+                        ])
+                    ], className="metric-card"),
+                    
+                    # MOFA
+                    html.Div([
+                        html.H4(i18n.get_text('mofa')),
+                        html.P(i18n.get_text('mofa_desc')),
+                        html.Ul([
+                            html.Li(i18n.get_text('factor_based', "Factor-based approach")),
+                            html.Li(i18n.get_text('dimension_reduction', "Dimension reduction")),
+                            html.Li(i18n.get_text('interpretable', "Interpretable factors"))
+                        ])
+                    ], className="metric-card")
+                ], className="metric-grid")
+            ], className="card"),
+            
+            # Data types
+            html.Div([
+                html.H3([html.Span("📊 "), i18n.get_text('omics_types')], className="card-title"),
+                html.Div([
+                    html.Div([
+                        html.H5([html.Span("🧬 "), i18n.get_text('expression_data')]),
+                        html.P(i18n.get_text('rna_seq_desc', "RNA-seq gene expression profiles"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5([html.Span("📊 "), i18n.get_text('cnv_data')]),
+                        html.P(i18n.get_text('cnv_desc', "Copy number variation data"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5([html.Span("🔄 "), i18n.get_text('mutation_data')]),
+                        html.P(i18n.get_text('mutation_desc', "Somatic mutation profiles"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5([html.Span("🏷️ "), i18n.get_text('methylation_data')]),
+                        html.P(i18n.get_text('methylation_desc', "DNA methylation levels"))
+                    ], className="metric-card")
+                ], className="metric-grid")
+            ], className="card"),
+            
+            # Feature importance
+            html.Div([
+                html.H3([html.Span("📈 "), i18n.get_text('feature_importance')], className="card-title"),
+                html.P(i18n.get_text('feature_importance_desc', "Integrated features are ranked by their contribution to the model")),
+                html.Div(id="multiomics-feature-plot", className="mt-3")
+            ], className="card")
+        ])
+    
+    def create_closedloop_content(self):
+        """Create ClosedLoop analysis page"""
+        return html.Div([
+            html.Div([
+                html.H2([html.Span("🔄 "), i18n.get_text('closedloop_analysis')], className="card-title"),
+                html.P(i18n.get_text('closedloop_desc'))
+            ], className="card"),
+            
+            # Evidence types
+            html.Div([
+                html.H3([html.Span("📊 "), i18n.get_text('evidence_types')], className="card-title"),
+                html.Div([
+                    # Differential expression
+                    html.Div([
+                        html.H5([html.Span("📈 "), i18n.get_text('differential_expression')]),
+                        html.P(i18n.get_text('diff_expr_desc', "Tumor vs normal tissue expression differences")),
+                        html.Small(i18n.get_text('weight', "Weight") + ": 25%")
+                    ], className="metric-card"),
+                    
+                    # Survival association
+                    html.Div([
+                        html.H5([html.Span("⏱️ "), i18n.get_text('survival_association')]),
+                        html.P(i18n.get_text('survival_assoc_desc', "Gene expression correlation with patient survival")),
+                        html.Small(i18n.get_text('weight', "Weight") + ": 30%")
+                    ], className="metric-card"),
+                    
+                    # CNV driver
+                    html.Div([
+                        html.H5([html.Span("🧬 "), i18n.get_text('cnv_driver')]),
+                        html.P(i18n.get_text('cnv_driver_desc', "Copy number alterations driving expression")),
+                        html.Small(i18n.get_text('weight', "Weight") + ": 15%")
+                    ], className="metric-card"),
+                    
+                    # Methylation regulation
+                    html.Div([
+                        html.H5([html.Span("🏷️ "), i18n.get_text('methylation_regulation')]),
+                        html.P(i18n.get_text('meth_reg_desc', "Epigenetic regulation patterns")),
+                        html.Small(i18n.get_text('weight', "Weight") + ": 15%")
+                    ], className="metric-card"),
+                    
+                    # Mutation frequency
+                    html.Div([
+                        html.H5([html.Span("🔄 "), i18n.get_text('mutation_frequency')]),
+                        html.P(i18n.get_text('mut_freq_desc', "Recurrent mutations in cohort")),
+                        html.Small(i18n.get_text('weight', "Weight") + ": 15%")
+                    ], className="metric-card")
+                ], className="metric-grid")
+            ], className="card"),
+            
+            # Causal scoring
+            html.Div([
+                html.H3([html.Span("🎯 "), i18n.get_text('causal_score')], className="card-title"),
+                html.P(i18n.get_text('causal_score_desc', "Weighted integration of all evidence types")),
+                html.Div([
+                    html.Div([
+                        html.H5([html.Span("🟢 "), i18n.get_text('high_confidence')]),
+                        html.P(i18n.get_text('high_conf_desc', "Score ≥ 0.7, strong multi-evidence support"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5([html.Span("🟡 "), i18n.get_text('medium_confidence')]),
+                        html.P(i18n.get_text('med_conf_desc', "Score 0.4-0.7, moderate evidence"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5([html.Span("🔴 "), i18n.get_text('low_confidence')]),
+                        html.P(i18n.get_text('low_conf_desc', "Score < 0.4, limited evidence"))
+                    ], className="metric-card")
+                ], className="metric-grid")
+            ], className="card"),
+            
+            # Validation metrics
+            html.Div([
+                html.H3([html.Span("✅ "), i18n.get_text('validation_metrics')], className="card-title"),
+                html.Div([
+                    html.Div([
+                        html.H5(i18n.get_text('bootstrap_stability')),
+                        html.P(i18n.get_text('bootstrap_desc', "Consistency across resampled datasets"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5(i18n.get_text('cross_validation')),
+                        html.P(i18n.get_text('cv_desc', "Performance on held-out samples"))
+                    ], className="metric-card"),
+                    html.Div([
+                        html.H5(i18n.get_text('pathway_enrichment')),
+                        html.P(i18n.get_text('pathway_desc', "Cancer-related pathway enrichment"))
+                    ], className="metric-card")
+                ], className="metric-grid")
+            ], className="card"),
+            
+            # Causal network visualization
+            html.Div([
+                html.H3([html.Span("🕸️ "), i18n.get_text('causal_network')], className="card-title"),
+                html.P(i18n.get_text('causal_network_desc', "Interactive visualization of causal relationships")),
+                html.Div(id="closedloop-network-plot", className="mt-3")
+            ], className="card")
+        ])
+    
+    def create_help_content(self):
+        """Create help and settings page"""
+        return html.Div([
+            html.Div([
+                html.H2(["⚙️ ", "帮助与设置"], className="card-title"),
+                html.P("平台使用指南、API文档和系统设置")
+            ], className="card"),
+            
+            # Help navigation
+            html.Div([
+                html.Div([
+                    html.Button([html.Span("📖"), " 使用指南"], 
+                               id="help-tab-guide", className="btn-secondary"),
+                    html.Button([html.Span("🔧"), " API文档"], 
+                               id="help-tab-api", className="btn-secondary"),
+                    html.Button([html.Span("⚙️"), " 系统设置"], 
+                               id="help-tab-settings", className="btn-secondary"),
+                ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'})
+            ]),
+            
+            # Default help content
+            html.Div(id="help-sub-content", children=[
+                self.create_user_guide()
+            ])
+        ], className="fade-in")
+    
+    def create_user_guide(self):
+        """Create user guide content"""
+        return html.Div([
+            html.Div([
+                html.H3("📖 平台使用指南", className="card-title"),
+                html.Div([
+                    html.H4("🚀 快速开始"),
+                    html.Ol([
+                        html.Li("点击\"平台概览\"了解系统功能"),
+                        html.Li("在\"分析结果\"中查看演示数据分析"),
+                        html.Li("使用\"数据管理\"上传您的数据"),
+                        html.Li("运行\"生存分析\"进行深入研究")
+                    ]),
+                    
+                    html.H4(["📊 ", i18n.get_text('analysis_workflow')]),
+                    html.Div([
+                        html.Div([
+                            html.H5(i18n.get_text('stage1_title', '第一阶段：多维度分析')),
+                            html.P(i18n.get_text('stage1_desc', '识别肿瘤细胞、免疫细胞、基质细胞、细胞外基质和细胞因子相关的预后基因'))
+                        ], className="metric-card"),
+                        
+                        html.Div([
+                            html.H5(i18n.get_text('stage2_title', '第二阶段：网络整合')),
+                            html.P(i18n.get_text('stage2_desc', '构建基因共表达网络，识别网络中心节点和功能模块'))
+                        ], className="metric-card"),
+                        
+                        html.Div([
+                            html.H5(i18n.get_text('stage3_title', '第三阶段：关键靶点发现')),
+                            html.P(i18n.get_text('stage3_desc', '整合多维度信息，计算Linchpin评分，优先排序治疗靶点'))
+                        ], className="metric-card")
+                    ], className="metric-grid"),
+                    
+                    html.H4(["🎯 ", i18n.get_text('scoring_system', '评分系统')]),
+                    html.P(i18n.get_text('scoring_formula', 'Linchpin评分 = 0.4×预后评分 + 0.3×网络中心性 + 0.2×跨维度连接性 + 0.1×调控潜力')),
+                    
+                    html.H4("💡 使用建议"),
+                    html.Ul([
+                        html.Li("首次使用建议先查看演示结果了解输出格式"),
+                        html.Li("上传数据前请下载并参考数据模板"),
+                        html.Li("关注Linchpin评分≥0.6的基因作为潜在治疗靶点"),
+                        html.Li("结合生存分析验证候选靶点的临床意义")
+                    ])
+                ])
+            ], className="card")
+        ])
     
     def create_linchpin_showcase(self, linchpin_data):
         """Create linchpin results showcase"""
@@ -636,50 +968,50 @@ class UnifiedLIHCDashboard:
         return html.Div([
             # Add scoring explanation first
             html.Div([
-                html.H4("📊 评分指标说明", className="mb-3"),
+                html.H4(["📊 ", i18n.get_text('scoring_indicators_explanation')], className="mb-3"),
                 
                 # Linchpin Score explanation
                 html.Div([
-                    html.H6("🎯 Linchpin Score (关键节点评分)", className="text-primary"),
+                    html.H6(["🎯 Linchpin Score (", i18n.get_text('linchpin_node_score'), ")"], className="text-primary"),
                     html.P([
-                        "综合评分，整合多个维度的重要性指标。",
+                        i18n.get_text('comprehensive_score_desc'),
                         html.Br(),
-                        html.Strong("计算公式: "),
-                        "Linchpin Score = 0.4×预后评分 + 0.3×网络中心性评分 + 0.2×跨维度连接性 + 0.1×调控重要性"
+                        html.Strong(i18n.get_text('calculation_formula') + ": "),
+                        i18n.get_text('scoring_formula')
                     ], className="small mb-2"),
                     html.P([
-                        html.Strong("数据来源: "),
-                        "多维度生物学分析整合结果"
+                        html.Strong(i18n.get_text('data_source') + ": "),
+                        i18n.get_text('multidim_integration_results', '多维度生物学分析整合结果')
                     ], className="small text-muted mb-3")
                 ]),
                 
                 # Prognostic Score explanation  
                 html.Div([
-                    html.H6("📈 Prognostic Score (预后评分)", className="text-success"),
+                    html.H6(["📈 Prognostic Score (", i18n.get_text('prognostic_score'), ")"], className="text-success"),
                     html.P([
-                        "基于Cox回归分析的生存预测能力评分。",
+                        i18n.get_text('prognostic_analysis_desc'),
                         html.Br(),
-                        html.Strong("计算方法: "),
+                        html.Strong(i18n.get_text('calculation_method') + ": "),
                         "Cox(survival_time, gene_expression) → hazard_ratio → normalized_score"
                     ], className="small mb-2"),
                     html.P([
-                        html.Strong("数据来源: "),
-                        "临床生存数据 + 基因表达数据的统计关联分析"
+                        html.Strong(i18n.get_text('data_source') + ": "),
+                        i18n.get_text('clinical_expression_analysis', '临床生存数据 + 基因表达数据的统计关联分析')
                     ], className="small text-muted mb-3")
                 ]),
                 
                 # Network Hub Score explanation
                 html.Div([
-                    html.H6("🕸️ Network Hub Score (网络中心性评分)", className="text-info"),
+                    html.H6(["🕸️ Network Hub Score (", i18n.get_text('network_hub_score'), ")"], className="text-info"),
                     html.P([
-                        "在分子相互作用网络中的重要程度评分。",
+                        i18n.get_text('network_importance_desc'),
                         html.Br(),
-                        html.Strong("计算方法: "),
-                        "degree_centrality + betweenness_centrality + closeness_centrality 综合标准化"
+                        html.Strong(i18n.get_text('calculation_method') + ": "),
+                        i18n.get_text('centrality_calculation', 'degree_centrality + betweenness_centrality + closeness_centrality 综合标准化')
                     ], className="small mb-2"),
                     html.P([
-                        html.Strong("数据来源: "),
-                        "基因表达相关性网络 + 蛋白质相互作用网络(STRING数据库)"
+                        html.Strong(i18n.get_text('data_source') + ": "),
+                        i18n.get_text('network_data_sources', '基因表达相关性网络 + 蛋白质相互作用网络(STRING数据库)')
                     ], className="small text-muted mb-3")
                 ]),
                 
@@ -1519,13 +1851,12 @@ class UnifiedLIHCDashboard:
              Output("header-subtitle", "children"),
              Output("lang-button-text", "children"),
              Output("nav-overview-text", "children"),
-             Output("nav-demo-text", "children"),
-             Output("nav-upload-text", "children"),
-             Output("nav-linchpins-text", "children"),
-             Output("nav-networks-text", "children"),
-             Output("nav-multidim-text", "children"),
+             Output("nav-results-text", "children"),
+             Output("nav-data-text", "children"),
              Output("nav-survival-text", "children"),
-             Output("nav-templates-text", "children")],
+             Output("nav-multiomics-text", "children"),
+             Output("nav-closedloop-text", "children"),
+             Output("nav-help-text", "children")],
             [Input("language-switcher", "n_clicks")],
             [State("language-store", "data")],
             prevent_initial_call=False
@@ -1546,37 +1877,49 @@ class UnifiedLIHCDashboard:
                 lang_button_text = "EN"
                 header_title = "🧬 LIHC多维度预后分析系统"
                 header_subtitle = "基于多维度网络分析的肝癌预后分析平台"
+                nav_overview = "平台概览"
+                nav_results = "分析结果"
+                nav_data = "数据管理"
+                nav_survival = "生存分析"
+                nav_multiomics = "多组学整合"
+                nav_closedloop = "ClosedLoop分析"
+                nav_help = "帮助设置"
             else:
                 lang_button_text = "中文"
                 header_title = "🧬 LIHC Multi-dimensional Analysis Platform"
                 header_subtitle = "Advanced therapeutic target discovery through integrated omics analysis"
+                nav_overview = "Overview"
+                nav_results = "Results"
+                nav_data = "Data"
+                nav_survival = "Survival"
+                nav_multiomics = "Multi-omics"
+                nav_closedloop = "ClosedLoop"
+                nav_help = "Help"
             
             return (
                 current_lang,
                 header_title,
                 header_subtitle,
                 lang_button_text,
-                i18n.get_text('nav_overview'),
-                i18n.get_text('nav_demo'),
-                i18n.get_text('nav_upload'),
-                i18n.get_text('nav_linchpins'),
-                i18n.get_text('nav_networks'),
-                i18n.get_text('nav_multidim'),
-                i18n.get_text('nav_survival'),
-                i18n.get_text('nav_templates')
+                nav_overview,
+                nav_results,
+                nav_data,
+                nav_survival,
+                nav_multiomics,
+                nav_closedloop,
+                nav_help
             )
         
         @self.app.callback(
             Output("main-content", "children"),
             [Input("nav-overview", "n_clicks"),
-             Input("nav-demo", "n_clicks"),
-             Input("nav-upload", "n_clicks"),
-             Input("nav-linchpins", "n_clicks"),
-             Input("nav-networks", "n_clicks"),
-             Input("nav-multidim", "n_clicks"),
+             Input("nav-results", "n_clicks"),
+             Input("nav-data", "n_clicks"),
              Input("nav-survival", "n_clicks"),
-             Input("nav-templates", "n_clicks"),
-             Input("language-store", "data")],  # Add language as trigger
+             Input("nav-multiomics", "n_clicks"),
+             Input("nav-closedloop", "n_clicks"),
+             Input("nav-help", "n_clicks"),
+             Input("language-store", "data")],
             prevent_initial_call=False
         )
         def update_content(*args):
@@ -1590,22 +1933,18 @@ class UnifiedLIHCDashboard:
             # Check if language changed
             trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
             if trigger_id == 'language-store':
-                # Language changed, refresh current page content
-                # We need to determine which page we're currently on
-                # For now, default to overview
                 return self.create_overview_content()
             
             button_id = trigger_id
             
             content_map = {
                 "nav-overview": self.create_overview_content,
-                "nav-demo": self.create_demo_content,
-                "nav-upload": self.create_upload_content,
-                "nav-linchpins": self.create_demo_content,  # Same as demo for now
-                "nav-networks": self.create_demo_content,   # Same as demo for now
-                "nav-multidim": self.create_demo_content,   # Same as demo for now
+                "nav-results": self.create_results_content,
+                "nav-data": self.create_data_management_content,
                 "nav-survival": self.create_survival_content,
-                "nav-templates": self.create_templates_content
+                "nav-multiomics": self.create_multiomics_content,
+                "nav-closedloop": self.create_closedloop_content,
+                "nav-help": self.create_help_content
             }
             
             return content_map.get(button_id, self.create_overview_content)()
@@ -1624,11 +1963,116 @@ class UnifiedLIHCDashboard:
             button_id = ctx.triggered[0]['prop_id'].split('.')[0]
             
             if button_id == "demo-btn":
-                return self.create_demo_content()
+                return self.create_results_content()
             elif button_id == "upload-btn":
-                return self.create_upload_content()
+                return self.create_data_management_content()
             elif button_id == "survival-preview-btn":
                 return self.create_survival_content()
+            
+            return no_update
+        
+        # Sub-tab callbacks within Results page
+        @self.app.callback(
+            Output("results-sub-content", "children"),
+            [Input("results-tab-linchpins", "n_clicks"),
+             Input("results-tab-networks", "n_clicks"),
+             Input("results-tab-multidim", "n_clicks"),
+             Input("results-tab-charts", "n_clicks")],
+            prevent_initial_call=True
+        )
+        def update_results_subcontent(linchpins_clicks, networks_clicks, multidim_clicks, charts_clicks):
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                return no_update
+            
+            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            linchpin_data = self.demo_data.get('stage3', {}).get('linchpin_scores', [])
+            stage1_data = self.demo_data.get('stage1', {})
+            
+            if button_id == "results-tab-linchpins":
+                return self.create_linchpin_showcase(linchpin_data)
+            elif button_id == "results-tab-networks":
+                return self.create_network_preview()
+            elif button_id == "results-tab-multidim":
+                return self.create_multidim_overview(stage1_data)
+            elif button_id == "results-tab-charts":
+                return html.Div([
+                    self.create_score_comparison_charts(linchpin_data),
+                    self.create_multidim_charts(stage1_data),
+                    self.create_network_charts()
+                ])
+            
+            return no_update
+        
+        # Sub-tab callbacks within Data Management page
+        @self.app.callback(
+            Output("data-sub-content", "children"),
+            [Input("data-tab-upload", "n_clicks"),
+             Input("data-tab-templates", "n_clicks"),
+             Input("data-tab-validation", "n_clicks")],
+            prevent_initial_call=True
+        )
+        def update_data_subcontent(upload_clicks, templates_clicks, validation_clicks):
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                return no_update
+            
+            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            
+            if button_id == "data-tab-upload":
+                return self.create_upload_interface()
+            elif button_id == "data-tab-templates":
+                return self.create_templates_content()
+            elif button_id == "data-tab-validation":
+                return html.Div([
+                    html.Div([
+                        html.H4("🔍 数据验证", className="card-title"),
+                        html.P("数据质量检查和格式验证功能"),
+                        html.Div([
+                            html.P("⚠️ 此功能正在开发中", className="text-warning")
+                        ], className="alert alert-warning")
+                    ], className="card")
+                ])
+            
+            return no_update
+        
+        # Sub-tab callbacks within Help page
+        @self.app.callback(
+            Output("help-sub-content", "children"),
+            [Input("help-tab-guide", "n_clicks"),
+             Input("help-tab-api", "n_clicks"),
+             Input("help-tab-settings", "n_clicks")],
+            prevent_initial_call=True
+        )
+        def update_help_subcontent(guide_clicks, api_clicks, settings_clicks):
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                return no_update
+            
+            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            
+            if button_id == "help-tab-guide":
+                return self.create_user_guide()
+            elif button_id == "help-tab-api":
+                return html.Div([
+                    html.Div([
+                        html.H4("🔧 API文档", className="card-title"),
+                        html.P("RESTful API接口说明和使用示例"),
+                        html.Div([
+                            html.P("📋 API文档功能正在开发中", className="text-info")
+                        ], className="alert alert-light")
+                    ], className="card")
+                ])
+            elif button_id == "help-tab-settings":
+                return html.Div([
+                    html.Div([
+                        html.H4("⚙️ 系统设置", className="card-title"),
+                        html.P("平台参数配置和个性化设置"),
+                        html.Div([
+                            html.P("🔧 设置功能正在开发中", className="text-info")
+                        ], className="alert alert-light")
+                    ], className="card")
+                ])
             
             return no_update
         
