@@ -1,0 +1,70 @@
+{
+  "datasets": {
+    "demo": {
+      "id": "demo",
+      "name": "LIHC Demo Dataset",
+      "type": "demo",
+      "status": "active",
+      "created_at": "2025-07-25T23:53:10.003093",
+      "modified_at": "2025-07-25T23:53:10.003099",
+      "size_mb": 0.0,
+      "samples": 374,
+      "genes": 20531,
+      "features": {
+        "has_clinical": true,
+        "has_expression": true,
+        "has_mutation": true,
+        "has_methylation": false,
+        "has_cnv": false
+      },
+      "metadata": {
+        "source": "TCGA",
+        "tumor_type": "LIHC",
+        "platform": "RNA-Seq",
+        "preprocessing": "log2(FPKM+1)"
+      },
+      "analysis_history": [],
+      "tags": [
+        "demo",
+        "lihc",
+        "tcga"
+      ],
+      "description": "Liver Hepatocellular Carcinoma demonstration dataset with clinical, expression, and mutation data",
+      "location": "data/demo"
+    },
+    "demo_small": {
+      "id": "demo_small",
+      "name": "LIHC Small Demo",
+      "type": "demo",
+      "status": "active",
+      "created_at": "2025-07-25T23:53:10.003517",
+      "modified_at": "2025-07-25T23:53:10.003520",
+      "size_mb": 0.0,
+      "samples": 50,
+      "genes": 1000,
+      "features": {
+        "has_clinical": true,
+        "has_expression": true,
+        "has_mutation": false,
+        "has_methylation": false,
+        "has_cnv": false
+      },
+      "metadata": {
+        "source": "TCGA",
+        "tumor_type": "LIHC",
+        "platform": "RNA-Seq",
+        "preprocessing": "log2(FPKM+1)"
+      },
+      "analysis_history": [],
+      "tags": [
+        "demo",
+        "small",
+        "test"
+      ],
+      "description": "Small subset for quick testing",
+      "location": "data/demo/small"
+    }
+  },
+  "current_dataset_id": "demo",
+  "last_updated": "2025-07-25T23:53:10.003616"
+}

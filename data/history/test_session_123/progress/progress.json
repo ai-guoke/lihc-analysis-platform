@@ -1,0 +1,46 @@
+{
+  "session_id": "test_session_123",
+  "status": "running",
+  "overall_progress": 33.333333333333336,
+  "start_time": "2025-07-25T23:36:15.057427",
+  "end_time": null,
+  "current_module": "differential_expression",
+  "modules": {
+    "differential_expression": {
+      "status": "completed",
+      "progress": 100,
+      "start_time": "2025-07-25T23:36:15.057677",
+      "end_time": "2025-07-25T23:36:15.058775",
+      "message": "differential_expression completed successfully"
+    },
+    "survival": {
+      "status": "pending",
+      "progress": 0,
+      "start_time": null,
+      "end_time": null,
+      "message": "Waiting to start"
+    },
+    "network": {
+      "status": "pending",
+      "progress": 0,
+      "start_time": null,
+      "end_time": null,
+      "message": "Waiting to start"
+    }
+  },
+  "logs": [
+    {
+      "timestamp": "2025-07-25T23:36:15.057534",
+      "message": "Analysis started with modules: differential_expression, survival, network"
+    },
+    {
+      "timestamp": "2025-07-25T23:36:15.057774",
+      "message": "Started module: differential_expression"
+    },
+    {
+      "timestamp": "2025-07-25T23:36:15.058862",
+      "message": "Completed module: differential_expression"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,69 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>LIHC Analysis Report - test-ana</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                h1 { color: #2c3e50; }
+                h2 { color: #34495e; margin-top: 30px; }
+                .result-section { 
+                    background: #f8f9fa; 
+                    padding: 20px; 
+                    margin: 20px 0;
+                    border-radius: 8px;
+                    border-left: 4px solid #3498db;
+                }
+                img { max-width: 100%; height: auto; margin: 10px 0; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #3498db; color: white; }
+                .metric { font-size: 24px; color: #2c3e50; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <h1>LIHC精准医学分析报告</h1>
+            <p>会话ID: test-analysis-viewer</p>
+            <p>生成时间: 2025-07-25 17:21:42</p>
+        
+            <div class="result-section">
+                <h2>Stage 1: 多维度生物学分析</h2>
+            
+                <h3>生存统计</h3>
+                <p>总患者数: <span class="metric">50</span></p>
+                <p>事件数: <span class="metric">23</span></p>
+                <p>中位随访时间: <span class="metric">410</span> 天</p>
+                
+                    <h3>Heatmap</h3>
+                    <img src="stage1_gene_heatmap.png" alt="heatmap">
+                    </div>
+            <div class="result-section">
+                <h2>Stage 2: 跨维度网络分析</h2>
+            
+                <h3>网络统计</h3>
+                <p>节点数: <span class="metric">30</span></p>
+                <p>边数: <span class="metric">15</span></p>
+                <p>平均相关性: <span class="metric">0.143</span></p>
+                
+                    <h3>Correlation Plot</h3>
+                    <img src="stage2_correlation_network.png" alt="correlation_plot">
+                    </div>
+            <div class="result-section">
+                <h2>Stage 3: Linchpin基因识别</h2>
+            
+                <h3>Top 5 Linchpin靶点</h3>
+                <table>
+                    <tr><th>基因</th><th>风险比</th><th>风险类型</th></tr>
+                </table>
+                    <h3>Target Plot</h3>
+                    <img src="stage3_linchpin_targets.png" alt="target_plot">
+                    </div>
+            <div class="result-section">
+                <h2>精准医学分析</h2>
+            
+                    <h3>Drug Plot</h3>
+                    <img src="precision_drug_sensitivity.png" alt="drug_plot">
+                    </div>
+        </body>
+        </html>
+        

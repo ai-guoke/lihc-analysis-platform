@@ -1,0 +1,215 @@
+{
+  "uploads": [
+    {
+      "session_id": "6f1ff1b6-0274-4177-83ad-ed5c8fa72f48",
+      "timestamp": "2025-07-25 16:35:37",
+      "files": {
+        "clinical_data.csv": {
+          "data_type": "clinical",
+          "validation": {
+            "valid": true
+          }
+        },
+        "expression_data.csv": {
+          "data_type": "expression",
+          "validation": {
+            "valid": true
+          }
+        },
+        "mutation_data.csv": {
+          "data_type": "mutation",
+          "validation": {
+            "valid": true
+          }
+        }
+      },
+      "validation_status": "success",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "session_id": "73ce3238-3e0e-4bde-a1a7-52850285f18d",
+      "timestamp": "2025-07-25 16:35:37",
+      "files": {
+        "clinical_data.csv": {
+          "data_type": "clinical",
+          "validation": {
+            "valid": true
+          }
+        },
+        "expression_data.csv": {
+          "data_type": "expression",
+          "validation": {
+            "valid": true
+          }
+        },
+        "mutation_data.csv": {
+          "data_type": "mutation",
+          "validation": {
+            "valid": false
+          }
+        }
+      },
+      "validation_status": "failed",
+      "errors": [
+        "Missing required columns in mutation data"
+      ],
+      "warnings": []
+    },
+    {
+      "session_id": "e49fa588-56ff-4783-b8e8-a3498128c835",
+      "timestamp": "2025-07-25 16:35:37",
+      "files": {
+        "clinical_data.csv": {
+          "data_type": "clinical",
+          "validation": {
+            "valid": true
+          }
+        },
+        "expression_data.csv": {
+          "data_type": "expression",
+          "validation": {
+            "valid": true
+          }
+        },
+        "mutation_data.csv": {
+          "data_type": "mutation",
+          "validation": {
+            "valid": true
+          }
+        }
+      },
+      "validation_status": "success",
+      "errors": [],
+      "warnings": [
+        "High percentage of missing values"
+      ]
+    },
+    {
+      "session_id": "test-complete-workflow",
+      "timestamp": "2025-07-25 16:43:09",
+      "files": {
+        "clinical_data.csv": {
+          "data_type": "clinical",
+          "validation": {
+            "valid": true
+          }
+        },
+        "expression_data.csv": {
+          "data_type": "expression",
+          "validation": {
+            "valid": true
+          }
+        },
+        "mutation_data.csv": {
+          "data_type": "mutation",
+          "validation": {
+            "valid": true
+          }
+        }
+      },
+      "validation_status": "success",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "session_id": "test-complete-workflow",
+      "timestamp": "2025-07-25 16:44:07",
+      "files": {
+        "clinical_data.csv": {
+          "data_type": "clinical",
+          "validation": {
+            "valid": true
+          }
+        },
+        "expression_data.csv": {
+          "data_type": "expression",
+          "validation": {
+            "valid": true
+          }
+        },
+        "mutation_data.csv": {
+          "data_type": "mutation",
+          "validation": {
+            "valid": true
+          }
+        }
+      },
+      "validation_status": "success",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "session_id": "test-analysis-viewer",
+      "timestamp": "2025-07-25 17:21:41",
+      "files": {},
+      "validation_status": "failed",
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "analyses": [
+    {
+      "session_id": "6f1ff1b6-0274-4177-83ad-ed5c8fa72f48",
+      "timestamp": "2025-07-25 16:35:37",
+      "modules": [
+        "stage1",
+        "stage2",
+        "stage3"
+      ],
+      "status": "completed",
+      "results_path": "data/history/6f1ff1b6-0274-4177-83ad-ed5c8fa72f48/results",
+      "duration": "15 minutes"
+    },
+    {
+      "session_id": "e49fa588-56ff-4783-b8e8-a3498128c835",
+      "timestamp": "2025-07-25 16:35:37",
+      "modules": [
+        "stage1",
+        "precision"
+      ],
+      "status": "completed",
+      "results_path": "data/history/e49fa588-56ff-4783-b8e8-a3498128c835/results",
+      "duration": "25 minutes"
+    },
+    {
+      "session_id": "test-complete-workflow",
+      "timestamp": "2025-07-25 16:43:13",
+      "modules": [
+        "stage1",
+        "stage2",
+        "stage3",
+        "precision"
+      ],
+      "status": "completed",
+      "results_path": "data/history/test-complete-workflow/results",
+      "duration": "2 minutes (demo)"
+    },
+    {
+      "session_id": "test-complete-workflow",
+      "timestamp": "2025-07-25 16:44:08",
+      "modules": [
+        "stage1",
+        "stage2",
+        "stage3",
+        "precision"
+      ],
+      "status": "completed",
+      "results_path": "data/history/test-complete-workflow/results",
+      "duration": "2 minutes (demo)"
+    },
+    {
+      "session_id": "test-analysis-viewer",
+      "timestamp": "2025-07-25 17:21:42",
+      "modules": [
+        "stage1",
+        "stage2",
+        "stage3",
+        "precision"
+      ],
+      "status": "completed",
+      "results_path": "data/history/test-analysis-viewer/results",
+      "duration": "N/A"
+    }
+  ]
+}

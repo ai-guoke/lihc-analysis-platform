@@ -1,0 +1,33 @@
+{
+  "stage": "precision",
+  "timestamp": "2025-07-25T16:44:07.903214",
+  "analyses": {
+    "immune_scores": {
+      "samples": [
+        "PATIENT_001",
+        "PATIENT_002",
+        "PATIENT_003",
+        "PATIENT_004",
+        "PATIENT_005",
+        "PATIENT_006",
+        "PATIENT_007",
+        "PATIENT_008",
+        "PATIENT_009",
+        "PATIENT_010"
+      ],
+      "scores": [
+        10.623755992384847,
+        13.868993682538843,
+        7.025782469519057,
+        13.506717131623349,
+        27.650673265775477,
+        7.215211405039812,
+        14.61175680394154,
+        15.774396877129464,
+        9.436302322055278,
+        21.670889409999663
+      ]
+    },
+    "drug_plot": "precision_drug_sensitivity.png"
+  }
+}

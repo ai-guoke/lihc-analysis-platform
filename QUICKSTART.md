@@ -1,75 +1,75 @@
-# Quick Start Guide - LIHC Multi-omics Analysis Platform
+# LIHC多维度预后分析系统 - 快速开始指南
 
-## 🚀 Getting Started in 5 Minutes
+## 🚀 5分钟快速上手
 
-### 1. Start the Platform
+### 1. 启动系统
 
 ```bash
-# Using Docker (recommended)
-./docker-start.sh
+# 使用Docker启动（推荐）
+docker-compose -f docker-compose.professional.yml up -d
 
-# Or using Python directly
-python main.py
+# 或使用Python直接运行
+python main.py --professional
 ```
 
-### 2. Access the Web Interface
+### 2. 访问Web界面
 
-Open your browser and navigate to:
-- Local: http://localhost:8050
-- With SSL: https://localhost:8443
+在浏览器中打开：
+- 本地访问: http://localhost:8050
+- HTTPS访问: https://localhost:8443
 
-### 3. Run Your First Analysis
+### 3. 运行第一个分析
 
-#### Option A: Using the Web Interface
-1. Click "Upload Data" in the navigation
-2. Upload your expression data (CSV format)
-3. Select "Run Analysis" 
-4. View results in the dashboard
+#### 方式A: 使用Web界面
+1. 点击导航栏中的"数据管理"
+2. 上传您的表达数据（CSV格式）
+3. 选择"运行分析"
+4. 在仪表板中查看结果
 
-#### Option B: Using Python API
+#### 方式B: 使用Python API
 
 ```python
 from src.analysis.integrated_analysis import IntegratedAnalysisPipeline
 
-# Initialize pipeline
+# 初始化分析流程
 pipeline = IntegratedAnalysisPipeline()
 
-# Run analysis
+# 运行分析
 results = pipeline.run_integrated_analysis(
     expression_file="data/expression.csv",
     clinical_file="data/clinical.csv"
 )
 
-# View top targets
+# 查看Top靶点
 print(results['top_targets'][:10])
 ```
 
-## 🧬 New Features: Multi-omics Integration
+## 🧬 新功能特性：多组学数据整合
 
-### Simple Multi-omics Analysis
+### 简单多组学分析
 
 ```python
 from src.data_processing.multi_omics_integrator import MultiOmicsIntegrator
 
-# Load and integrate data
+# 加载和整合数据
 integrator = MultiOmicsIntegrator()
 integrator.load_expression_data("expression.csv")
 integrator.load_cnv_data("cnv.csv")
 integrator.load_mutation_data("mutations.csv")
 
-# Integrate using concatenation
+# 使用拼接方法整合
 integrated = integrator.integrate_omics(method="concatenate")
 
-# Save results
+# 保存结果
 integrator.save_integrated_data("results/")
 ```
 
-### ClosedLoop Causal Analysis
+### ClosedLoop因果分析
 
 ```python
 from src.analysis.closedloop_analyzer import ClosedLoopAnalyzer
 
-# Run causal inference
+# 运行因果推理
 analyzer = ClosedLoopAnalyzer()
 result = analyzer.analyze_causal_relationships(
     rna_data=expression_df,
@@ -77,29 +77,29 @@ result = analyzer.analyze_causal_relationships(
     cnv_data=cnv_df
 )
 
-# Get top causal genes
+# 获取Top因果基因
 top_genes = result.causal_genes[:20]
 ```
 
-## 📊 Demo Analysis
+## 📊 演示分析
 
-Run the complete demo with simulated data:
+使用模拟数据运行完整演示：
 
 ```bash
 cd examples
 python demo_integrated_analysis.py
 ```
 
-This will:
-1. Generate demo multi-omics data
-2. Run integrated analysis
-3. Identify causal driver genes
-4. Generate visualizations
-5. Create HTML report
+这将执行以下步骤：
+1. 生成演示多组学数据
+2. 运行集成分析
+3. 识别因果驱动基因
+4. 生成可视化图表
+5. 创建HTML报告
 
-## 📁 Data Format Examples
+## 📁 数据格式示例
 
-### Expression Data (CSV)
+### 表达数据 (CSV)
 ```
 Gene,Sample_001,Sample_002,Sample_003
 TP53,12.5,8.3,15.2
@@ -107,7 +107,7 @@ KRAS,5.6,7.8,4.3
 EGFR,20.1,18.5,22.3
 ```
 
-### Clinical Data (CSV)
+### 临床数据 (CSV)
 ```
 Sample,survival_time,survival_status,age,stage
 Sample_001,850,1,65,III
@@ -115,7 +115,7 @@ Sample_002,1200,0,58,II
 Sample_003,450,1,72,IV
 ```
 
-### Mutation Data (CSV)
+### 突变数据 (CSV)
 ```
 gene_id,sample_id,mutation_type
 TP53,Sample_001,missense
@@ -123,87 +123,87 @@ KRAS,Sample_002,nonsense
 TP53,Sample_003,frameshift
 ```
 
-## 🔧 Common Tasks
+## 🔧 常用操作
 
-### 1. Filter High-Confidence Targets
+### 1. 筛选高置信度靶点
 ```python
-# Get genes with integrated score > 0.8
+# 获取综合评分 > 0.8 的基因
 high_conf = results['integrated_scores']
 high_conf = high_conf[high_conf['integrated_score'] > 0.8]
 ```
 
-### 2. Export Results
+### 2. 导出结果
 ```python
-# Export to Excel
+# 导出到Excel
 results['integrated_scores'].to_excel("top_targets.xlsx")
 
-# Export to CSV
+# 导出到CSV
 results['top_targets'].to_csv("causal_genes.csv")
 ```
 
-### 3. Visualize Networks
+### 3. 可视化网络
 ```python
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# Plot evidence network
+# 绘制证据网络
 G = results['evidence_network']
 nx.draw(G, with_labels=True)
 plt.show()
 ```
 
-## 🐛 Troubleshooting
+## 🐛 故障排除
 
-### Issue: "No module named 'src'"
-**Solution**: Run from project root directory or add to Python path:
+### 问题："No module named 'src'"
+**解决方案**：从项目根目录运行或添加到Python路径：
 ```python
 import sys
 sys.path.append('/path/to/mrna2')
 ```
 
-### Issue: "No common samples found"
-**Solution**: Ensure sample IDs match exactly across all files (case-sensitive)
+### 问题："No common samples found"
+**解决方案**：确保所有文件中的样本ID完全匹配（区分大小写）
 
-### Issue: Docker container won't start
-**Solution**: 
+### 问题：Docker容器无法启动
+**解决方案**：
 ```bash
-# Check logs
+# 查看日志
 docker-compose logs
 
-# Restart containers
+# 重启容器
 ./docker-stop.sh
 ./docker-start.sh
 ```
 
-## 📚 Next Steps
+## 📚 下一步
 
-1. Read the full documentation:
-   - [Multi-omics Integration Guide](docs/multi_omics_integration_guide.md)
-   - [ClosedLoop Analysis Guide](docs/closedloop_analysis_guide.md)
+1. 阅读完整文档：
+   - [多组学整合指南](docs/multi_omics_integration_guide.md)
+   - [ClosedLoop分析指南](docs/closedloop_analysis_guide.md)
 
-2. Explore example notebooks:
+2. 探索示例教程：
    - `examples/multi_omics_tutorial.ipynb`
    - `examples/causal_analysis_demo.ipynb`
 
-3. Join the community:
-   - Report issues on GitHub
-   - Share your results
-   - Contribute improvements
+3. 加入社区：
+   - 在GitHub上报告问题
+   - 分享您的分析结果
+   - 贡献代码改进
 
-## 💡 Tips for Best Results
+## 💡 获得最佳结果的建议
 
-1. **Data Quality**: Ensure proper normalization of expression data
-2. **Sample Size**: Minimum 50 samples recommended for reliable results
-3. **Integration Method**: Start with "concatenate", try "SNF" for complex relationships
-4. **Validation**: Always check bootstrap stability scores
+1. **数据质量**：确保表达数据经过适当的标准化
+2. **样本数量**：建议最少50个样本以获得可靠结果
+3. **整合方法**：从"concatenate"开始，复杂关系可尝试"SNF"
+4. **结果验证**：始终检查bootstrap稳定性评分
 
-## 🆘 Getting Help
+## 🆘 获取帮助
 
-- **Documentation**: Check `/docs` folder
-- **Examples**: See `/examples` folder
-- **Issues**: GitHub Issues page
-- **Email**: support@lihc-platform.org
+- **文档资料**：查看 `/docs` 目录
+- **示例代码**：参考 `/examples` 目录
+- **问题报告**：GitHub Issues页面
+- **邮件支持**：support@lihc-platform.org
 
 ---
 
-Happy analyzing! 🧬🔬📊
+祝您分析愉快！🧬🔬📊

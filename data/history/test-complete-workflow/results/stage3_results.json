@@ -1,0 +1,8 @@
+{
+  "stage": "stage3",
+  "timestamp": "2025-07-25T16:44:07.790131",
+  "analyses": {
+    "linchpin_targets": [],
+    "target_plot": "stage3_linchpin_targets.png"
+  }
+}

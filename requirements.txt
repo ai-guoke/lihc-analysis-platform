@@ -48,6 +48,8 @@ python-multipart>=0.0.6,<0.0.8
 # Background task processing
 celery>=5.2.0,<5.4.0
 redis>=4.3.0,<5.1.0
+kombu>=5.2.0,<5.4.0
+flower>=2.0.0,<2.1.0
 
 # Additional utilities
 PyYAML>=6.0,<6.1.0

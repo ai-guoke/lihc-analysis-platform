@@ -1,0 +1,12 @@
+{
+  "stage": "stage2",
+  "timestamp": "2025-07-25T16:44:07.460629",
+  "analyses": {
+    "network_stats": {
+      "nodes": 30,
+      "edges": 18,
+      "avg_correlation": 0.13174482921299938
+    },
+    "correlation_plot": "stage2_correlation_network.png"
+  }
+}

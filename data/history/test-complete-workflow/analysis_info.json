@@ -1,0 +1,13 @@
+{
+  "session_id": "test-complete-workflow",
+  "timestamp": "2025-07-25 16:44:08",
+  "modules": [
+    "stage1",
+    "stage2",
+    "stage3",
+    "precision"
+  ],
+  "status": "completed",
+  "results_path": "data/history/test-complete-workflow/results",
+  "duration": "2 minutes (demo)"
+}

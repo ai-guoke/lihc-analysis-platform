@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  lihc-platform-professional:
+    build:
+      context: .
+      dockerfile: Dockerfile.minimal
+    container_name: lihc-platform-professional
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+      - ./examples:/app/examples
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - DASHBOARD_MODE=professional
+    command: python main.py --dashboard --professional --port 8050
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

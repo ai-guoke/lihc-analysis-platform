@@ -1,0 +1,12 @@
+{
+  "session_id": "6f1ff1b6-0274-4177-83ad-ed5c8fa72f48",
+  "timestamp": "2025-07-25 16:35:37",
+  "modules": [
+    "stage1",
+    "stage2",
+    "stage3"
+  ],
+  "status": "completed",
+  "results_path": "data/history/6f1ff1b6-0274-4177-83ad-ed5c8fa72f48/results",
+  "duration": "15 minutes"
+}

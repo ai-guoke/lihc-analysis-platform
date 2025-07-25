@@ -13,17 +13,14 @@
 ## 📋 目录
 
 - [项目概述](#-项目概述)
-- [快速开始](#-快速开始)
-- [Docker部署](#-docker部署)
-- [核心功能](#-核心功能)
+- [系统功能](#-系统功能)
+- [设计理念](#-设计理念)
+- [科学原理](#-科学原理)
 - [技术架构](#-技术架构)
-- [使用指南](#-使用指南)
-- [API文档](#-api文档)
-- [开发指南](#-开发指南)
+- [快速开始](#-快速开始)
 - [项目结构](#-项目结构)
-- [常见问题](#-常见问题)
-- [贡献指南](#-贡献指南)
-- [升级规划](#-升级规划)
+- [许可证](#-许可证)
+- [致谢](#-致谢)
 
 ---
 
@@ -56,130 +53,7 @@
 
 ---
 
-## ⚡ 快速开始
-
-### 方式1：Docker一键启动（推荐）
-
-```bash
-# 1. 克隆项目
-git clone https://github.com/ai-guoke/lihc-analysis-platform.git
-cd lihc-analysis-platform
-
-# 2. 使用Docker启动脚本（自动构建并运行）
-./docker-start.sh
-
-# 3. 访问Web界面
-# 浏览器打开: http://localhost:8050
-```
-
-### 方式2：Python本地运行
-
-```bash
-# 1. 克隆项目
-git clone https://github.com/ai-guoke/lihc-analysis-platform.git
-cd lihc-analysis-platform
-
-# 2. 安装依赖
-pip install -r requirements-minimal.txt  # 最小依赖
-# 或
-pip install -r requirements.txt  # 完整依赖
-
-# 3. 启动应用
-python main.py
-
-# 4. 访问Web界面
-# 浏览器打开: http://localhost:8050
-```
-
-### 新功能快速体验
-
-```python
-# 多组学整合分析
-from src.data_processing.multi_omics_integrator import MultiOmicsIntegrator
-
-integrator = MultiOmicsIntegrator()
-integrator.load_expression_data("data/expression.csv")
-integrator.load_cnv_data("data/cnv.csv")
-integrated = integrator.integrate_omics(method="concatenate")
-
-# ClosedLoop因果分析
-from src.analysis.closedloop_analyzer import ClosedLoopAnalyzer
-
-analyzer = ClosedLoopAnalyzer()
-result = analyzer.analyze_causal_relationships(
-    rna_data=expression_df,
-    clinical_data=clinical_df
-)
-```
-
----
-
-## 🐳 Docker部署
-
-### 方式1: 使用Docker启动脚本（推荐）
-
-```bash
-# 使用交互式启动脚本
-./docker-start.sh
-
-# 停止服务
-./docker-stop.sh
-
-# 查看服务状态
-./docker-status.sh
-```
-
-### 方式2: 手动Docker部署
-
-#### 快速体验模式（推荐测试）
-```bash
-# 构建并启动最小化版本
-docker-compose -f docker-compose.minimal.yml up -d
-
-# 访问应用
-open http://localhost:8050
-```
-
-#### 开发模式（包含热重载）
-```bash
-# 启动开发环境
-docker-compose -f docker-compose.dev.yml up -d
-
-# 还可以访问Jupyter环境
-open http://localhost:8888
-```
-
-#### 生产模式（完整服务栈）
-```bash
-# 生成环境配置
-cp .env.example .env
-# 编辑.env文件配置数据库密码等
-
-# 启动完整服务
-docker-compose up -d
-
-# 访问服务
-open http://localhost:8050  # 主应用
-open http://localhost:3000  # Grafana监控
-open http://localhost:9090  # Prometheus
-```
-
-### Docker服务说明
-
-| 服务 | 端口 | 说明 | 运行模式 |
-|------|------|------|----------|
-| lihc-platform | 8050 | 主应用界面 | 所有模式 |
-| lihc-api | 8051 | REST API接口 | 开发/生产 |
-| postgres | 5432 | 数据库服务 | 生产模式 |
-| redis | 6379 | 缓存服务 | 生产模式 |
-| nginx | 80/443 | 反向代理 | 生产模式 |
-| grafana | 3000 | 监控面板 | 生产模式 |
-| prometheus | 9090 | 指标收集 | 生产模式 |
-| jupyter | 8888 | Jupyter Lab | 开发模式 |
-
----
-
-## 🚀 核心功能
+## 🚀 系统功能
 
 ### 1. 多维度肿瘤微环境分析
 
@@ -259,27 +133,155 @@ Linchpin Score = w1×预后评分 + w2×网络中心性 + w3×跨维度连接性
 - 因果网络可视化
 - 通路富集分析
 
-### 7. 交互式数据可视化
+### 7. 智能分析引擎
 
-**Dashboard功能**：
-- **📱 概览页面**: 项目介绍、快速导航、评分指标说明
-- **📤 数据上传**: 支持CSV/Excel/ZIP格式，实时验证
-- **📊 分析结果**: 交互式图表、可下载报告
-  - Linchpin靶点排序表格
-  - 多维度雷达图
-  - 得分相关性散点图
-  - 网络中心性分布图
-- **📈 生存分析**: Kaplan-Meier生存曲线分析
-  - 基因表达高低分组
-  - Log-rank检验
-  - 风险比计算
-  - 生存统计指标
-- **🕸️ 网络分析**: 分子相互作用网络
-  - 3D/2D网络可视化
-  - 节点度分布
-  - 社区检测
-  - 路径分析
-- **🌐 语言支持**: 中英文双语界面（i18n国际化）
+**核心分析能力**：
+- **🧠 智能推荐**: AI驱动的分析路径推荐
+- **⚡ 实时分析**: 支持动态数据加载和在线分析
+- **📊 批量处理**: 多数据集并行分析能力
+- **🎯 精准医学**: 个性化治疗方案推荐
+- **🔄 因果推理**: ClosedLoop多证据整合
+- **🌐 多组学整合**: RNA-seq、CNV、突变、甲基化数据融合
+
+### 8. 交互式数据可视化
+
+**专业Dashboard界面**：
+- **📱 概览中心**: 系统总览、快速导航、功能介绍
+- **📤 数据管理**: 支持多格式上传、模板下载、数据验证
+- **📊 分析结果**: 交互式图表、实时更新、导出报告
+- **📈 生存分析**: Kaplan-Meier曲线、Cox回归、风险评估
+- **🕸️ 网络分析**: 3D分子网络、社区检测、路径分析
+- **🌐 多语言支持**: 中英文双语界面（i18n国际化）
+
+---
+
+## 💡 设计理念
+
+### 系统设计哲学
+
+**以用户为中心的设计**：
+- **直觉性**: 复杂的生物信息学分析通过简洁界面实现
+- **专业性**: 保持科学严谨性的同时提供友好的用户体验
+- **可扩展性**: 模块化架构支持功能快速迭代和扩展
+- **开放性**: 支持多种数据格式和分析流程的灵活配置
+
+### 核心设计原则
+
+**1. 科学严谨性**
+```
+统计学基础 + 生物学验证 + 临床可解释性 = 可信的分析结果
+```
+
+**2. 系统完整性**
+```
+数据输入 → 质量控制 → 多维分析 → 结果验证 → 报告输出
+```
+
+**3. 用户友好性**
+```
+零编程基础 + 一键式分析 + 可视化结果 + 专业报告
+```
+
+**4. 性能优化**
+```
+并行计算 + 智能缓存 + 增量更新 + 资源管理
+```
+
+### 创新架构特点
+
+- **微服务架构**: 分析引擎、可视化、数据管理独立部署
+- **容器化部署**: Docker支持一键部署和横向扩展
+- **智能队列**: Celery任务队列支持大规模批量分析
+- **实时协作**: WebSocket支持多用户实时数据共享
+- **云原生**: 支持本地部署和云端SaaS两种模式
+
+---
+
+## 🔬 科学原理
+
+### 多维度肿瘤微环境理论
+
+**理论基础**：
+肿瘤不是孤立的细胞群体，而是由肿瘤细胞、免疫细胞、基质细胞、细胞外基质和细胞因子构成的复杂生态系统。传统的单一维度分析无法捕捉这种复杂性。
+
+**五维度分析框架**：
+
+| 维度 | 生物学意义 | 分析方法 | 临床价值 |
+|------|-----------|----------|----------|
+| 🦠 **肿瘤细胞** | 癌症驱动机制 | 差异表达、通路富集 | 靶向治疗选择 |
+| 🛡️ **免疫细胞** | 免疫应答状态 | 免疫评分、浸润分析 | 免疫治疗指导 |
+| 🧱 **基质细胞** | 肿瘤支持环境 | 基质评分、纤维化分析 | 耐药机制预测 |
+| 🕸️ **细胞外基质** | 侵袭转移能力 | ECM重塑、MMP活性 | 转移风险评估 |
+| 📡 **细胞因子** | 微环境调节 | 信号通路、炎症反应 | 联合治疗策略 |
+
+### 网络生物学原理
+
+**理论依据**：
+生物系统是由分子间相互作用构成的复杂网络。关键的治疗靶点往往位于网络的关键节点（hub nodes）或连接不同功能模块的桥接节点（bridge nodes）。
+
+**Linchpin算法数学模型**：
+
+```mathematics
+Linchpin Score = Σ(wi × Si)
+
+其中：
+S1 = Prognostic Score = -log(p_value) × sign(β)  # Cox回归系数
+S2 = Network Centrality = (Degree + Betweenness + Closeness) / 3
+S3 = Cross-dimensional Connectivity = Σ(connections_across_dimensions)
+S4 = Regulatory Importance = TF_score + miRNA_score
+
+权重分配：w1=0.4, w2=0.3, w3=0.2, w4=0.1
+```
+
+### ClosedLoop因果推理原理
+
+**科学背景**：
+传统的关联分析无法区分因果关系和相关关系。ClosedLoop方法通过整合多层证据，构建因果推理链条。
+
+**五证据整合模型**：
+
+```mathematics
+Causal Score = Σ(Ei × Wi) / Σ(Wi)
+
+证据类型：
+E1 = Differential Expression Evidence  # 差异表达证据
+E2 = Survival Association Evidence     # 生存关联证据 
+E3 = CNV Driving Evidence             # 拷贝数驱动证据
+E4 = Methylation Regulation Evidence  # 甲基化调控证据
+E5 = Mutation Frequency Evidence      # 突变频率证据
+
+动态权重：Wi = confidence_score × evidence_strength
+```
+
+### 多组学数据整合理论
+
+**整合策略**：
+- **早期整合**: 特征层面的数据融合
+- **中期整合**: 相似性网络融合(SNF)
+- **晚期整合**: 结果层面的集成学习
+
+**数学框架**：
+```mathematics
+# 相似性网络融合(SNF)
+P(t+1) = S × (Σ P(t)k / m) × S^T
+
+其中：
+S = 相似性矩阵
+P(t) = 第t次迭代的网络矩阵
+m = 组学数据类型数量
+```
+
+### 统计学基础
+
+**生存分析**：
+- **Kaplan-Meier估计**: 非参数生存概率估计
+- **Cox比例风险模型**: 多变量生存分析
+- **Log-rank检验**: 生存曲线差异显著性检验
+
+**网络分析**：
+- **社区检测**: Louvain算法识别功能模块
+- **中心性度量**: 度中心性、介数中心性、紧密中心性
+- **路径分析**: 最短路径和关键路径识别
 
 ---
 
@@ -339,6 +341,24 @@ Prometheus + Grafana     # 监控服务
 ### 1. 访问应用
 
 **访问地址**: http://localhost:8050
+
+**界面模式**:
+
+#### 经典布局（默认）
+```bash
+python main.py --dashboard
+```
+
+#### 专业布局（新增）✨
+```bash
+python main.py --dashboard --professional
+```
+
+专业布局特点：
+- 顶部导航栏：数据管理、测试Demo、系统设置
+- 侧边导航栏：分析功能、高级分析、分析结果
+- 响应式设计，移动端友好
+- 更清晰的功能组织
 
 **主要页面**:
 
@@ -585,14 +605,6 @@ integrated = integrator.integrate_omics()
 
 ---
 
-## 📞 支持与联系
-
-- 🐛 **问题反馈**: [GitHub Issues](https://github.com/ai-guoke/lihc-platform/issues)
-- 📚 **文档中心**: [项目Wiki](https://github.com/ai-guoke/lihc-platform/wiki)
-- 💬 **社区讨论**: [GitHub Discussions](https://github.com/ai-guoke/lihc-platform/discussions)
-
----
-
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
@@ -628,12 +640,10 @@ integrated = integrator.integrate_omics()
 *版本: v2.1* 🎉  
 *项目状态: 积极维护*  
 
-**v2.1 更新内容**：
-- 🐳 完善的Docker部署方案（支持3种运行模式）
-- 🌐 中英文双语界面支持
-- 📊 增强的可视化功能（专业图表分析）
-- 🧬 多组学数据整合（RNA-seq, CNV, 突变, 甲基化）
-- 🔄 ClosedLoop因果推理分析
-- 📈 交互式生存分析（Kaplan-Meier曲线）
-- 🧪 75%测试覆盖率的测试套件
-- 📚 完整的快速开始指南和API文档
+**平台特色**：
+- 🧠 **创新算法**: 首创五维度肿瘤微环境分析框架
+- 🔬 **科学严谨**: 基于统计学和生物学双重验证的分析流程
+- 🎯 **精准医学**: 提供个性化治疗靶点和用药指导
+- 🚀 **高性能**: 支持大规模数据并行处理和实时分析
+- 🌐 **用户友好**: 零编程基础的Web界面和一键式分析
+- 🔄 **完整生态**: 从数据输入到结果输出的完整解决方案

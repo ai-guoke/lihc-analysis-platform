@@ -1,0 +1,15 @@
+{
+  "job_id": "d462b993-0aaf-4ffb-baa1-c7c376cf8ffe",
+  "dataset_ids": [
+    "demo",
+    "dataset_1",
+    "dataset_2"
+  ],
+  "modules": [
+    "differential_expression",
+    "survival",
+    "network"
+  ],
+  "created_at": "2025-07-25T23:37:02.656768",
+  "status": "pending"
+}

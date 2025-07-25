@@ -1,0 +1,21 @@
+{
+  "current_dataset": "demo",
+  "datasets": {
+    "demo": {
+      "name": "TCGA-LIHC Demo数据",
+      "type": "demo",
+      "description": "200例肝癌患者的示例数据",
+      "created": "2025-01-01",
+      "data_path": "examples/demo_data",
+      "features": {
+        "samples": 200,
+        "genes": 500,
+        "has_clinical": true,
+        "has_expression": true,
+        "has_mutation": true,
+        "has_cnv": true,
+        "has_methylation": true
+      }
+    }
+  }
+}

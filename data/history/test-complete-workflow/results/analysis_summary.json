@@ -1,0 +1,24 @@
+{
+  "session_id": "test-complete-workflow",
+  "timestamp": "2025-07-25T16:44:08.048040",
+  "modules_completed": [
+    "stage1",
+    "stage2",
+    "stage3",
+    "precision"
+  ],
+  "results_count": 4,
+  "report_path": "data/history/test-complete-workflow/results/analysis_report.html",
+  "results_dir": "data/history/test-complete-workflow/results",
+  "files_generated": [
+    "data/history/test-complete-workflow/results/precision_drug_sensitivity.png",
+    "data/history/test-complete-workflow/results/stage2_correlation_network.png",
+    "data/history/test-complete-workflow/results/stage1_results.json",
+    "data/history/test-complete-workflow/results/stage3_linchpin_targets.png",
+    "data/history/test-complete-workflow/results/stage2_results.json",
+    "data/history/test-complete-workflow/results/stage1_gene_heatmap.png",
+    "data/history/test-complete-workflow/results/stage3_results.json",
+    "data/history/test-complete-workflow/results/analysis_report.html",
+    "data/history/test-complete-workflow/results/precision_results.json"
+  ]
+}

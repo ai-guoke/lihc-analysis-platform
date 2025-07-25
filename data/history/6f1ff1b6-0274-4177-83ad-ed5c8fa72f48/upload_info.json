@@ -1,0 +1,27 @@
+{
+  "session_id": "6f1ff1b6-0274-4177-83ad-ed5c8fa72f48",
+  "timestamp": "2025-07-25 16:35:37",
+  "files": {
+    "clinical_data.csv": {
+      "data_type": "clinical",
+      "validation": {
+        "valid": true
+      }
+    },
+    "expression_data.csv": {
+      "data_type": "expression",
+      "validation": {
+        "valid": true
+      }
+    },
+    "mutation_data.csv": {
+      "data_type": "mutation",
+      "validation": {
+        "valid": true
+      }
+    }
+  },
+  "validation_status": "success",
+  "errors": [],
+  "warnings": []
+}

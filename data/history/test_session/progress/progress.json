@@ -1,0 +1,11 @@
+{
+  "session_id": "test_session",
+  "status": "initializing",
+  "overall_progress": 0,
+  "start_time": "2025-07-25T23:36:17.141793",
+  "end_time": null,
+  "current_module": null,
+  "modules": {},
+  "logs": [],
+  "errors": []
+}

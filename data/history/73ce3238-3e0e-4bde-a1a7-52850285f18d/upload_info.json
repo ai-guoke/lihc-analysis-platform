@@ -1,0 +1,29 @@
+{
+  "session_id": "73ce3238-3e0e-4bde-a1a7-52850285f18d",
+  "timestamp": "2025-07-25 16:35:37",
+  "files": {
+    "clinical_data.csv": {
+      "data_type": "clinical",
+      "validation": {
+        "valid": true
+      }
+    },
+    "expression_data.csv": {
+      "data_type": "expression",
+      "validation": {
+        "valid": true
+      }
+    },
+    "mutation_data.csv": {
+      "data_type": "mutation",
+      "validation": {
+        "valid": false
+      }
+    }
+  },
+  "validation_status": "failed",
+  "errors": [
+    "Missing required columns in mutation data"
+  ],
+  "warnings": []
+}
