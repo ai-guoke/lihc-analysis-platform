@@ -919,6 +919,10 @@ class ProfessionalDashboard:
                     button_id = 'top-nav-demo'
                 elif page_value == 'data-upload':
                     button_id = 'top-nav-data'
+                elif page_value in ['multidim', 'network', 'linchpin', 'survival', 
+                                  'multiomics', 'closedloop', 'charts', 'immune', 
+                                  'drug', 'subtype']:
+                    button_id = f'sidebar-{page_value}'
                 else:
                     button_id = triggered_id
             else:
@@ -1060,6 +1064,40 @@ class ProfessionalDashboard:
                 return 'data-upload'
             
             return no_update
+        
+        # Module card button callbacks
+        @self.app.callback(
+            Output('current-page', 'data', allow_duplicate=True),
+            [Input(f'{button_id}-card-btn', 'n_clicks') for button_id in 
+             ['sidebar-multidim', 'sidebar-network', 'sidebar-linchpin', 'sidebar-survival',
+              'sidebar-multiomics', 'sidebar-closedloop', 'sidebar-charts', 
+              'sidebar-immune', 'sidebar-drug', 'sidebar-subtype']],
+            prevent_initial_call=True
+        )
+        def handle_module_cards(*args):
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                return no_update
+            
+            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            # Remove the '-card-btn' suffix to get the page id
+            page_id = button_id.replace('-card-btn', '')
+            
+            # Map to the actual page names
+            page_map = {
+                'sidebar-multidim': 'multidim',
+                'sidebar-network': 'network',
+                'sidebar-linchpin': 'linchpin',
+                'sidebar-survival': 'survival',
+                'sidebar-multiomics': 'multiomics',
+                'sidebar-closedloop': 'closedloop',
+                'sidebar-charts': 'charts',
+                'sidebar-immune': 'immune',
+                'sidebar-drug': 'drug',
+                'sidebar-subtype': 'subtype'
+            }
+            
+            return page_map.get(page_id, 'overview')
         
         # File upload and validation callbacks
         @self.app.callback(
@@ -2420,10 +2458,10 @@ class ProfessionalDashboard:
                 html.H5(title, style={'marginTop': '10px', 'marginBottom': '10px'}),
                 html.P(description, style={'fontSize': '0.9rem', 'color': '#6c757d', 'marginBottom': '15px'}),
                 html.Button("进入", 
+                           id=f"{button_id}-card-btn",
                            className="btn btn-outline-primary btn-sm",
                            style={'position': 'absolute', 'bottom': '15px', 'right': '15px'},
-                           **{'data-target': button_id},
-                           onClick=f"document.getElementById('{button_id}').click()")
+                           **{'data-target': button_id})
             ], style={'padding': '20px', 'height': '100%', 'position': 'relative'})
         ], className="card", style={'height': '200px'})
     
