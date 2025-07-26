@@ -226,8 +226,8 @@ class ChartCallbackManager:
         
         @self.app.callback(
             [Output(f'chart-{chart_id}', 'figure') for chart_id in ['scatter-plot', 'heatmap', 'bar-chart']],
-            [Input('enable-crossfilter', 'value'),
-             Input(f'selection-store-{chart_id}', 'data') 
+            [Input('enable-crossfilter', 'value')] + 
+            [Input(f'selection-store-{chart_id}', 'data') 
              for chart_id in ['scatter-plot', 'heatmap', 'bar-chart']],
             [State(f'chart-{chart_id}', 'figure') for chart_id in ['scatter-plot', 'heatmap', 'bar-chart']],
             prevent_initial_call=True
