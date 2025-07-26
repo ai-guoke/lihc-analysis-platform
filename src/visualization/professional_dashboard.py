@@ -387,6 +387,19 @@ class ProfessionalDashboard:
                 html.Div(id="main-content", className="main-content")
             ], className="main-wrapper"),
             
+            # Copyright Footer
+            html.Div([
+                html.Div([
+                    html.P([
+                        "版权所有 © ",
+                        html.Strong("中国科学院大学杭州高等研究院"),
+                        " | LIHC Analysis Platform v2.3"
+                    ], style={'margin': '0', 'fontSize': '14px', 'color': '#666'}),
+                    html.P("University of Chinese Academy of Sciences, Hangzhou Institute for Advanced Study", 
+                           style={'margin': '5px 0 0 0', 'fontSize': '12px', 'color': '#999'})
+                ], style={'textAlign': 'center', 'padding': '15px 20px'})
+            ], className="copyright-footer"),
+            
             # Progress tracking components
             dcc.Interval(
                 id='analysis-progress-interval',
@@ -856,7 +869,36 @@ class ProfessionalDashboard:
         }
         
         /* Scientific Tips Styling */
-        " + (SCIENTIFIC_TIP_STYLE if SCIENTIFIC_TIPS_AVAILABLE else "") + "
+        """ + (SCIENTIFIC_TIP_STYLE if SCIENTIFIC_TIPS_AVAILABLE else "") + """
+        
+        /* Copyright Footer Styling */
+        .copyright-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e1e8ed;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        .main-wrapper {
+            margin-bottom: 70px; /* Add bottom margin to prevent content overlap */
+        }
+        
+        /* Responsive design for copyright footer */
+        @media (max-width: 768px) {
+            .copyright-footer p {
+                font-size: 12px !important;
+                line-height: 1.3;
+            }
+            
+            .copyright-footer .copyright-footer > div {
+                padding: 10px 15px !important;
+            }
+        }
         """
     
     def setup_callbacks(self):
@@ -2002,13 +2044,29 @@ class ProfessionalDashboard:
                     'system': options
                 }
                 
-                # Save to config file
+                # Save to config file (use temp directory if config is read-only)
                 import json
-                config_path = Path('config/user_settings.json')
-                config_path.parent.mkdir(exist_ok=True)
+                import tempfile
+                import os
                 
-                with open(config_path, 'w', encoding='utf-8') as f:
-                    json.dump(settings, f, indent=2, ensure_ascii=False)
+                try:
+                    # Try to save to config directory first
+                    config_path = Path('config/user_settings.json')
+                    config_path.parent.mkdir(exist_ok=True)
+                    
+                    with open(config_path, 'w', encoding='utf-8') as f:
+                        json.dump(settings, f, indent=2, ensure_ascii=False)
+                        
+                except (OSError, PermissionError):
+                    # If config directory is read-only, save to temp directory
+                    temp_dir = Path('/tmp/lihc_config')
+                    temp_dir.mkdir(exist_ok=True)
+                    config_path = temp_dir / 'user_settings.json'
+                    
+                    with open(config_path, 'w', encoding='utf-8') as f:
+                        json.dump(settings, f, indent=2, ensure_ascii=False)
+                    
+                    print(f"Settings saved to temporary location: {config_path}")
                 
                 return html.Div([
                     html.I(className="fas fa-check-circle", style={'color': 'green', 'marginRight': '10px'}),
