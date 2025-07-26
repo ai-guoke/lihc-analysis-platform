@@ -9,6 +9,17 @@ class I18nManager:
     def __init__(self, default_language='zh'):
         self.current_language = default_language
         self.translations = self._load_translations()
+        # Try to load comprehensive translations
+        try:
+            from src.utils.i18n_comprehensive import TRANSLATIONS as COMPREHENSIVE_TRANSLATIONS
+            # Merge comprehensive translations with existing ones
+            for lang in COMPREHENSIVE_TRANSLATIONS:
+                if lang in self.translations:
+                    self.translations[lang].update(COMPREHENSIVE_TRANSLATIONS[lang])
+                else:
+                    self.translations[lang] = COMPREHENSIVE_TRANSLATIONS[lang]
+        except ImportError:
+            pass
     
     def _load_translations(self):
         """Load translation dictionaries"""
@@ -25,6 +36,13 @@ class I18nManager:
                 'nav_multiomics': '多组学整合',
                 'nav_closedloop': 'ClosedLoop分析',
                 'nav_templates': '数据模板',
+                'nav_dataset_management': '数据集管理',
+                'nav_settings': '系统设置',
+                'nav_immune': '免疫微环境',
+                'nav_drug': '药物响应预测',
+                'nav_subtype': '分子分型',
+                'nav_metabolism': '代谢分析',
+                'nav_heterogeneity': '异质性分析',
                 
                 # Overview page
                 'overview_title': 'LIHC多维度预后分析系统',
@@ -518,6 +536,13 @@ class I18nManager:
                 'nav_multiomics': 'Multi-omics',
                 'nav_closedloop': 'ClosedLoop',
                 'nav_templates': 'Templates',
+                'nav_dataset_management': 'Dataset Management',
+                'nav_settings': 'System Settings',
+                'nav_immune': 'Immune Microenvironment',
+                'nav_drug': 'Drug Response Prediction',
+                'nav_subtype': 'Molecular Subtyping',
+                'nav_metabolism': 'Metabolism Analysis',
+                'nav_heterogeneity': 'Heterogeneity Analysis',
                 
                 # Overview page
                 'overview_title': 'LIHC Multi-dimensional Prognostic Analysis Platform',

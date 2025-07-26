@@ -161,6 +161,8 @@ Linchpin Score = w1×预后评分 + w2×网络中心性 + w3×跨维度连接性
 - **🎯 精准医学**: 个性化治疗方案推荐
 - **🔄 因果推理**: ClosedLoop多证据整合
 - **🌐 多组学整合**: RNA-seq、CNV、突变、甲基化数据融合
+- **💡 科学原理**: 每个模块配备详细的科学背景说明
+- **🌍 国际化**: 完整的中英文双语支持
 
 ### 8. 交互式数据可视化
 
@@ -364,8 +366,8 @@ Prometheus + Grafana     # 监控服务
 git clone https://github.com/your-username/lihc-analysis-platform.git
 cd lihc-analysis-platform
 
-# 使用专业版Docker镜像
-docker-compose -f docker-compose.professional.yml up -d
+# 使用Docker Compose启动
+docker-compose up -d
 
 # 访问应用
 打开浏览器访问: http://localhost:8050
@@ -550,14 +552,10 @@ lihc-analysis-platform/
 ├── 📁 docs/                      # 文档
 │   ├── multi_omics_integration_guide.md  # 多组学指南
 │   └── closedloop_analysis_guide.md      # ClosedLoop指南
-├── 📁 docker/                    # Docker配置
-│   ├── Dockerfile.minimal       # 最小化镜像
-│   ├── Dockerfile.stable        # 稳定版镜像
-│   └── Dockerfile.complete      # 完整版镜像
+├── 📄 Dockerfile                 # Docker镜像定义
 ├── 📄 main.py                    # 主程序入口
 ├── 📄 requirements.txt           # Python依赖
-├── 📄 docker-compose.yml         # Docker编排
-├── 📄 docker-start.sh            # Docker启动脚本
+├── 📄 docker-compose.yml         # Docker编排配置
 ├── 📄 README.md                  # 项目说明
 ├── 📄 QUICKSTART.md              # 快速开始指南
 └── 📄 FEATURE_SUMMARY.md         # 功能总结
@@ -571,8 +569,8 @@ lihc-analysis-platform/
 
 **Q: Docker构建速度慢？**
 ```bash
-# 使用最小化版本快速测试
-docker-compose -f docker-compose.minimal.yml up -d
+# 使用Docker缓存层或配置镜像加速器
+docker-compose build --no-cache=false
 
 # 或使用国内镜像源
 ```
@@ -583,14 +581,14 @@ docker-compose -f docker-compose.minimal.yml up -d
 lsof -i :8050
 
 # 使用其他端口
-docker-compose -f docker-compose.minimal.yml up -d -e PORT=8051
+docker-compose up -d -e PORT=8051
 ```
 
 ### 功能相关
 
 **Q: 生存分析功能不可用？**
 - 确保使用的是更新后的镜像（包含lifelines和scipy）
-- 检查Docker日志：`docker logs lihc-platform-minimal`
+- 检查Docker日志：`docker logs lihc-platform`
 
 **Q: 如何使用自己的数据？**
 1. 准备符合格式要求的数据文件

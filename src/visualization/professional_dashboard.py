@@ -32,8 +32,10 @@ try:
     from src.data_processing.data_upload_manager import DataUploadManager, UserDataAnalyzer
     from src.analysis.data_loader import data_loader, create_dataset_specific_content
     from src.analysis.progress_manager import ProgressManager, create_progress_callback
+    from src.components.scientific_tips import create_scientific_tip, register_callbacks as register_tip_callbacks, SCIENTIFIC_TIP_STYLE
     DATALOADER_AVAILABLE = True
     PROGRESS_AVAILABLE = True
+    SCIENTIFIC_TIPS_AVAILABLE = True
 except ImportError:
     # Fallback
     class MockI18n:
@@ -46,7 +48,10 @@ except ImportError:
     i18n = MockI18n()
     DATALOADER_AVAILABLE = False
     PROGRESS_AVAILABLE = False
+    SCIENTIFIC_TIPS_AVAILABLE = False
     data_loader = None
+
+# Multilingual support is integrated directly
 
 class ProfessionalDashboard:
     """Professional dashboard with enhanced navigation"""
@@ -59,6 +64,10 @@ class ProfessionalDashboard:
         self.setup_callbacks()
         self.setup_batch_callbacks()
         self.setup_taskqueue_callbacks()
+        
+        # Register scientific tips callbacks if available
+        if SCIENTIFIC_TIPS_AVAILABLE:
+            register_tip_callbacks(self.app)
         
         # Initialize upload manager
         try:
@@ -208,6 +217,7 @@ class ProfessionalDashboard:
             dcc.Store(id='sidebar-state', data='expanded'),
             dcc.Store(id='language-store', data='zh'),
             dcc.Store(id='current-session-id', data=None),
+            dcc.Store(id='update-page-trigger', data={}),
             
             # Progress modal
             html.Div(
@@ -263,7 +273,7 @@ class ProfessionalDashboard:
             html.Div([
                 # Analysis section
                 html.Div([
-                    html.Div("分析功能", className="sidebar-section-title"),
+                    html.Div("分析功能", id="analysis-section-title", className="sidebar-section-title"),
                     
                     html.Button([
                         html.I(className="fas fa-home"),
@@ -293,7 +303,7 @@ class ProfessionalDashboard:
                 
                 # Advanced Analysis section
                 html.Div([
-                    html.Div("高级分析", className="sidebar-section-title"),
+                    html.Div("高级分析", id="advanced-section-title", className="sidebar-section-title"),
                     
                     html.Button([
                         html.I(className="fas fa-dna"),
@@ -313,7 +323,7 @@ class ProfessionalDashboard:
                 
                 # Precision Medicine section
                 html.Div([
-                    html.Div("精准医学", className="sidebar-section-title"),
+                    html.Div("精准医学", id="precision-section-title", className="sidebar-section-title"),
                     
                     html.Button([
                         html.I(className="fas fa-shield-alt"),
@@ -844,6 +854,9 @@ class ProfessionalDashboard:
             background: #bdc3c7;
             cursor: not-allowed;
         }
+        
+        /* Scientific Tips Styling */
+        " + (SCIENTIFIC_TIP_STYLE if SCIENTIFIC_TIPS_AVAILABLE else "") + "
         """
     
     def setup_callbacks(self):
@@ -864,29 +877,119 @@ class ProfessionalDashboard:
                     return 'sidebar active'
             return 'sidebar'
         
-        # Language switching
+        # Comprehensive language switching with content update
         @self.app.callback(
-            [Output('lang-zh', 'className'),
-             Output('lang-en', 'className'),
-             Output('language-store', 'data')],
+            [
+                # Button states
+                Output('lang-zh', 'className'),
+                Output('lang-en', 'className'),
+                Output('language-store', 'data'),
+                # Navigation texts
+                Output('nav-data-upload', 'children'),
+                Output('nav-dataset-management', 'children'),
+                Output('nav-demo', 'children'),
+                Output('nav-settings', 'children'),
+                # Sidebar texts
+                Output('side-overview', 'children'),
+                Output('side-multidim', 'children'),
+                Output('side-network', 'children'),
+                Output('side-linchpin', 'children'),
+                Output('side-survival', 'children'),
+                Output('side-multiomics', 'children'),
+                Output('side-closedloop', 'children'),
+                Output('side-immune', 'children'),
+                Output('side-drug', 'children'),
+                Output('side-subtype', 'children'),
+                Output('side-metabolism', 'children'),
+                Output('side-heterogeneity', 'children'),
+                # Section titles
+                Output('analysis-section-title', 'children'),
+                Output('precision-section-title', 'children'),
+                Output('advanced-section-title', 'children'),
+                # Update current page content
+                Output('update-page-trigger', 'data')
+            ],
             [Input('lang-zh', 'n_clicks'),
              Input('lang-en', 'n_clicks')],
             State('language-store', 'data'),
             prevent_initial_call=True
         )
-        def switch_language(zh_clicks, en_clicks, current_lang):
+        def switch_language_and_update_content(zh_clicks, en_clicks, current_lang):
             ctx = dash.callback_context
             if not ctx.triggered:
                 raise PreventUpdate
             
             button_id = ctx.triggered[0]['prop_id'].split('.')[0]
             
+            # Determine new language
             if button_id == 'lang-zh':
-                i18n.set_language('zh')
-                return 'lang-btn active', 'lang-btn', 'zh'
+                new_lang = 'zh'
             else:
-                i18n.set_language('en')
-                return 'lang-btn', 'lang-btn active', 'en'
+                new_lang = 'en'
+            
+            # Set language
+            i18n.set_language(new_lang)
+            
+            # Update button states
+            zh_class = 'lang-btn active' if new_lang == 'zh' else 'lang-btn'
+            en_class = 'lang-btn active' if new_lang == 'en' else 'lang-btn'
+            
+            # Get all translated texts
+            nav_upload = ' ' + i18n.get_text('nav_upload', '数据上传' if new_lang == 'zh' else 'Data Upload')
+            nav_dataset = ' ' + i18n.get_text('nav_dataset_management', '数据集管理' if new_lang == 'zh' else 'Dataset Management')
+            nav_demo = ' ' + i18n.get_text('nav_demo', '测试Demo' if new_lang == 'zh' else 'Test Demo')
+            nav_settings = ' ' + i18n.get_text('nav_settings', '系统设置' if new_lang == 'zh' else 'System Settings')
+            
+            side_overview = ' ' + i18n.get_text('nav_overview', '平台概览' if new_lang == 'zh' else 'Platform Overview')
+            side_multidim = ' ' + i18n.get_text('nav_multidim', '多维度分析' if new_lang == 'zh' else 'Multi-dimensional Analysis')
+            side_network = ' ' + i18n.get_text('nav_network', '网络分析' if new_lang == 'zh' else 'Network Analysis')
+            side_linchpin = ' ' + i18n.get_text('nav_linchpin', 'Linchpin靶点' if new_lang == 'zh' else 'Linchpin Targets')
+            side_survival = ' ' + i18n.get_text('nav_survival', '生存分析' if new_lang == 'zh' else 'Survival Analysis')
+            side_multiomics = ' ' + i18n.get_text('nav_multiomics', '多组学整合' if new_lang == 'zh' else 'Multi-omics Integration')
+            side_closedloop = ' ' + i18n.get_text('nav_closedloop', 'ClosedLoop分析' if new_lang == 'zh' else 'ClosedLoop Analysis')
+            side_immune = ' ' + i18n.get_text('nav_immune', '免疫微环境' if new_lang == 'zh' else 'Immune Microenvironment')
+            side_drug = ' ' + i18n.get_text('nav_drug', '药物响应预测' if new_lang == 'zh' else 'Drug Response Prediction')
+            side_subtype = ' ' + i18n.get_text('nav_subtype', '分子分型' if new_lang == 'zh' else 'Molecular Subtyping')
+            side_metabolism = ' ' + i18n.get_text('nav_metabolism', '代谢分析' if new_lang == 'zh' else 'Metabolism Analysis')
+            side_heterogeneity = ' ' + i18n.get_text('nav_heterogeneity', '异质性分析' if new_lang == 'zh' else 'Heterogeneity Analysis')
+            
+            # Section titles
+            analysis_title = i18n.get_text('section_analysis', '分析功能' if new_lang == 'zh' else 'Analysis Functions')
+            precision_title = i18n.get_text('section_precision', '精准医学' if new_lang == 'zh' else 'Precision Medicine')
+            advanced_title = i18n.get_text('section_advanced', '高级分析' if new_lang == 'zh' else 'Advanced Analysis')
+            
+            return [
+                zh_class, en_class, new_lang,
+                nav_upload, nav_dataset, nav_demo, nav_settings,
+                side_overview, side_multidim, side_network, side_linchpin,
+                side_survival, side_multiomics, side_closedloop,
+                side_immune, side_drug, side_subtype, side_metabolism, side_heterogeneity,
+                analysis_title, precision_title, advanced_title,
+                {'timestamp': dash.callback_context.triggered[0]['prop_id']}  # Trigger page update
+            ]
+        
+        # Sync language selector in settings with language store
+        @self.app.callback(
+            Output('language-selector', 'value'),
+            Input('language-store', 'data'),
+            prevent_initial_call=True
+        )
+        def sync_language_selector(lang):
+            return lang
+        
+        # Update language from settings page
+        @self.app.callback(
+            [Output('language-store', 'data', allow_duplicate=True),
+             Output('lang-zh', 'className', allow_duplicate=True),
+             Output('lang-en', 'className', allow_duplicate=True)],
+            Input('language-selector', 'value'),
+            prevent_initial_call=True
+        )
+        def update_language_from_settings(lang):
+            i18n.set_language(lang)
+            zh_class = 'lang-btn active' if lang == 'zh' else 'lang-btn'
+            en_class = 'lang-btn active' if lang == 'en' else 'lang-btn'
+            return lang, zh_class, en_class
         
         # Main content routing
         @self.app.callback(
@@ -2485,7 +2588,10 @@ class ProfessionalDashboard:
             # Main content card with data source indicator
             html.Div([
                 data_indicator,  # Data source indicator in top-right
-                html.H2("多维度分析", className="card-title"),
+                html.Div([
+                    html.H2("多维度分析", className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("多维度分析", "multidim") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("五个生物学维度的综合分析"),
             ], className="card", style={'position': 'relative'}),
             
@@ -2662,7 +2768,10 @@ class ProfessionalDashboard:
             # Main content card
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2("网络分析", className="card-title"),
+                html.Div([
+                    html.H2("网络分析", className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("网络分析", "network") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("分子相互作用网络分析"),
                 html.Div(id='network-analysis-content', children=initial_content)
             ], className="card", style={'position': 'relative'})
@@ -2699,7 +2808,10 @@ class ProfessionalDashboard:
             # Main content card
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2("Linchpin靶点", className="card-title"),
+                html.Div([
+                    html.H2("Linchpin靶点", className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("Linchpin靶点", "linchpin") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("关键治疗靶点识别"),
                 html.Div(id='linchpin-analysis-content', children=initial_content)
             ], className="card", style={'position': 'relative'})
@@ -2734,7 +2846,10 @@ class ProfessionalDashboard:
             
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-chart-line"), " 生存分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-chart-line"), " 生存分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("生存分析", "survival") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("基于Kaplan-Meier方法的生存曲线分析"),
             ], className="card", style={'position': 'relative'}),
             
@@ -2780,7 +2895,10 @@ class ProfessionalDashboard:
         return html.Div([
             # Header
             html.Div([
-                html.H2([html.I(className="fas fa-dna"), " 多组学数据整合分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-dna"), " 多组学数据整合分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("多组学整合", "multiomics") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("整合RNA-seq、CNV、突变、甲基化等多维度数据进行综合分析"),
             ], className="card"),
             
@@ -2890,7 +3008,10 @@ class ProfessionalDashboard:
             # Header
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-sync-alt"), " ClosedLoop因果推理分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-sync-alt"), " ClosedLoop因果推理分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("ClosedLoop分析", "closedloop") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("基于多证据链的闭环因果推断与验证系统"),
             ], className="card", style={'position': 'relative'}),
             
@@ -5054,7 +5175,10 @@ class ProfessionalDashboard:
             # Header
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-shield-alt"), " 免疫微环境分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-shield-alt"), " 免疫微环境分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("免疫微环境", "immune") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("肿瘤免疫微环境综合评估与免疫治疗响应预测"),
             ], className="card", style={'position': 'relative'}),
             
@@ -5124,7 +5248,10 @@ class ProfessionalDashboard:
             # Header
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-pills"), " 药物响应与耐药分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-pills"), " 药物响应与耐药分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("药物响应预测", "drug") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("个体化药物敏感性预测与耐药机制识别"),
             ], className="card", style={'position': 'relative'}),
             
@@ -5194,7 +5321,10 @@ class ProfessionalDashboard:
             # Header
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-layer-group"), " 分子亚型精细分类"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-layer-group"), " 分子亚型精细分类"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("分子分型", "subtype") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("基于多组学数据的肿瘤分子亚型识别与特征分析"),
             ], className="card", style={'position': 'relative'}),
             
@@ -5264,7 +5394,10 @@ class ProfessionalDashboard:
             # Header
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-fire"), " 代谢重编程分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-fire"), " 代谢重编程分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("代谢分析", "metabolism") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("肿瘤代谢通路活性评估与代谢靶向治疗机会识别"),
             ], className="card", style={'position': 'relative'}),
             
@@ -5334,7 +5467,10 @@ class ProfessionalDashboard:
             # Header
             html.Div([
                 data_indicator,  # Data source indicator
-                html.H2([html.I(className="fas fa-code-branch"), " 肿瘤异质性与进化分析"], className="card-title"),
+                html.Div([
+                    html.H2([html.I(className="fas fa-code-branch"), " 肿瘤异质性与进化分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("异质性分析", "heterogeneity") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
                 html.P("肿瘤克隆结构、进化轨迹与时空异质性综合分析"),
             ], className="card", style={'position': 'relative'}),
             

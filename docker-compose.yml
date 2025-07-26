@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  lihc-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: lihc-platform
+    ports:
+      - "8050:8050"
+    volumes:
+      # Mount source code for development (read-only in production)
+      - ./src:/app/src:ro
+      # Mount data directories
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+      - ./examples:/app/examples:ro
+      # Mount configuration
+      - ./config:/app/config:ro
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - DASHBOARD_MODE=professional
+      - ENABLE_SCIENTIFIC_TIPS=true
+      - FLASK_ENV=production
+      - LOG_LEVEL=INFO
+    command: python main.py --dashboard --professional --port 8050
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - lihc-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+  # Optional: Redis for caching (uncomment if needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: lihc-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - lihc-network
+  #   restart: unless-stopped
+
+  # Optional: PostgreSQL for data persistence (uncomment if needed)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: lihc-postgres
+  #   environment:
+  #     - POSTGRES_DB=lihc_db
+  #     - POSTGRES_USER=lihc_user
+  #     - POSTGRES_PASSWORD=lihc_password
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - lihc-network
+  #   restart: unless-stopped
+
+networks:
+  lihc-network:
+    driver: bridge
