@@ -14,9 +14,9 @@ import logging
 
 from data_processing.multi_omics_integrator import MultiOmicsIntegrator
 from analysis.closedloop_analyzer import ClosedLoopAnalyzer
-from analysis.stage1_multidimensional import Stage1Analyzer
-from analysis.stage2_network import Stage2Analyzer
-from analysis.stage3_linchpin import Stage3Analyzer
+from analysis.stage1_multidimensional import MultiDimensionalAnalysis
+from analysis.stage2_network import CrossDimensionalNetwork
+from analysis.stage3_linchpin import LinchpinIdentifier
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -31,10 +31,10 @@ class IntegratedAnalysisPipeline:
         
         # 初始化各个分析器
         self.multi_omics = MultiOmicsIntegrator(data_dir)
-        self.closedloop = ClosedLoopAnalyzer(data_dir, results_dir)
-        self.stage1 = Stage1Analyzer(data_dir, results_dir)
-        self.stage2 = Stage2Analyzer(data_dir, results_dir)
-        self.stage3 = Stage3Analyzer(data_dir, results_dir)
+        self.closedloop = ClosedLoopAnalyzer()
+        self.stage1 = MultiDimensionalAnalysis(data_dir, results_dir)
+        self.stage2 = CrossDimensionalNetwork(data_dir, results_dir)
+        self.stage3 = LinchpinIdentifier(data_dir, results_dir)
         
         self.integrated_results = {}
     

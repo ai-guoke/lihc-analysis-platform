@@ -136,7 +136,9 @@ class DatasetManager:
     def get_current_dataset(self) -> Dict:
         """Get current dataset information"""
         current_id = self.config.get('current_dataset', 'demo')
-        return self.config['datasets'].get(current_id, self.config['datasets']['demo'])
+        dataset_info = self.config['datasets'].get(current_id, self.config['datasets']['demo']).copy()
+        dataset_info['id'] = current_id
+        return dataset_info
     
     def set_current_dataset(self, dataset_id: str) -> bool:
         """Set current dataset"""

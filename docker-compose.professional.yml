@@ -4,7 +4,7 @@ services:
   lihc-platform-professional:
     build:
       context: .
-      dockerfile: Dockerfile.minimal
+      dockerfile: Dockerfile
     container_name: lihc-platform-professional
     ports:
       - "8050:8050"

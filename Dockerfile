@@ -24,12 +24,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy requirements first for better caching
-COPY requirements.txt requirements-api.txt ./
+COPY requirements.txt ./
 
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-RUN pip install -r requirements-api.txt
 
 # Development stage
 FROM base as development
