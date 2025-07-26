@@ -664,6 +664,73 @@ class ProfessionalDashboard:
             transform: translateY(-1px);
         }
         
+        .btn-success {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .btn {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            vertical-align: middle;
+            user-select: none;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+        
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 1.125rem;
+        }
+        
         /* Loading state */
         .loading {
             display: flex;
@@ -833,7 +900,13 @@ class ProfessionalDashboard:
              ['overview', 'multidim', 'network', 'linchpin', 'survival', 
               'multiomics', 'closedloop', 'charts', 'immune', 'drug', 'subtype', 
               'metabolism', 'heterogeneity', 'tables', 'download', 'history', 'batch', 'taskqueue']] +
-            [Input(f'top-nav-{page}', 'n_clicks') for page in ['data', 'demo', 'settings']],
+            [Input(f'top-nav-{page}', 'n_clicks') for page in ['data', 'demo', 'settings']] +
+            [Input('quick-demo-btn', 'n_clicks'), 
+             Input('quick-upload-btn', 'n_clicks'), 
+             Input('quick-docs-btn', 'n_clicks')] +
+            [Input(f'sidebar-{page}-overview', 'n_clicks') for page in 
+             ['multidim', 'network', 'linchpin', 'survival', 'multiomics', 
+              'closedloop', 'charts', 'immune', 'drug', 'subtype']],
             State('current-page', 'data')
         )
         def update_content(*args):
@@ -855,6 +928,11 @@ class ProfessionalDashboard:
                 button_id = 'top-nav-demo'
             elif button_id == 'quick-upload-btn':
                 button_id = 'top-nav-data'
+            elif button_id == 'quick-docs-btn':
+                # Open documentation in new tab
+                import webbrowser
+                webbrowser.open('https://github.com/your-repo/docs')
+                return no_update, no_update, *([no_update] * 18)
             
             # Map button IDs to content
             content_map = {
@@ -2284,7 +2362,7 @@ class ProfessionalDashboard:
                             html.Button([
                                 html.I(className="fas fa-flask"),
                                 " 查看Demo"
-                            ], id="quick-demo-btn", className="btn-primary", n_clicks=0)
+                            ], id="quick-demo-btn", className="btn btn-primary", n_clicks=0, style={'width': '120px'})
                         ], style={'textAlign': 'center', 'padding': '20px'})
                     ], className="card"),
                     
@@ -2296,7 +2374,7 @@ class ProfessionalDashboard:
                             html.Button([
                                 html.I(className="fas fa-cloud-upload-alt"),
                                 " 上传数据"
-                            ], id="quick-upload-btn", className="btn-success", n_clicks=0)
+                            ], id="quick-upload-btn", className="btn btn-success", n_clicks=0, style={'width': '120px'})
                         ], style={'textAlign': 'center', 'padding': '20px'})
                     ], className="card"),
                     
@@ -2308,7 +2386,7 @@ class ProfessionalDashboard:
                             html.Button([
                                 html.I(className="fas fa-external-link-alt"),
                                 " 使用文档"
-                            ], id="quick-docs-btn", className="btn-info", n_clicks=0)
+                            ], id="quick-docs-btn", className="btn btn-info", n_clicks=0, style={'width': '120px'})
                         ], style={'textAlign': 'center', 'padding': '20px'})
                     ], className="card"),
                 ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(3, 1fr)', 'gap': '20px'})
@@ -2324,7 +2402,7 @@ class ProfessionalDashboard:
                 html.P(description, style={'fontSize': '0.9rem', 'color': '#6c757d', 'marginBottom': '15px'}),
                 html.Button("进入", 
                            id=button_id + "-overview", 
-                           className="btn-outline-primary btn-sm",
+                           className="btn btn-outline-primary btn-sm",
                            style={'position': 'absolute', 'bottom': '15px', 'right': '15px'})
             ], style={'padding': '20px', 'height': '100%', 'position': 'relative'})
         ], className="card", style={'height': '200px'})
