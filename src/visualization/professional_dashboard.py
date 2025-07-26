@@ -901,13 +901,7 @@ class ProfessionalDashboard:
               'multiomics', 'closedloop', 'charts', 'immune', 'drug', 'subtype', 
               'metabolism', 'heterogeneity', 'tables', 'download', 'history', 'batch', 'taskqueue']] +
             [Input(f'top-nav-{page}', 'n_clicks') for page in ['data', 'demo', 'settings']] +
-            [Input('quick-demo-btn', 'n_clicks'), 
-             Input('quick-upload-btn', 'n_clicks'), 
-             Input('quick-docs-btn', 'n_clicks')] +
-            [Input(f'sidebar-{page}-overview', 'n_clicks') for page in 
-             ['multidim', 'network', 'linchpin', 'survival', 'multiomics', 
-              'closedloop', 'charts', 'immune', 'drug', 'subtype']],
-            State('current-page', 'data')
+            [Input('current-page', 'data')]
         )
         def update_content(*args):
             ctx = dash.callback_context
@@ -915,24 +909,20 @@ class ProfessionalDashboard:
                 # Return default overview page
                 return self.create_overview_content(), 'overview', *(['sidebar-item active'] + ['sidebar-item'] * 17)
             
-            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            triggered_prop = ctx.triggered[0]['prop_id'].split('.')[1]
             
-            # Handle overview page module navigation buttons
-            if button_id.endswith('-overview'):
-                # Remove the '-overview' suffix to get the actual sidebar button id
-                actual_button_id = button_id.replace('-overview', '')
-                button_id = actual_button_id
-            
-            # Handle quick action buttons from overview page
-            if button_id == 'quick-demo-btn':
-                button_id = 'top-nav-demo'
-            elif button_id == 'quick-upload-btn':
-                button_id = 'top-nav-data'
-            elif button_id == 'quick-docs-btn':
-                # Open documentation in new tab
-                import webbrowser
-                webbrowser.open('https://github.com/your-repo/docs')
-                return no_update, no_update, *([no_update] * 18)
+            # Handle current-page changes from quick actions
+            if triggered_id == 'current-page' and triggered_prop == 'data':
+                page_value = ctx.triggered[0]['value']
+                if page_value == 'demo':
+                    button_id = 'top-nav-demo'
+                elif page_value == 'data-upload':
+                    button_id = 'top-nav-data'
+                else:
+                    button_id = triggered_id
+            else:
+                button_id = triggered_id
             
             # Map button IDs to content
             content_map = {
@@ -1046,6 +1036,29 @@ class ProfessionalDashboard:
                 
                 zip_buffer.seek(0)
                 return dcc.send_bytes(zip_buffer.getvalue(), "lihc_templates.zip")
+            return no_update
+        
+        # Quick action links callback
+        @self.app.callback(
+            Output('current-page', 'data', allow_duplicate=True),
+            [Input('quick-demo-link', 'n_clicks'),
+             Input('quick-upload-link', 'n_clicks')],
+            prevent_initial_call=True
+        )
+        def handle_quick_actions(demo_clicks, upload_clicks):
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                return no_update
+            
+            button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+            
+            if button_id == 'quick-demo-link':
+                # Trigger demo navigation
+                return 'demo'
+            elif button_id == 'quick-upload-link':
+                # Trigger data upload navigation
+                return 'data-upload'
+            
             return no_update
         
         # File upload and validation callbacks
@@ -2359,10 +2372,12 @@ class ProfessionalDashboard:
                             html.I(className="fas fa-play-circle fa-2x", style={'color': '#3498db'}),
                             html.H4("使用Demo数据", style={'marginTop': '10px'}),
                             html.P("立即体验平台功能"),
-                            html.Button([
-                                html.I(className="fas fa-flask"),
-                                " 查看Demo"
-                            ], id="quick-demo-btn", className="btn btn-primary", n_clicks=0, style={'width': '120px'})
+                            html.A([
+                                html.Button([
+                                    html.I(className="fas fa-flask"),
+                                    " 查看Demo"
+                                ], className="btn btn-primary", style={'width': '120px'})
+                            ], href="#", id="quick-demo-link", n_clicks=0)
                         ], style={'textAlign': 'center', 'padding': '20px'})
                     ], className="card"),
                     
@@ -2371,10 +2386,12 @@ class ProfessionalDashboard:
                             html.I(className="fas fa-upload fa-2x", style={'color': '#27ae60'}),
                             html.H4("上传您的数据", style={'marginTop': '10px'}),
                             html.P("开始个性化分析"),
-                            html.Button([
-                                html.I(className="fas fa-cloud-upload-alt"),
-                                " 上传数据"
-                            ], id="quick-upload-btn", className="btn btn-success", n_clicks=0, style={'width': '120px'})
+                            html.A([
+                                html.Button([
+                                    html.I(className="fas fa-cloud-upload-alt"),
+                                    " 上传数据"
+                                ], className="btn btn-success", style={'width': '120px'})
+                            ], href="#", id="quick-upload-link", n_clicks=0)
                         ], style={'textAlign': 'center', 'padding': '20px'})
                     ], className="card"),
                     
@@ -2383,10 +2400,12 @@ class ProfessionalDashboard:
                             html.I(className="fas fa-book fa-2x", style={'color': '#e74c3c'}),
                             html.H4("查看文档", style={'marginTop': '10px'}),
                             html.P("详细使用指南"),
-                            html.Button([
-                                html.I(className="fas fa-external-link-alt"),
-                                " 使用文档"
-                            ], id="quick-docs-btn", className="btn btn-info", n_clicks=0, style={'width': '120px'})
+                            html.A([
+                                html.Button([
+                                    html.I(className="fas fa-external-link-alt"),
+                                    " 使用文档"
+                                ], className="btn btn-info", style={'width': '120px'})
+                            ], href="https://github.com/your-repo/docs", target="_blank")
                         ], style={'textAlign': 'center', 'padding': '20px'})
                     ], className="card"),
                 ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(3, 1fr)', 'gap': '20px'})
@@ -2401,9 +2420,10 @@ class ProfessionalDashboard:
                 html.H5(title, style={'marginTop': '10px', 'marginBottom': '10px'}),
                 html.P(description, style={'fontSize': '0.9rem', 'color': '#6c757d', 'marginBottom': '15px'}),
                 html.Button("进入", 
-                           id=button_id + "-overview", 
                            className="btn btn-outline-primary btn-sm",
-                           style={'position': 'absolute', 'bottom': '15px', 'right': '15px'})
+                           style={'position': 'absolute', 'bottom': '15px', 'right': '15px'},
+                           **{'data-target': button_id},
+                           onClick=f"document.getElementById('{button_id}').click()")
             ], style={'padding': '20px', 'height': '100%', 'position': 'relative'})
         ], className="card", style={'height': '200px'})
     
