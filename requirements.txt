@@ -54,6 +54,8 @@ flower>=2.0.0,<2.1.0
 # Additional utilities
 PyYAML>=6.0,<6.1.0
 reportlab>=3.6.0,<4.1.0
+openpyxl>=3.0.0,<3.2.0
+python-docx>=0.8.11,<0.9.0
 
 # Packaging compatibility
 packaging>=16.8,<24.0
