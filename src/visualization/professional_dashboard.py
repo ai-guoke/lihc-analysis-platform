@@ -1003,7 +1003,7 @@ class ProfessionalDashboard:
              ['overview', 'multidim', 'network', 'linchpin', 'survival', 
               'multiomics', 'closedloop', 'charts', 'immune', 'drug', 'subtype', 
               'metabolism', 'heterogeneity', 'tables', 'download', 'history', 'batch', 'taskqueue']] +
-            [Input(f'top-nav-{page}', 'n_clicks') for page in ['data', 'demo', 'settings']] +
+            [Input(f'top-nav-{page}', 'n_clicks') for page in ['data', 'datasets', 'demo', 'settings']] +
             [Input('current-page', 'data')]
         )
         def update_content(*args):
@@ -2557,16 +2557,30 @@ class ProfessionalDashboard:
         """创建功能模块卡片"""
         return html.Div([
             html.Div([
-                html.I(className=f"fas {icon}", style={'fontSize': '2rem', 'color': color}),
-                html.H5(title, style={'marginTop': '10px', 'marginBottom': '10px'}),
-                html.P(description, style={'fontSize': '0.9rem', 'color': '#6c757d', 'marginBottom': '15px'}),
-                html.Button("进入", 
-                           id=f"{button_id}-card-btn",
-                           className="btn btn-outline-primary btn-sm",
-                           style={'position': 'absolute', 'bottom': '15px', 'right': '15px'},
-                           **{'data-target': button_id})
-            ], style={'padding': '20px', 'height': '100%', 'position': 'relative'})
-        ], className="card", style={'height': '200px'})
+                html.Div([
+                    html.I(className=f"fas {icon}", style={'fontSize': '2rem', 'color': color, 'marginBottom': '10px'}),
+                    html.H5(title, style={'marginBottom': '10px', 'fontSize': '1.1rem'}),
+                    html.P(description, style={
+                        'fontSize': '0.85rem', 
+                        'color': '#6c757d', 
+                        'marginBottom': '10px',
+                        'lineHeight': '1.4',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'display': '-webkit-box',
+                        '-webkit-line-clamp': '3',
+                        '-webkit-box-orient': 'vertical'
+                    }),
+                ], style={'textAlign': 'center', 'flex': '1', 'overflow': 'hidden'}),
+                html.Div([
+                    html.Button("进入", 
+                               id=f"{button_id}-card-btn",
+                               className="btn btn-outline-primary btn-sm",
+                               style={'width': '80px'},
+                               **{'data-target': button_id})
+                ], style={'textAlign': 'center', 'paddingTop': '10px'})
+            ], style={'padding': '15px', 'height': '100%', 'display': 'flex', 'flexDirection': 'column'})
+        ], className="card", style={'height': '200px', 'overflow': 'hidden'})
     
     def create_multidim_content(self):
         """Create multi-dimensional analysis content"""
