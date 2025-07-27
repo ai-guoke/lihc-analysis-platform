@@ -8,8 +8,8 @@ seaborn>=0.11.0,<0.14.0
 plotly>=5.10.0,<5.20.0
 
 # Dashboard and visualization
-dash>=2.6.0,<2.15.0
-dash-bootstrap-components>=1.2.0,<1.6.0
+dash>=2.14.0,<2.18.0
+dash-bootstrap-components>=1.5.0,<1.7.0
 streamlit>=1.28.2,<1.30.0
 
 # Network analysis

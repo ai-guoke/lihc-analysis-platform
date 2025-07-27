@@ -64,7 +64,20 @@ class ProfessionalDashboard:
     """Professional dashboard with enhanced navigation"""
     
     def __init__(self):
-        self.app = dash.Dash(__name__, suppress_callback_exceptions=True)
+        # 抑制React警告（临时解决方案，直到Dash升级）
+        import warnings
+        warnings.filterwarnings("ignore", message=".*componentWillMount.*")
+        warnings.filterwarnings("ignore", message=".*componentWillReceiveProps.*")
+        
+        self.app = dash.Dash(
+            __name__, 
+            suppress_callback_exceptions=True,
+            # 添加meta标签来抑制React开发者警告
+            meta_tags=[
+                {"name": "viewport", "content": "width=device-width, initial-scale=1"},
+                {"httpEquiv": "X-UA-Compatible", "content": "IE=edge"}
+            ]
+        )
         self.load_demo_data()
         self.setup_styling()
         self.setup_layout()
@@ -311,6 +324,21 @@ class ProfessionalDashboard:
                     {%config%}
                     {%scripts%}
                     {%renderer%}
+                    <script>
+                        // 抑制React废弃生命周期方法警告
+                        (function() {
+                            const originalWarn = console.warn;
+                            console.warn = function(message) {
+                                if (typeof message === 'string' && 
+                                    (message.includes('componentWillMount') || 
+                                     message.includes('componentWillReceiveProps') ||
+                                     message.includes('UNSAFE_component'))) {
+                                    return; // 忽略这些警告
+                                }
+                                originalWarn.apply(console, arguments);
+                            };
+                        })();
+                    </script>
                 </footer>
             </body>
         </html>
@@ -431,6 +459,11 @@ class ProfessionalDashboard:
                         html.I(className="fas fa-chart-bar"),
                         html.Span(" 综合图表", id="side-charts")
                     ], id="sidebar-charts", className="sidebar-item"),
+                    
+                    html.Button([
+                        html.I(className="fas fa-robot"),
+                        html.Span(" AI生物标志物发现", id="side-ai-biomarker")
+                    ], id="sidebar-ai-biomarker", className="sidebar-item"),
                 ], className="sidebar-section"),
                 
                 # Precision Medicine section
@@ -466,6 +499,16 @@ class ProfessionalDashboard:
                         html.I(className="fas fa-code-branch"),
                         html.Span(" 异质性分析", id="side-heterogeneity")
                     ], id="sidebar-heterogeneity", className="sidebar-item"),
+                    
+                    html.Button([
+                        html.I(className="fas fa-microscope"),
+                        html.Span(" 单细胞分析", id="side-singlecell")
+                    ], id="sidebar-singlecell", className="sidebar-item"),
+                    
+                    html.Button([
+                        html.I(className="fas fa-capsules"),
+                        html.Span(" 药物组合预测", id="side-drug-combination")
+                    ], id="sidebar-drug-combination", className="sidebar-item"),
                 ], className="sidebar-section"),
                 
                 # Results section
@@ -1064,6 +1107,7 @@ class ProfessionalDashboard:
                 Output('side-subtype', 'children'),
                 Output('side-metabolism', 'children'),
                 Output('side-heterogeneity', 'children'),
+                Output('side-singlecell', 'children'),
                 # Section titles
                 Output('analysis-section-title', 'children'),
                 Output('precision-section-title', 'children'),
@@ -1114,6 +1158,7 @@ class ProfessionalDashboard:
             side_subtype = ' ' + i18n.get_text('nav_subtype', '分子分型' if new_lang == 'zh' else 'Molecular Subtyping')
             side_metabolism = ' ' + i18n.get_text('nav_metabolism', '代谢分析' if new_lang == 'zh' else 'Metabolism Analysis')
             side_heterogeneity = ' ' + i18n.get_text('nav_heterogeneity', '异质性分析' if new_lang == 'zh' else 'Heterogeneity Analysis')
+            side_singlecell = ' ' + i18n.get_text('nav_singlecell', '单细胞分析' if new_lang == 'zh' else 'Single Cell Analysis')
             
             # Section titles
             analysis_title = i18n.get_text('section_analysis', '分析功能' if new_lang == 'zh' else 'Analysis Functions')
@@ -1125,7 +1170,7 @@ class ProfessionalDashboard:
                 nav_upload, nav_dataset, nav_demo, nav_settings,
                 side_overview, side_multidim, side_network, side_linchpin,
                 side_survival, side_multiomics, side_closedloop,
-                side_immune, side_drug, side_subtype, side_metabolism, side_heterogeneity,
+                side_immune, side_drug, side_subtype, side_metabolism, side_heterogeneity, side_singlecell,
                 analysis_title, precision_title, advanced_title,
                 {'timestamp': dash.callback_context.triggered[0]['prop_id']}  # Trigger page update
             ]
@@ -1159,12 +1204,12 @@ class ProfessionalDashboard:
              Output('current-page', 'data')] + 
             [Output(f'sidebar-{page}', 'className') for page in 
              ['overview', 'multidim', 'five-dimension', 'network', 'linchpin', 'survival', 
-              'multiomics', 'closedloop', 'charts', 'immune', 'stromal', 'drug', 'subtype', 
-              'metabolism', 'heterogeneity', 'tables', 'download', 'history', 'batch', 'taskqueue']],
+              'multiomics', 'closedloop', 'charts', 'ai-biomarker', 'immune', 'stromal', 'drug', 'subtype', 
+              'metabolism', 'heterogeneity', 'singlecell', 'drug-combination', 'tables', 'download', 'history', 'batch', 'taskqueue']],
             [Input(f'sidebar-{page}', 'n_clicks') for page in 
              ['overview', 'multidim', 'five-dimension', 'network', 'linchpin', 'survival', 
-              'multiomics', 'closedloop', 'charts', 'immune', 'stromal', 'drug', 'subtype', 
-              'metabolism', 'heterogeneity', 'tables', 'download', 'history', 'batch', 'taskqueue']] +
+              'multiomics', 'closedloop', 'charts', 'ai-biomarker', 'immune', 'stromal', 'drug', 'subtype', 
+              'metabolism', 'heterogeneity', 'singlecell', 'drug-combination', 'tables', 'download', 'history', 'batch', 'taskqueue']] +
             [Input(f'top-nav-{page}', 'n_clicks') for page in ['data', 'datasets', 'demo', 'settings']] +
             [Input('current-page', 'data')]
         )
@@ -1172,7 +1217,7 @@ class ProfessionalDashboard:
             ctx = dash.callback_context
             if not ctx.triggered:
                 # Return default overview page
-                return self.create_overview_content(), 'overview', *(['sidebar-item active'] + ['sidebar-item'] * 19)
+                return self.create_overview_content(), 'overview', *(['sidebar-item active'] + ['sidebar-item'] * 22)
             
             triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
             triggered_prop = ctx.triggered[0]['prop_id'].split('.')[1]
@@ -1210,6 +1255,9 @@ class ProfessionalDashboard:
                 'sidebar-subtype': ('subtype', self.create_subtype_content()),
                 'sidebar-metabolism': ('metabolism', self.create_metabolism_content()),
                 'sidebar-heterogeneity': ('heterogeneity', self.create_heterogeneity_content()),
+                'sidebar-singlecell': ('singlecell', self.create_singlecell_content()),
+                'sidebar-ai-biomarker': ('ai-biomarker', self.create_ai_biomarker_content()),
+                'sidebar-drug-combination': ('drug-combination', self.create_drug_combination_content()),
                 'precision-prediction-center': ('precision-prediction', self.create_precision_medicine_prediction()),
                 'sidebar-tables': ('tables', self.create_tables_content()),
                 'sidebar-download': ('download', self.create_download_content()),
@@ -1228,8 +1276,8 @@ class ProfessionalDashboard:
                 # Update sidebar button states
                 sidebar_classes = []
                 sidebar_pages = ['overview', 'multidim', 'five-dimension', 'network', 'linchpin', 'survival', 
-                               'multiomics', 'closedloop', 'charts', 'immune', 'stromal', 'drug', 'subtype',
-                               'metabolism', 'heterogeneity', 'tables', 'download', 'history', 'batch', 'taskqueue']
+                               'multiomics', 'closedloop', 'charts', 'ai-biomarker', 'immune', 'stromal', 'drug', 'subtype',
+                               'metabolism', 'heterogeneity', 'singlecell', 'drug-combination', 'tables', 'download', 'history', 'batch', 'taskqueue']
                 
                 for page in sidebar_pages:
                     if f'sidebar-{page}' == button_id:
@@ -1338,9 +1386,10 @@ class ProfessionalDashboard:
             Output('current-page', 'data', allow_duplicate=True),
             [Input(f'{button_id}-card-btn', 'n_clicks') for button_id in 
              ['sidebar-multidim', 'sidebar-network', 'sidebar-linchpin', 'sidebar-survival',
-              'sidebar-multiomics', 'sidebar-closedloop', 'sidebar-charts', 
+              'sidebar-multiomics', 'sidebar-closedloop', 'sidebar-charts', 'sidebar-ai-biomarker',
               'sidebar-immune', 'sidebar-stromal', 'sidebar-drug', 'sidebar-subtype',
-              'sidebar-metabolism', 'sidebar-heterogeneity', 'precision-prediction-center']],
+              'sidebar-metabolism', 'sidebar-heterogeneity', 'sidebar-singlecell', 
+              'sidebar-drug-combination', 'precision-prediction-center']],
             prevent_initial_call=True
         )
         def handle_module_cards(*args):
@@ -1361,12 +1410,15 @@ class ProfessionalDashboard:
                 'sidebar-multiomics': 'multiomics',
                 'sidebar-closedloop': 'closedloop',
                 'sidebar-charts': 'charts',
+                'sidebar-ai-biomarker': 'ai-biomarker',
                 'sidebar-immune': 'immune',
                 'sidebar-stromal': 'stromal',
                 'sidebar-drug': 'drug',
                 'sidebar-subtype': 'subtype',
                 'sidebar-metabolism': 'metabolism',
                 'sidebar-heterogeneity': 'heterogeneity',
+                'sidebar-singlecell': 'singlecell',
+                'sidebar-drug-combination': 'drug-combination',
                 'precision-prediction-center': 'precision-prediction'
             }
             
@@ -3047,7 +3099,7 @@ If some charts failed to generate, check the corresponding error files.
     def export_all_tables(self):
         """Export all data tables to Excel"""
         try:
-            from ..analysis.data_loader import DataLoader
+            from src.analysis.data_loader import DataLoader
             import pandas as pd
             
             # Load demo data
@@ -3278,8 +3330,8 @@ For questions, contact: support@lihc-platform.com
         """Generate executive summary section with actual data"""
         # Get actual data statistics
         try:
-            from ..analysis.data_loader import DataLoader
-            from ..analysis.advanced_analyzer import AdvancedAnalyzer
+            from src.analysis.data_loader import DataLoader
+            from src.analysis.advanced_analyzer import AdvancedAnalyzer
             
             # Load demo data
             loader = DataLoader()
@@ -3357,8 +3409,8 @@ For questions, contact: support@lihc-platform.com
     def _generate_deg_section(self):
         """Generate differential expression analysis section with actual results"""
         try:
-            from ..analysis.data_loader import DataLoader
-            from ..analysis.advanced_analyzer import AdvancedAnalyzer
+            from src.analysis.data_loader import DataLoader
+            from src.analysis.advanced_analyzer import AdvancedAnalyzer
             
             # Load demo data and run analysis
             loader = DataLoader()
@@ -3447,7 +3499,7 @@ For questions, contact: support@lihc-platform.com
 | Gene_12 | 0.52 (0.38-0.71) | 8.9e-05 | 良好 |"""
         
         try:
-            from ..analysis.data_loader import DataLoader
+            from src.analysis.data_loader import DataLoader
             import numpy as np
             from scipy import stats
             
@@ -3531,7 +3583,7 @@ For questions, contact: support@lihc-platform.com
     def _generate_network_section(self):
         """Generate network analysis section with actual data"""
         try:
-            from ..analysis.data_loader import DataLoader
+            from src.analysis.data_loader import DataLoader
             import numpy as np
             
             # Load demo data
@@ -3605,7 +3657,7 @@ For questions, contact: support@lihc-platform.com
     def _generate_precision_section(self):
         """Generate precision medicine section with actual data"""
         try:
-            from ..analysis.data_loader import DataLoader
+            from src.analysis.data_loader import DataLoader
             import numpy as np
             
             # Load demo data
@@ -4296,7 +4348,8 @@ Linchpin Score = 0.4 × 预后评分 +
         # 计算分析模块数量
         n_basic_modules = 4  # 多维度、网络、Linchpin、生存
         n_advanced_modules = 3  # 多组学、ClosedLoop、综合图表
-        n_precision_modules = 5  # 免疫、药物、分型、代谢、异质性
+        n_precision_modules = 8  # 免疫、药物、分型、代谢、异质性、单细胞、AI生物标志物、药物组合
+        n_new_v27_modules = 3  # 单细胞、AI生物标志物、药物组合
         total_modules = n_basic_modules + n_advanced_modules + n_precision_modules
         
         return html.Div([
@@ -4471,6 +4524,43 @@ Linchpin Score = 0.4 × 预后评分 +
                 ])
             ], className="card"),
             
+            # v2.7 新功能
+            html.Div([
+                html.H2([html.I(className="fas fa-star"), " v2.7 新功能"], style={'marginBottom': '20px', 'color': '#e74c3c'}),
+                html.Div([
+                    html.Div([
+                        self._create_module_card(
+                            "单细胞RNA-seq分析",
+                            "深度解析单细胞转录组数据，识别细胞亚群和状态转换",
+                            "fa-microscope",
+                            "#17a2b8",
+                            "sidebar-singlecell"
+                        ),
+                        self._create_module_card(
+                            "AI生物标志物发现",
+                            "机器学习驱动的生物标志物智能识别与验证系统",
+                            "fa-robot",
+                            "#6f42c1",
+                            "sidebar-ai-biomarker"
+                        ),
+                        self._create_module_card(
+                            "药物组合预测",
+                            "基于AI的个性化药物组合方案设计与协同效应预测",
+                            "fa-capsules",
+                            "#dc3545",
+                            "sidebar-drug-combination"
+                        ),
+                    ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(3, 1fr)', 'gap': '20px', 'marginBottom': '20px'}),
+                    
+                    html.Div([
+                        html.P([
+                            html.I(className="fas fa-info-circle"),
+                            " 新版本集成了最新的AI技术和单细胞分析方法，为肝癌精准医疗提供更强大的分析能力"
+                        ], style={'color': '#6c757d', 'fontStyle': 'italic', 'textAlign': 'center', 'marginTop': '10px'})
+                    ])
+                ])
+            ], className="card", style={'marginTop': '30px', 'border': '2px solid #e74c3c'}),
+            
             # 技术特色
             html.Div([
                 html.H2("技术特色", style={'marginBottom': '20px'}),
@@ -4590,8 +4680,8 @@ Linchpin Score = 0.4 × 预后评分 +
                             'overflow': 'hidden',
                             'textOverflow': 'ellipsis',
                             'display': '-webkit-box',
-                            '-webkit-line-clamp': '3',
-                            '-webkit-box-orient': 'vertical'
+                            'WebkitLineClamp': '3',
+                            'WebkitBoxOrient': 'vertical'
                         }),
                     ], style={'textAlign': 'center', 'flex': '1', 'overflow': 'hidden'}),
                     html.Div([
@@ -9929,7 +10019,7 @@ Linchpin Score = 0.4 × 预后评分 +
     def create_precision_medicine_prediction(self):
         """Create comprehensive precision medicine prediction module"""
         try:
-            from ..analysis.data_loader import data_loader
+            from src.analysis.data_loader import data_loader
             current_dataset = self.dataset_manager.get_current_dataset() if self.dataset_manager else {'type': 'demo', 'id': 'demo'}
             data = data_loader.load_dataset(current_dataset['id'], current_dataset)
             
@@ -10520,6 +10610,329 @@ Linchpin Score = 0.4 × 预后评分 +
                     style={'height': '450px'}
                 )
             ], className="card")
+        ])
+    
+    def create_singlecell_content(self):
+        """Create single cell analysis content"""
+        # Import dataset selector
+        try:
+            from src.components.dataset_selector import create_dataset_selector, create_data_source_indicator
+            dataset_selector = create_dataset_selector(self.dataset_manager, 'singlecell-dataset-selector')
+            current_dataset = self.dataset_manager.get_current_dataset() if self.dataset_manager else {'name': 'Demo', 'type': 'demo'}
+            data_indicator = create_data_source_indicator(current_dataset)
+        except:
+            dataset_selector = html.Div()
+            data_indicator = html.Div()
+            
+        return html.Div([
+            # Header at top
+            html.Div([
+                data_indicator,  # Data source indicator
+                html.Div([
+                    html.H2([html.I(className="fas fa-microscope"), " 单细胞RNA测序分析"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("单细胞分析", "singlecell") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
+                html.P("肿瘤微环境细胞类型识别、细胞状态分析与细胞通讯网络解析"),
+            ], className="card", style={'position': 'relative'}),
+            
+            # Dataset selector
+            dataset_selector,
+            
+            # Analysis content container
+            html.Div(id='singlecell-analysis-content'),
+            
+            # Quality Control
+            html.Div([
+                html.H3([html.I(className="fas fa-search"), " 数据质量控制"]),
+                html.Div([
+                    html.Button("运行QC分析", id='singlecell-qc-btn', className='btn btn-primary'),
+                    html.Div(id='singlecell-qc-results', style={'marginTop': '20px'})
+                ])
+            ], className="card"),
+            
+            # Cell type identification
+            html.Div([
+                html.H3([html.I(className="fas fa-tags"), " 细胞类型识别与聚类"]),
+                html.Div([
+                    html.Button("细胞聚类分析", id='singlecell-clustering-btn', className='btn btn-success'),
+                    html.Div([
+                        dcc.Graph(
+                            id='singlecell-umap',
+                            figure=self.create_demo_umap(),
+                            style={'height': '500px', 'flex': '1'}
+                        ),
+                        dcc.Graph(
+                            id='singlecell-cell-types',
+                            figure=self.create_demo_cell_type_composition(),
+                            style={'height': '500px', 'flex': '1'}
+                        )
+                    ], style={'display': 'flex', 'gap': '20px', 'marginTop': '20px'})
+                ])
+            ], className="card"),
+            
+            # Differential expression
+            html.Div([
+                html.H3([html.I(className="fas fa-chart-line"), " 差异表达分析"]),
+                html.Div([
+                    dcc.Dropdown(
+                        id='singlecell-de-celltype',
+                        options=[
+                            {'label': 'Hepatocytes', 'value': 'Hepatocytes'},
+                            {'label': 'Cancer cells', 'value': 'Cancer_cells'},
+                            {'label': 'CD8+ T cells', 'value': 'CD8_T_cells'},
+                            {'label': 'Macrophages', 'value': 'Macrophages'},
+                            {'label': 'CAFs', 'value': 'CAFs'}
+                        ],
+                        value='Cancer_cells',
+                        placeholder="选择细胞类型",
+                        style={'width': '200px', 'marginRight': '10px'}
+                    ),
+                    html.Button("分析差异基因", id='singlecell-de-btn', className='btn btn-info'),
+                    dcc.Graph(
+                        id='singlecell-volcano',
+                        figure=self.create_demo_volcano_plot(),
+                        style={'height': '400px', 'marginTop': '20px'}
+                    )
+                ])
+            ], className="card"),
+            
+            # Cell communication
+            html.Div([
+                html.H3([html.I(className="fas fa-project-diagram"), " 细胞通讯分析"]),
+                html.Div([
+                    html.Button("分析细胞通讯", id='singlecell-comm-btn', className='btn btn-warning'),
+                    html.Div([
+                        dcc.Graph(
+                            id='singlecell-communication',
+                            figure=self.create_demo_cell_communication(),
+                            style={'height': '500px', 'flex': '1'}
+                        ),
+                        dcc.Graph(
+                            id='singlecell-pathways',
+                            figure=self.create_demo_pathway_activity(),
+                            style={'height': '500px', 'flex': '1'}
+                        )
+                    ], style={'display': 'flex', 'gap': '20px', 'marginTop': '20px'})
+                ])
+            ], className="card"),
+            
+            # Trajectory analysis
+            html.Div([
+                html.H3([html.I(className="fas fa-route"), " 细胞轨迹与发育分析"]),
+                html.Div([
+                    html.Button("轨迹分析", id='singlecell-trajectory-btn', className='btn btn-dark'),
+                    dcc.Graph(
+                        id='singlecell-trajectory',
+                        figure=self.create_demo_trajectory(),
+                        style={'height': '400px', 'marginTop': '20px'}
+                    )
+                ])
+            ], className="card")
+        ])
+    
+    def create_ai_biomarker_content(self):
+        """Create AI-driven biomarker discovery content"""
+        # Import dataset selector
+        try:
+            from src.components.dataset_selector import create_dataset_selector, create_data_source_indicator
+            dataset_selector = create_dataset_selector(self.dataset_manager, 'ai-biomarker-dataset-selector')
+            current_dataset = self.dataset_manager.get_current_dataset() if self.dataset_manager else {'name': 'Demo', 'type': 'demo'}
+            data_indicator = create_data_source_indicator(current_dataset)
+        except:
+            dataset_selector = html.Div()
+            data_indicator = html.Div()
+            
+        return html.Div([
+            # Header
+            html.Div([
+                data_indicator,
+                html.Div([
+                    html.H2([html.I(className="fas fa-robot"), " AI驱动的生物标志物发现"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("AI生物标志物发现", "ai-biomarker") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
+                html.P("基于机器学习算法的智能生物标志物识别与验证系统"),
+            ], className="card", style={'position': 'relative'}),
+            
+            # Dataset selector
+            dataset_selector,
+            
+            # Algorithm Selection
+            html.Div([
+                html.H3([html.I(className="fas fa-cogs"), " 算法配置"]),
+                html.Div([
+                    html.Label("选择分析算法:", style={'fontWeight': 'bold', 'marginBottom': '10px', 'display': 'block'}),
+                    dcc.Checklist(
+                        id='ai-biomarker-algorithms',
+                        options=[
+                            {'label': ' Random Forest', 'value': 'rf'},
+                            {'label': ' LASSO Regression', 'value': 'lasso'},
+                            {'label': ' Elastic Net', 'value': 'elastic'},
+                            {'label': ' XGBoost', 'value': 'xgb'},
+                            {'label': ' Deep Learning', 'value': 'dl'},
+                            {'label': ' Support Vector Machine', 'value': 'svm'}
+                        ],
+                        value=['rf', 'lasso', 'xgb'],
+                        inline=True,
+                        style={'marginBottom': '15px'}
+                    ),
+                    html.Label("目标终点:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='ai-biomarker-endpoint',
+                        options=[
+                            {'label': '总体生存期 (Overall Survival)', 'value': 'overall_survival'},
+                            {'label': '无进展生存期 (Progression-Free Survival)', 'value': 'pfs'},
+                            {'label': '疾病特异性生存期 (Disease-Specific Survival)', 'value': 'dss'},
+                            {'label': '药物响应 (Drug Response)', 'value': 'drug_response'}
+                        ],
+                        value='overall_survival',
+                        style={'width': '300px', 'marginBottom': '15px'}
+                    ),
+                    html.Button("开始发现分析", id='ai-biomarker-start-btn', className='btn btn-primary')
+                ])
+            ], className="card"),
+            
+            # Analysis Results
+            html.Div([
+                html.H3([html.I(className="fas fa-chart-bar"), " 发现结果"]),
+                html.Div(id='ai-biomarker-results-content', children=[
+                    html.Div([
+                        dcc.Graph(
+                            id='ai-biomarker-consensus',
+                            figure=self.create_demo_biomarker_consensus(),
+                            style={'height': '500px'}
+                        )
+                    ], style={'marginBottom': '20px'}),
+                    html.Div([
+                        dcc.Graph(
+                            id='ai-biomarker-ranking',
+                            figure=self.create_demo_biomarker_ranking(),
+                            style={'height': '400px', 'flex': '1'}
+                        ),
+                        dcc.Graph(
+                            id='ai-biomarker-validation',
+                            figure=self.create_demo_biomarker_validation(),
+                            style={'height': '400px', 'flex': '1'}
+                        )
+                    ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
+                    html.Div([
+                        dcc.Graph(
+                            id='ai-biomarker-clinical-utility',
+                            figure=self.create_demo_clinical_utility_radar(),
+                            style={'height': '400px', 'flex': '1'}
+                        ),
+                        dcc.Graph(
+                            id='ai-biomarker-druggability',
+                            figure=self.create_demo_druggability_plot(),
+                            style={'height': '400px', 'flex': '1'}
+                        )
+                    ], style={'display': 'flex', 'gap': '20px'})
+                ])
+            ], className="card"),
+        ])
+    
+    def create_drug_combination_content(self):
+        """Create drug combination prediction content"""
+        # Import dataset selector
+        try:
+            from src.components.dataset_selector import create_dataset_selector, create_data_source_indicator
+            dataset_selector = create_dataset_selector(self.dataset_manager, 'drug-combination-dataset-selector')
+            current_dataset = self.dataset_manager.get_current_dataset() if self.dataset_manager else {'name': 'Demo', 'type': 'demo'}
+            data_indicator = create_data_source_indicator(current_dataset)
+        except:
+            dataset_selector = html.Div()
+            data_indicator = html.Div()
+            
+        return html.Div([
+            # Header
+            html.Div([
+                data_indicator,
+                html.Div([
+                    html.H2([html.I(className="fas fa-capsules"), " 药物组合疗法预测"], className="card-title", style={"display": "inline-block"}),
+                    create_scientific_tip("药物组合预测", "drug-combination") if SCIENTIFIC_TIPS_AVAILABLE else html.Div(),
+                ], style={"display": "flex", "alignItems": "center", "gap": "10px"}),
+                html.P("基于分子特征的个性化药物组合方案设计与协同效应预测"),
+            ], className="card", style={'position': 'relative'}),
+            
+            # Dataset selector
+            dataset_selector,
+            
+            # Patient Profile Input
+            html.Div([
+                html.H3([html.I(className="fas fa-user-md"), " 患者特征输入"]),
+                html.Div([
+                    html.Div([
+                        html.Label("患者年龄:", style={'fontWeight': 'bold'}),
+                        dcc.Input(
+                            id='drug-combo-age',
+                            type='number',
+                            value=65,
+                            min=18,
+                            max=100,
+                            style={'width': '100px', 'marginLeft': '10px'}
+                        )
+                    ], style={'marginBottom': '15px'}),
+                    html.Div([
+                        html.Label("肿瘤分期:", style={'fontWeight': 'bold'}),
+                        dcc.Dropdown(
+                            id='drug-combo-stage',
+                            options=[
+                                {'label': 'Stage I', 'value': 'I'},
+                                {'label': 'Stage II', 'value': 'II'},
+                                {'label': 'Stage III', 'value': 'III'},
+                                {'label': 'Stage IV', 'value': 'IV'}
+                            ],
+                            value='III',
+                            style={'width': '150px', 'marginLeft': '10px'}
+                        )
+                    ], style={'marginBottom': '15px'}),
+                    html.Div([
+                        html.Label("关键生物标志物:", style={'fontWeight': 'bold', 'display': 'block', 'marginBottom': '10px'}),
+                        dcc.Checklist(
+                            id='drug-combo-biomarkers',
+                            options=[
+                                {'label': ' AFP高表达', 'value': 'afp_high'},
+                                {'label': ' TP53突变', 'value': 'tp53_mut'},
+                                {'label': ' CTNNB1突变', 'value': 'ctnnb1_mut'},
+                                {'label': ' PD-L1阳性', 'value': 'pdl1_pos'},
+                                {'label': ' MSI-H', 'value': 'msi_h'}
+                            ],
+                            value=['afp_high', 'tp53_mut'],
+                            inline=True
+                        )
+                    ], style={'marginBottom': '15px'}),
+                    html.Button("生成治疗方案", id='drug-combo-predict-btn', className='btn btn-success')
+                ])
+            ], className="card"),
+            
+            # Prediction Results
+            html.Div([
+                html.H3([html.I(className="fas fa-flask"), " 预测结果"]),
+                html.Div(id='drug-combo-results-content', children=[
+                    html.Div([
+                        dcc.Graph(
+                            id='drug-combo-recommendations',
+                            figure=self.create_demo_drug_recommendations(),
+                            style={'height': '400px', 'flex': '1'}
+                        ),
+                        dcc.Graph(
+                            id='drug-combo-synergy',
+                            figure=self.create_demo_synergy_heatmap(),
+                            style={'height': '400px', 'flex': '1'}
+                        )
+                    ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
+                    html.Div([
+                        dcc.Graph(
+                            id='drug-combo-timeline',
+                            figure=self.create_demo_treatment_timeline(),
+                            style={'height': '300px'}
+                        )
+                    ], style={'marginBottom': '20px'}),
+                    html.Div([
+                        html.H4("推荐治疗方案详情"),
+                        html.Div(id='drug-combo-details', children=self.create_demo_treatment_details())
+                    ])
+                ])
+            ], className="card"),
         ])
     
     # Immune analysis visualization methods
@@ -14224,6 +14637,562 @@ Linchpin Score = 0.4 × 预后评分 +
                     ])
             
             return {'display': 'none'}, ""
+    
+    # Single cell analysis demo methods
+    def create_demo_umap(self):
+        """Create demo UMAP plot for single cell analysis"""
+        np.random.seed(42)
+        n_cells = 2000
+        
+        # Generate UMAP coordinates
+        umap_x = np.random.normal(0, 3, n_cells)
+        umap_y = np.random.normal(0, 3, n_cells)
+        
+        # Define cell types and their centers
+        cell_types = ['Hepatocytes', 'Cancer_cells', 'CD8_T_cells', 'Macrophages', 'CAFs', 'Endothelial']
+        centers = [(2, 2), (-2, -2), (3, -1), (-3, 1), (0, 3), (-1, -3)]
+        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD']
+        
+        fig = go.Figure()
+        
+        for i, (cell_type, center, color) in enumerate(zip(cell_types, centers, colors)):
+            # Generate cluster
+            cluster_x = np.random.normal(center[0], 0.8, n_cells//6)
+            cluster_y = np.random.normal(center[1], 0.8, n_cells//6)
+            
+            fig.add_trace(go.Scatter(
+                x=cluster_x,
+                y=cluster_y,
+                mode='markers',
+                marker=dict(size=4, color=color, opacity=0.7),
+                name=cell_type,
+                hovertemplate=f'{cell_type}<br>UMAP1: %{{x}}<br>UMAP2: %{{y}}<extra></extra>'
+            ))
+        
+        fig.update_layout(
+            title='UMAP: 细胞类型分布',
+            xaxis_title='UMAP1',
+            yaxis_title='UMAP2',
+            height=500,
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def create_demo_cell_type_composition(self):
+        """Create demo cell type composition plot"""
+        cell_types = ['Hepatocytes', 'Cancer_cells', 'CD8_T_cells', 'Macrophages', 'CAFs', 'Endothelial', 'Others']
+        proportions = [25, 20, 15, 12, 10, 8, 10]
+        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#BDC3C7']
+        
+        fig = go.Figure(data=go.Pie(
+            labels=cell_types,
+            values=proportions,
+            marker=dict(colors=colors),
+            textinfo='label+percent',
+            hovertemplate='%{label}<br>细胞数: %{value}%<extra></extra>'
+        ))
+        
+        fig.update_layout(
+            title='细胞类型组成',
+            height=500
+        )
+        
+        return fig
+    
+    def create_demo_volcano_plot(self):
+        """Create demo volcano plot for differential expression"""
+        np.random.seed(42)
+        n_genes = 2000
+        
+        # Generate random data
+        log2fc = np.random.normal(0, 1.5, n_genes)
+        p_values = np.random.uniform(0.001, 0.5, n_genes)
+        neg_log10_p = -np.log10(p_values)
+        
+        # Create significance categories
+        significant_up = (log2fc > 1) & (neg_log10_p > 1.3)
+        significant_down = (log2fc < -1) & (neg_log10_p > 1.3)
+        not_significant = ~(significant_up | significant_down)
+        
+        fig = go.Figure()
+        
+        # Non-significant genes
+        fig.add_trace(go.Scatter(
+            x=log2fc[not_significant],
+            y=neg_log10_p[not_significant],
+            mode='markers',
+            marker=dict(size=4, color='lightgray', opacity=0.6),
+            name='Non-significant',
+            hovertemplate='log2FC: %{x:.2f}<br>-log10(p): %{y:.2f}<extra></extra>'
+        ))
+        
+        # Upregulated genes
+        fig.add_trace(go.Scatter(
+            x=log2fc[significant_up],
+            y=neg_log10_p[significant_up],
+            mode='markers',
+            marker=dict(size=5, color='red', opacity=0.8),
+            name='Upregulated',
+            hovertemplate='log2FC: %{x:.2f}<br>-log10(p): %{y:.2f}<extra></extra>'
+        ))
+        
+        # Downregulated genes
+        fig.add_trace(go.Scatter(
+            x=log2fc[significant_down],
+            y=neg_log10_p[significant_down],
+            mode='markers',
+            marker=dict(size=5, color='blue', opacity=0.8),
+            name='Downregulated',
+            hovertemplate='log2FC: %{x:.2f}<br>-log10(p): %{y:.2f}<extra></extra>'
+        ))
+        
+        # Add significance lines
+        fig.add_hline(y=1.3, line_dash="dash", line_color="gray")
+        fig.add_vline(x=1, line_dash="dash", line_color="gray")
+        fig.add_vline(x=-1, line_dash="dash", line_color="gray")
+        
+        fig.update_layout(
+            title='差异表达基因火山图',
+            xaxis_title='log2(Fold Change)',
+            yaxis_title='-log10(P-value)',
+            height=400,
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def create_demo_cell_communication(self):
+        """Create demo cell communication heatmap"""
+        cell_types = ['Hepatocytes', 'Cancer_cells', 'CD8_T_cells', 'Macrophages', 'CAFs', 'Endothelial']
+        
+        # Generate communication scores
+        np.random.seed(42)
+        comm_matrix = np.random.uniform(0, 1, (len(cell_types), len(cell_types)))
+        
+        # Make diagonal zero (no self-communication)
+        np.fill_diagonal(comm_matrix, 0)
+        
+        # Enhance some known interactions
+        comm_matrix[1, 4] = 0.9  # Cancer-CAFs
+        comm_matrix[4, 1] = 0.85  # CAFs-Cancer
+        comm_matrix[2, 1] = 0.8  # T cells-Cancer
+        comm_matrix[3, 1] = 0.75  # Macrophages-Cancer
+        
+        fig = go.Figure(data=go.Heatmap(
+            z=comm_matrix,
+            x=cell_types,
+            y=cell_types,
+            colorscale='Viridis',
+            colorbar=dict(title='Communication Score')
+        ))
+        
+        fig.update_layout(
+            title='细胞间通讯强度矩阵',
+            xaxis_title='Receiver',
+            yaxis_title='Sender',
+            height=500,
+            xaxis=dict(tickangle=45)
+        )
+        
+        return fig
+    
+    def create_demo_pathway_activity(self):
+        """Create demo pathway activity plot"""
+        pathways = ['Glycolysis', 'OXPHOS', 'Immune Response', 'Angiogenesis', 'ECM Remodeling', 'Cell Cycle']
+        cell_types = ['Hepatocytes', 'Cancer_cells', 'CD8_T_cells', 'Macrophages', 'CAFs']
+        
+        # Generate activity matrix
+        np.random.seed(42)
+        activity_matrix = np.random.uniform(0.2, 1.0, (len(pathways), len(cell_types)))
+        
+        # Enhance specific patterns
+        activity_matrix[0, 1] = 0.95  # High glycolysis in cancer
+        activity_matrix[2, 2] = 0.9   # High immune response in T cells
+        activity_matrix[3, 5-1] = 0.85  # High angiogenesis in endothelial
+        activity_matrix[4, 4] = 0.9   # High ECM remodeling in CAFs
+        
+        fig = go.Figure(data=go.Heatmap(
+            z=activity_matrix,
+            x=cell_types,
+            y=pathways,
+            colorscale='RdBu_r',
+            zmid=0.5,
+            colorbar=dict(title='Pathway Activity')
+        ))
+        
+        fig.update_layout(
+            title='通路活性热图',
+            xaxis_title='Cell Type',
+            yaxis_title='Pathway',
+            height=500,
+            xaxis=dict(tickangle=45)
+        )
+        
+        return fig
+    
+    def create_demo_trajectory(self):
+        """Create demo trajectory analysis plot"""
+        np.random.seed(42)
+        
+        # Generate trajectory data
+        t = np.linspace(0, 10, 100)
+        
+        # Main trajectory
+        main_x = t + np.random.normal(0, 0.2, 100)
+        main_y = np.sin(t/2) + np.random.normal(0, 0.2, 100)
+        
+        # Branch trajectories
+        branch1_t = np.linspace(5, 10, 50)
+        branch1_x = branch1_t + np.random.normal(0.5, 0.15, 50)
+        branch1_y = np.cos(branch1_t/2) + 0.5 + np.random.normal(0, 0.15, 50)
+        
+        branch2_t = np.linspace(7, 10, 30)
+        branch2_x = branch2_t + np.random.normal(-0.5, 0.15, 30)
+        branch2_y = -np.sin(branch2_t/2) - 0.5 + np.random.normal(0, 0.15, 30)
+        
+        fig = go.Figure()
+        
+        # Main trajectory
+        fig.add_trace(go.Scatter(
+            x=main_x, y=main_y,
+            mode='markers+lines',
+            marker=dict(size=6, color='blue', colorscale='Viridis'),
+            line=dict(width=2, color='blue'),
+            name='Main trajectory',
+            hovertemplate='Pseudotime: %{x:.1f}<br>Component 2: %{y:.1f}<extra></extra>'
+        ))
+        
+        # Branch 1
+        fig.add_trace(go.Scatter(
+            x=branch1_x, y=branch1_y,
+            mode='markers+lines',
+            marker=dict(size=6, color='red'),
+            line=dict(width=2, color='red'),
+            name='Branch 1',
+            hovertemplate='Pseudotime: %{x:.1f}<br>Component 2: %{y:.1f}<extra></extra>'
+        ))
+        
+        # Branch 2
+        fig.add_trace(go.Scatter(
+            x=branch2_x, y=branch2_y,
+            mode='markers+lines',
+            marker=dict(size=6, color='green'),
+            line=dict(width=2, color='green'),
+            name='Branch 2',
+            hovertemplate='Pseudotime: %{x:.1f}<br>Component 2: %{y:.1f}<extra></extra>'
+        ))
+        
+        fig.update_layout(
+            title='细胞发育轨迹分析',
+            xaxis_title='伪时间 (Pseudotime)',
+            yaxis_title='发育成分2',
+            height=400,
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    # AI Biomarker Discovery demo methods
+    def create_demo_biomarker_consensus(self):
+        """Create demo biomarker consensus heatmap"""
+        np.random.seed(42)
+        
+        # Sample genes and algorithms
+        genes = [f'Gene_{i:03d}' for i in range(25)]
+        algorithms = ['Random Forest', 'LASSO', 'XGBoost', 'Deep Learning', 'Elastic Net']
+        
+        # Create consensus matrix
+        consensus_matrix = []
+        for gene in genes:
+            gene_scores = np.random.uniform(0.3, 1.0, len(algorithms))
+            consensus_matrix.append(gene_scores)
+        
+        fig = go.Figure(data=go.Heatmap(
+            z=consensus_matrix,
+            x=algorithms,
+            y=genes,
+            colorscale='Viridis',
+            colorbar=dict(title='重要性评分')
+        ))
+        
+        fig.update_layout(
+            title='算法共识热图：生物标志物重要性',
+            xaxis_title='算法',
+            yaxis_title='候选基因',
+            height=500
+        )
+        
+        return fig
+    
+    def create_demo_biomarker_ranking(self):
+        """Create demo biomarker ranking plot"""
+        np.random.seed(42)
+        
+        genes = [f'Gene_{i:03d}' for i in range(20)]
+        scores = np.random.uniform(0.6, 0.95, 20)
+        scores = sorted(scores, reverse=True)
+        
+        # Color by biomarker type
+        colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'] * 4
+        
+        fig = go.Figure(data=go.Bar(
+            x=scores,
+            y=genes,
+            orientation='h',
+            marker=dict(color=colors),
+            text=[f'{score:.3f}' for score in scores],
+            textposition='inside'
+        ))
+        
+        fig.update_layout(
+            title='Top 20 生物标志物候选基因',
+            xaxis_title='共识评分',
+            yaxis_title='基因',
+            height=400,
+            yaxis=dict(autorange='reversed')
+        )
+        
+        return fig
+    
+    def create_demo_biomarker_validation(self):
+        """Create demo biomarker validation performance plot"""
+        np.random.seed(42)
+        
+        biomarker_counts = [5, 10, 15, 20, 25]
+        accuracies = [0.72, 0.78, 0.82, 0.85, 0.83]
+        stds = [0.05, 0.04, 0.03, 0.03, 0.04]
+        
+        fig = go.Figure()
+        
+        fig.add_trace(go.Scatter(
+            x=biomarker_counts,
+            y=accuracies,
+            mode='lines+markers',
+            name='交叉验证准确率',
+            line=dict(width=3),
+            marker=dict(size=8),
+            error_y=dict(
+                type='data',
+                array=stds,
+                visible=True
+            )
+        ))
+        
+        fig.add_hline(y=0.5, line_dash="dash", line_color="red", 
+                     annotation_text="随机基准线")
+        
+        fig.update_layout(
+            title='生物标志物数量 vs 预测性能',
+            xaxis_title='生物标志物数量',
+            yaxis_title='交叉验证准确率',
+            height=400,
+            yaxis_range=[0.4, 1.0]
+        )
+        
+        return fig
+    
+    def create_demo_clinical_utility_radar(self):
+        """Create demo clinical utility radar chart"""
+        np.random.seed(42)
+        
+        categories = ['敏感性', '特异性', '阳性预测值', '阴性预测值', '准确率', 'F1评分']
+        values = [0.85, 0.92, 0.78, 0.95, 0.88, 0.81]
+        
+        fig = go.Figure()
+        
+        fig.add_trace(go.Scatterpolar(
+            r=values + [values[0]],  # 闭合图形
+            theta=categories + [categories[0]],
+            fill='toself',
+            name='生物标志物性能',
+            line=dict(color='rgb(32, 124, 202)'),
+            fillcolor='rgba(32, 124, 202, 0.3)'
+        ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 1]
+                )),
+            showlegend=True,
+            title='临床实用性评估',
+            height=400
+        )
+        
+        return fig
+    
+    def create_demo_druggability_plot(self):
+        """Create demo druggability analysis plot"""
+        np.random.seed(42)
+        
+        genes = [f'Gene_{i:03d}' for i in range(15)]
+        druggability_scores = np.random.uniform(0.3, 0.9, 15)
+        known_inhibitors = np.random.randint(0, 15, 15)
+        
+        fig = go.Figure(data=go.Scatter(
+            x=druggability_scores,
+            y=known_inhibitors,
+            mode='markers+text',
+            marker=dict(
+                size=15,
+                color=druggability_scores,
+                colorscale='Viridis',
+                opacity=0.8,
+                line=dict(width=1, color='black')
+            ),
+            text=genes,
+            textposition='top center',
+            hovertemplate='<b>%{text}</b><br>' +
+                         '药物靶向性评分: %{x:.2f}<br>' +
+                         '已知抑制剂数量: %{y}<br>' +
+                         '<extra></extra>'
+        ))
+        
+        fig.update_layout(
+            title='生物标志物药物靶向性分析',
+            xaxis_title='药物靶向性评分',
+            yaxis_title='已知抑制剂数量',
+            height=400
+        )
+        
+        return fig
+    
+    # Drug Combination demo methods
+    def create_demo_drug_recommendations(self):
+        """Create demo drug recommendation chart"""
+        np.random.seed(42)
+        
+        combinations = [
+            'Sorafenib + Atezolizumab',
+            'Lenvatinib + Pembrolizumab', 
+            'Sorafenib + Bevacizumab',
+            'Atezolizumab + Bevacizumab',
+            'Cabozantinib单药'
+        ]
+        
+        scores = [0.85, 0.82, 0.78, 0.75, 0.68]
+        colors = ['#2E8B57', '#4682B4', '#CD853F', '#9370DB', '#DC143C']
+        
+        fig = go.Figure(data=go.Bar(
+            x=combinations,
+            y=scores,
+            marker=dict(color=colors),
+            text=[f'{score:.2f}' for score in scores],
+            textposition='inside'
+        ))
+        
+        fig.update_layout(
+            title='个性化药物组合推荐',
+            xaxis_title='治疗方案',
+            yaxis_title='综合评分',
+            height=400,
+            xaxis=dict(tickangle=45)
+        )
+        
+        return fig
+    
+    def create_demo_synergy_heatmap(self):
+        """Create demo drug synergy heatmap"""
+        drugs = ['Sorafenib', 'Lenvatinib', 'Atezolizumab', 'Pembrolizumab', 'Bevacizumab']
+        
+        # Create synergy matrix
+        np.random.seed(42)
+        synergy_matrix = np.random.uniform(-0.3, 0.8, (len(drugs), len(drugs)))
+        np.fill_diagonal(synergy_matrix, 0)
+        
+        fig = go.Figure(data=go.Heatmap(
+            z=synergy_matrix,
+            x=drugs,
+            y=drugs,
+            colorscale='RdYlBu_r',
+            colorbar=dict(title='协同效应评分')
+        ))
+        
+        fig.update_layout(
+            title='药物协同效应矩阵',
+            height=400
+        )
+        
+        return fig
+    
+    def create_demo_treatment_timeline(self):
+        """Create demo treatment timeline"""
+        timeline_data = {
+            'Phase': ['一线治疗', '二线治疗', '三线治疗'],
+            'Start': [0, 6, 12],
+            'Duration': [6, 6, 8],
+            'Treatment': [
+                'Sorafenib + Atezolizumab',
+                'Lenvatinib + Pembrolizumab', 
+                'Cabozantinib单药'
+            ],
+            'Color': ['#2E8B57', '#4682B4', '#CD853F']
+        }
+        
+        fig = go.Figure()
+        
+        for i, phase in enumerate(timeline_data['Phase']):
+            fig.add_trace(go.Bar(
+                name=phase,
+                x=[timeline_data['Duration'][i]],
+                y=[timeline_data['Treatment'][i]],
+                base=[timeline_data['Start'][i]],
+                orientation='h',
+                marker_color=timeline_data['Color'][i],
+                text=f"{timeline_data['Duration'][i]}个月",
+                textposition='inside'
+            ))
+        
+        fig.update_layout(
+            title='个性化治疗时间线',
+            xaxis_title='时间 (月)',
+            yaxis_title='治疗方案',
+            height=300,
+            showlegend=False
+        )
+        
+        return fig
+    
+    def create_demo_treatment_details(self):
+        """Create demo treatment details table"""
+        return html.Div([
+            html.Table([
+                html.Thead([
+                    html.Tr([
+                        html.Th("治疗方案"),
+                        html.Th("预期响应率"),
+                        html.Th("中位PFS"),
+                        html.Th("毒性风险"),
+                        html.Th("推荐等级")
+                    ])
+                ]),
+                html.Tbody([
+                    html.Tr([
+                        html.Td("Sorafenib + Atezolizumab"),
+                        html.Td("68%"),
+                        html.Td("8.2个月"),
+                        html.Td("中等"),
+                        html.Td("A级", style={'color': '#2E8B57', 'fontWeight': 'bold'})
+                    ]),
+                    html.Tr([
+                        html.Td("Lenvatinib + Pembrolizumab"),
+                        html.Td("65%"),
+                        html.Td("7.8个月"),
+                        html.Td("中等"),
+                        html.Td("A级", style={'color': '#2E8B57', 'fontWeight': 'bold'})
+                    ]),
+                    html.Tr([
+                        html.Td("Sorafenib + Bevacizumab"),
+                        html.Td("58%"),
+                        html.Td("6.5个月"),
+                        html.Td("较低"),
+                        html.Td("B级", style={'color': '#4682B4', 'fontWeight': 'bold'})
+                    ])
+                ])
+            ], className="table table-striped")
+        ])
     
     def setup_taskqueue_callbacks(self):
         """Setup callbacks for task queue management"""

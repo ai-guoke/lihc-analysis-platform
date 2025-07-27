@@ -1,16 +1,17 @@
 version: '3.8'
 
 services:
-  lihc-platform:
+  # LIHC v2.5 Main Dashboard
+  lihc-dashboard:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: lihc-platform
+    container_name: lihc-dashboard
     ports:
       - "8050:8050"
     volumes:
-      # Mount source code for development (read-only in production)
+      # Mount source code for development
       - ./src:/app/src:ro
       # Mount data directories
       - ./data:/app/data
@@ -19,6 +20,8 @@ services:
       - ./examples:/app/examples:ro
       # Mount configuration
       - ./config:/app/config:ro
+      # Mount API usage guide
+      - ./API_USAGE_GUIDE.md:/app/API_USAGE_GUIDE.md:ro
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
@@ -26,7 +29,9 @@ services:
       - ENABLE_SCIENTIFIC_TIPS=true
       - FLASK_ENV=production
       - LOG_LEVEL=INFO
-    command: python main.py --dashboard --professional --port 8050
+      - LIHC_VERSION=2.5.0
+      - API_SERVER_URL=http://lihc-api:8000
+    command: python src/visualization/professional_dashboard.py
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8050/"]
@@ -36,6 +41,8 @@ services:
       start_period: 40s
     networks:
       - lihc-network
+    depends_on:
+      - lihc-api
     deploy:
       resources:
         limits:
@@ -45,33 +52,135 @@ services:
           cpus: '1'
           memory: 2G
 
-  # Optional: Redis for caching (uncomment if needed)
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: lihc-redis
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis-data:/data
-  #   networks:
-  #     - lihc-network
-  #   restart: unless-stopped
+  # LIHC v2.5 Unified API System
+  lihc-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: production
+    container_name: lihc-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source code
+      - ./src:/app/src:ro
+      # Mount data directories
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - API_ENV=production
+      - LOG_LEVEL=INFO
+      - LIHC_VERSION=2.5.0
+      - REDIS_URL=redis://redis:6379/0
+    command: uvicorn src.api.unified_api_system:app --host 0.0.0.0 --port 8000 --workers 2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - lihc-network
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
 
-  # Optional: PostgreSQL for data persistence (uncomment if needed)
-  # postgres:
-  #   image: postgres:15-alpine
-  #   container_name: lihc-postgres
-  #   environment:
-  #     - POSTGRES_DB=lihc_db
-  #     - POSTGRES_USER=lihc_user
-  #     - POSTGRES_PASSWORD=lihc_password
-  #   volumes:
-  #     - postgres-data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     - lihc-network
-  #   restart: unless-stopped
+  # Redis for API task queue and caching
+  redis:
+    image: redis:7-alpine
+    container_name: lihc-redis
+    # 不暴露端口，仅供内部使用
+    volumes:
+      - redis-data:/data
+    networks:
+      - lihc-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: lihc-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/ssl/certs:ro
+    networks:
+      - lihc-network
+    depends_on:
+      - lihc-dashboard
+      - lihc-api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL for data persistence (Optional)
+  postgres:
+    image: postgres:15-alpine
+    container_name: lihc-postgres
+    environment:
+      - POSTGRES_DB=lihc_db
+      - POSTGRES_USER=lihc_user
+      - POSTGRES_PASSWORD=lihc_password_2025
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - lihc-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lihc_user -d lihc_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring with Grafana (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: lihc-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=lihc2025
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - lihc-network
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
+  grafana-data:
+    driver: local
 
 networks:
   lihc-network:
