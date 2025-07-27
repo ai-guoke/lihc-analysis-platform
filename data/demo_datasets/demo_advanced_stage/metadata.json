@@ -1,0 +1,27 @@
+{
+    "dataset_id": "demo_advanced_stage",
+    "name": "晚期肝癌队列",
+    "description": "200例晚期肝癌患者（Stage III/IV），免疫抑制，预后较差",
+    "created_date": "2025-07-27",
+    "data_types": [
+        "clinical",
+        "expression",
+        "mutation"
+    ],
+    "statistics": {
+        "n_samples": 200,
+        "n_genes": 2000,
+        "stage_distribution": {
+            "III": 45,
+            "IV": 55
+        },
+        "survival_rate": 25,
+        "metastasis_rate": 70,
+        "characteristics": [
+            "免疫抑制",
+            "高突变负荷",
+            "代谢重编程",
+            "血管生成活跃"
+        ]
+    }
+}

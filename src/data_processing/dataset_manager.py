@@ -22,8 +22,10 @@ class DatasetManager:
         if self.config_file.exists():
             with open(self.config_file, 'r', encoding='utf-8') as f:
                 self.config = json.load(f)
+            # Check and add new demo datasets if they exist
+            self._add_demo_datasets_if_exist()
         else:
-            # Initialize with demo dataset
+            # Initialize with demo datasets
             self.config = {
                 'current_dataset': 'demo',
                 'datasets': {
@@ -45,12 +47,55 @@ class DatasetManager:
                     }
                 }
             }
+            # Add new demo datasets
+            self._add_demo_datasets_if_exist()
             self.save_config()
     
     def save_config(self):
         """Save dataset configuration"""
         with open(self.config_file, 'w', encoding='utf-8') as f:
             json.dump(self.config, f, indent=2, ensure_ascii=False)
+    
+    def _add_demo_datasets_if_exist(self):
+        """Add new demo datasets if they exist on disk"""
+        demo_datasets_path = Path("data/demo_datasets")
+        if not demo_datasets_path.exists():
+            return
+        
+        # Check for datasets summary
+        summary_file = demo_datasets_path / "datasets_summary.json"
+        if summary_file.exists():
+            try:
+                with open(summary_file, 'r', encoding='utf-8') as f:
+                    summary_data = json.load(f)
+                
+                for dataset_info in summary_data.get('datasets', []):
+                    dataset_id = dataset_info['id']
+                    
+                    # Skip if already exists
+                    if dataset_id in self.config['datasets']:
+                        continue
+                    
+                    # Add to config
+                    self.config['datasets'][dataset_id] = {
+                        'name': dataset_info['name'],
+                        'type': 'demo',
+                        'description': dataset_info['description'],
+                        'created': '2025-01-27',
+                        'data_path': f'data/demo_datasets/{dataset_id}',
+                        'features': {
+                            'samples': dataset_info['n_samples'],
+                            'genes': 2000,
+                            'has_clinical': True,
+                            'has_expression': True,
+                            'has_mutation': True,
+                            'has_cnv': False,
+                            'has_methylation': False
+                        },
+                        'characteristics': dataset_info.get('characteristics', [])
+                    }
+            except Exception as e:
+                print(f"Error loading demo datasets summary: {e}")
     
     def add_user_dataset(self, session_id: str, name: str = None, description: str = None) -> str:
         """Add a new user dataset"""

@@ -1,0 +1,25 @@
+{
+    "dataset_id": "demo_early_stage",
+    "name": "早期肝癌队列",
+    "description": "150例早期肝癌患者（Stage I/II），免疫活跃，预后较好",
+    "created_date": "2025-07-27",
+    "data_types": [
+        "clinical",
+        "expression",
+        "mutation"
+    ],
+    "statistics": {
+        "n_samples": 150,
+        "n_genes": 2000,
+        "stage_distribution": {
+            "I": 60,
+            "II": 40
+        },
+        "survival_rate": 80,
+        "characteristics": [
+            "高免疫浸润",
+            "低突变负荷",
+            "代谢正常"
+        ]
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "datasets": [
+        {
+            "id": "demo_early_stage",
+            "name": "早期肝癌队列",
+            "description": "150例早期肝癌患者（Stage I/II），免疫活跃，预后较好",
+            "n_samples": 150,
+            "characteristics": [
+                "高免疫浸润",
+                "低突变负荷",
+                "代谢正常"
+            ]
+        },
+        {
+            "id": "demo_advanced_stage",
+            "name": "晚期肝癌队列",
+            "description": "200例晚期肝癌患者（Stage III/IV），免疫抑制，预后较差",
+            "n_samples": 200,
+            "characteristics": [
+                "免疫抑制",
+                "高突变负荷",
+                "代谢重编程",
+                "血管生成活跃"
+            ]
+        },
+        {
+            "id": "demo_mixed_cohort",
+            "name": "混合队列（全阶段）",
+            "description": "300例混合肝癌患者，包含所有分期，具有明显的分子亚型",
+            "n_samples": 300,
+            "characteristics": [
+                "高异质性",
+                "明显分子亚型",
+                "多病因",
+                "适合精准医学分析"
+            ]
+        }
+    ]
+}

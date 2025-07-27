@@ -1,0 +1,33 @@
+{
+    "dataset_id": "demo_mixed_cohort",
+    "name": "混合队列（全阶段）",
+    "description": "300例混合肝癌患者，包含所有分期，具有明显的分子亚型",
+    "created_date": "2025-07-27",
+    "data_types": [
+        "clinical",
+        "expression",
+        "mutation"
+    ],
+    "statistics": {
+        "n_samples": 300,
+        "n_genes": 2000,
+        "stage_distribution": {
+            "I": 20,
+            "II": 30,
+            "III": 30,
+            "IV": 20
+        },
+        "survival_rate": 50,
+        "subtype_distribution": {
+            "Immune": 30,
+            "Metabolic": 35,
+            "Proliferative": 35
+        },
+        "characteristics": [
+            "高异质性",
+            "明显分子亚型",
+            "多病因",
+            "适合精准医学分析"
+        ]
+    }
+}

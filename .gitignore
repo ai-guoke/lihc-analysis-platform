@@ -223,8 +223,24 @@ ssl/*.pem
 ssl/*.key
 ssl/*.crt
 
+# Additional temporary files
+uploads/
+htmlcov/
+cache/
+*.md~
+*_REPORT.md
+*_SUMMARY.md
+ANALYSIS_*.md
+TODO.md
+功能特性*.md
+开发者*.md
+待开发*.md
+用户使用*.md
+
 # Keep important directories
 !data/.gitkeep
+!data/demo_datasets/
+!data/demo_datasets/**/*
 !logs/.gitkeep
 !results/.gitkeep
 !tests/test_*.py
