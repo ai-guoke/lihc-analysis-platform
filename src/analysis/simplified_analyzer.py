@@ -39,12 +39,12 @@ class SimplifiedAnalyzer:
         # Load clinical data
         clinical_file = self.data_dir / "clinical_data.csv"
         if clinical_file.exists():
-            data['clinical'] = pd.read_csv(clinical_file)
+            data['clinical_data'] = pd.read_csv(clinical_file)
         
         # Load expression data
         expression_file = self.data_dir / "expression_data.csv"
         if expression_file.exists():
-            data['expression'] = pd.read_csv(expression_file, index_col=0)
+            data['expression_data'] = pd.read_csv(expression_file, index_col=0)
         
         # Load mutation data
         mutation_file = self.data_dir / "mutation_data.csv"
@@ -61,9 +61,9 @@ class SimplifiedAnalyzer:
             'analyses': {}
         }
         
-        if 'expression' in data:
+        if 'expression_data' in data:
             # Top variable genes
-            expr_df = data['expression']
+            expr_df = data['expression_data']
             gene_variance = expr_df.var(axis=1).sort_values(ascending=False)
             top_genes = gene_variance.head(20)
             
@@ -84,9 +84,9 @@ class SimplifiedAnalyzer:
             
             results['analyses']['heatmap'] = 'stage1_gene_heatmap.png'
         
-        if 'clinical' in data:
+        if 'clinical_data' in data:
             # Survival statistics
-            clinical_df = data['clinical']
+            clinical_df = data['clinical_data']
             survival_stats = {
                 'total_patients': int(len(clinical_df)),
                 'events': int(clinical_df['os_status'].sum()) if 'os_status' in clinical_df.columns else 0,
@@ -108,8 +108,8 @@ class SimplifiedAnalyzer:
             'analyses': {}
         }
         
-        if 'expression' in data:
-            expr_df = data['expression']
+        if 'expression_data' in data:
+            expr_df = data['expression_data']
             
             # Gene correlation network
             top_genes = expr_df.var(axis=1).sort_values(ascending=False).head(30).index
@@ -148,9 +148,9 @@ class SimplifiedAnalyzer:
             'analyses': {}
         }
         
-        if 'expression' in data and 'clinical' in data:
-            expr_df = data['expression']
-            clinical_df = data['clinical']
+        if 'expression_data' in data and 'clinical_data' in data:
+            expr_df = data['expression_data']
+            clinical_df = data['clinical_data']
             
             # Simple survival association
             if 'os_status' in clinical_df.columns:
@@ -211,8 +211,8 @@ class SimplifiedAnalyzer:
             'analyses': {}
         }
         
-        if 'expression' in data:
-            expr_df = data['expression']
+        if 'expression_data' in data:
+            expr_df = data['expression_data']
             
             # Immune signature (simplified)
             immune_genes = ['CD8A', 'CD4', 'FOXP3', 'CD19', 'CD56', 'CD68']

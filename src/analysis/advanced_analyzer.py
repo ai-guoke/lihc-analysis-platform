@@ -645,15 +645,15 @@ class AdvancedAnalyzer:
             }
         
             # 1. Differential Expression Analysis
-            if 'differential_expression' in modules and 'expression' in data and 'clinical' in data:
+            if 'differential_expression' in modules and 'expression_data' in data and 'clinical_data' in data:
                 print("Running differential expression analysis...")
                 
                 if self.progress_manager:
                     with ProgressUpdater(self.progress_manager, 'differential_expression', 100) as progress:
                         progress.update(10, "Loading expression data...")
                         de_results = self.differential_expression_analysis(
-                            data['expression'], 
-                            data['clinical']
+                            data['expression_data'], 
+                            data['clinical_data']
                         )
                         progress.update(90, "Saving results...")
                         all_results['analyses']['differential_expression'] = de_results
@@ -665,8 +665,8 @@ class AdvancedAnalyzer:
                         progress.update(100, "Differential expression analysis completed")
                 else:
                     de_results = self.differential_expression_analysis(
-                        data['expression'], 
-                        data['clinical']
+                        data['expression_data'], 
+                        data['clinical_data']
                     )
                     all_results['analyses']['differential_expression'] = de_results
                     
@@ -676,20 +676,20 @@ class AdvancedAnalyzer:
                         json.dump(sig_genes[:100], f, indent=2)
             
             # 2. Survival Analysis
-            if 'survival' in modules and 'clinical' in data:
+            if 'survival' in modules and 'clinical_data' in data:
                 print("Running survival analysis...")
                 # Overall survival
-                surv_results = self.survival_analysis(data['clinical'])
+                surv_results = self.survival_analysis(data['clinical_data'])
                 
                 # Gene-based survival for top DE genes
-                if 'expression' in data and 'differential_expression' in all_results['analyses']:
+                if 'expression_data' in data and 'differential_expression' in all_results['analyses']:
                     top_genes = all_results['analyses']['differential_expression']['genes'][:5]
                     for gene_info in top_genes:
                         gene = gene_info['gene']
-                        if gene in data['expression'].index:
+                        if gene in data['expression_data'].index:
                             gene_surv = self.survival_analysis(
-                                data['clinical'], 
-                                data['expression'], 
+                                data['clinical_data'], 
+                                data['expression_data'], 
                                 gene
                             )
                             surv_results[f'gene_{gene}'] = gene_surv.get('gene_survival', {})
@@ -697,9 +697,9 @@ class AdvancedAnalyzer:
                 all_results['analyses']['survival'] = surv_results
             
             # 3. Network Analysis
-            if 'network' in modules and 'expression' in data:
+            if 'network' in modules and 'expression_data' in data:
                 print("Running network analysis...")
-                network_results = self.network_analysis(data['expression'])
+                network_results = self.network_analysis(data['expression_data'])
                 all_results['analyses']['network'] = network_results
             
             # 4. Pathway Enrichment
@@ -711,18 +711,18 @@ class AdvancedAnalyzer:
                 all_results['analyses']['pathway'] = pathway_results
             
             # 5. Machine Learning Prediction
-            if 'machine_learning' in modules and 'expression' in data and 'clinical' in data:
+            if 'machine_learning' in modules and 'expression_data' in data and 'clinical_data' in data:
                 print("Running machine learning prediction...")
                 ml_results = self.machine_learning_prediction(
-                    data['expression'], 
-                    data['clinical']
+                    data['expression_data'], 
+                    data['clinical_data']
                 )
                 all_results['analyses']['machine_learning'] = ml_results
             
             # 6. Molecular Subtyping
-            if 'subtyping' in modules and 'expression' in data:
+            if 'subtyping' in modules and 'expression_data' in data:
                 print("Running molecular subtyping...")
-                subtype_results = self.molecular_subtyping(data['expression'])
+                subtype_results = self.molecular_subtyping(data['expression_data'])
                 all_results['analyses']['subtyping'] = subtype_results
             
             # Generate comprehensive report
@@ -751,15 +751,15 @@ class AdvancedAnalyzer:
         # Load clinical data
         clinical_file = self.data_dir / "clinical_data.csv"
         if clinical_file.exists():
-            data['clinical'] = pd.read_csv(clinical_file)
+            data['clinical_data'] = pd.read_csv(clinical_file)
             # Ensure sample_id column exists
-            if 'sample_id' not in data['clinical'].columns:
-                data['clinical']['sample_id'] = data['clinical'].index.astype(str)
+            if 'sample_id' not in data['clinical_data'].columns:
+                data['clinical_data']['sample_id'] = data['clinical_data'].index.astype(str)
         
         # Load expression data
         expression_file = self.data_dir / "expression_data.csv"
         if expression_file.exists():
-            data['expression'] = pd.read_csv(expression_file, index_col=0)
+            data['expression_data'] = pd.read_csv(expression_file, index_col=0)
         
         # Load mutation data
         mutation_file = self.data_dir / "mutation_data.csv"

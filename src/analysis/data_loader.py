@@ -82,10 +82,26 @@ class DataLoader:
                                      p=[0.5, 0.2, 0.2, 0.1])
         })
         
+        # CNV data (Copy Number Variation)
+        cnv_data = pd.DataFrame(
+            np.random.choice([-2, -1, 0, 1, 2], size=(n_genes, n_samples), p=[0.1, 0.2, 0.4, 0.2, 0.1]),
+            index=genes,
+            columns=clinical_data['sample_id']
+        )
+        
+        # Methylation data (beta values)
+        methylation_data = pd.DataFrame(
+            np.random.beta(2, 2, size=(n_genes, n_samples)),
+            index=genes,
+            columns=clinical_data['sample_id']
+        )
+        
         return {
-            'clinical': clinical_data,
-            'expression': expression_data,
+            'clinical_data': clinical_data,
+            'expression_data': expression_data,
             'mutations': mutation_data,
+            'cnv': cnv_data,
+            'methylation': methylation_data,
             'dataset_info': {
                 'name': 'TCGA-LIHC Demo',
                 'samples': n_samples,
@@ -101,14 +117,14 @@ class DataLoader:
         # Load clinical data
         clinical_file = data_path / "clinical_data.csv"
         if clinical_file.exists():
-            data['clinical'] = pd.read_csv(clinical_file)
-            if 'sample_id' not in data['clinical'].columns:
-                data['clinical']['sample_id'] = data['clinical'].index.astype(str)
+            data['clinical_data'] = pd.read_csv(clinical_file)
+            if 'sample_id' not in data['clinical_data'].columns:
+                data['clinical_data']['sample_id'] = data['clinical_data'].index.astype(str)
         
         # Load expression data
         expression_file = data_path / "expression_data.csv"
         if expression_file.exists():
-            data['expression'] = pd.read_csv(expression_file, index_col=0)
+            data['expression_data'] = pd.read_csv(expression_file, index_col=0)
         
         # Load mutation data
         mutation_file = data_path / "mutation_data.csv"
@@ -118,8 +134,8 @@ class DataLoader:
         # Dataset info
         data['dataset_info'] = {
             'name': 'User Dataset',
-            'samples': len(data.get('clinical', [])),
-            'genes': len(data.get('expression', [])),
+            'samples': len(data.get('clinical_data', [])),
+            'genes': len(data.get('expression_data', [])),
             'type': 'user'
         }
         
@@ -138,17 +154,17 @@ class DataLoader:
             'stage_distribution': {}
         }
         
-        if 'clinical' in data and not data['clinical'].empty:
-            stats['samples'] = len(data['clinical'])
-            if 'age' in data['clinical'].columns:
-                stats['median_age'] = data['clinical']['age'].median()
-            if 'os_status' in data['clinical'].columns:
-                stats['survival_rate'] = 1 - data['clinical']['os_status'].mean()
-            if 'stage' in data['clinical'].columns:
-                stats['stage_distribution'] = data['clinical']['stage'].value_counts().to_dict()
+        if 'clinical_data' in data and not data['clinical_data'].empty:
+            stats['samples'] = len(data['clinical_data'])
+            if 'age' in data['clinical_data'].columns:
+                stats['median_age'] = data['clinical_data']['age'].median()
+            if 'os_status' in data['clinical_data'].columns:
+                stats['survival_rate'] = 1 - data['clinical_data']['os_status'].mean()
+            if 'stage' in data['clinical_data'].columns:
+                stats['stage_distribution'] = data['clinical_data']['stage'].value_counts().to_dict()
         
-        if 'expression' in data and not data['expression'].empty:
-            stats['genes'] = len(data['expression'])
+        if 'expression_data' in data and not data['expression_data'].empty:
+            stats['genes'] = len(data['expression_data'])
         
         if 'mutations' in data and not data['mutations'].empty:
             stats['mutations'] = len(data['mutations'])
@@ -159,24 +175,24 @@ class DataLoader:
         """Get top variable genes"""
         data = self.load_dataset(dataset_id, dataset_info)
         
-        if 'expression' not in data or data['expression'].empty:
+        if 'expression_data' not in data or data['expression_data'].empty:
             return pd.DataFrame()
         
-        gene_variance = data['expression'].var(axis=1)
+        gene_variance = data['expression_data'].var(axis=1)
         top_genes = gene_variance.nlargest(n)
         
         return pd.DataFrame({
             'gene': top_genes.index,
             'variance': top_genes.values,
-            'mean_expression': data['expression'].loc[top_genes.index].mean(axis=1).values
+            'mean_expression': data['expression_data'].loc[top_genes.index].mean(axis=1).values
         })
     
     def get_survival_data(self, dataset_id: str, dataset_info: Dict) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
         """Get survival data for analysis"""
         data = self.load_dataset(dataset_id, dataset_info)
         
-        clinical = data.get('clinical', pd.DataFrame())
-        expression = data.get('expression', None)
+        clinical = data.get('clinical_data', pd.DataFrame())
+        expression = data.get('expression_data', None)
         
         # Ensure required columns
         if not clinical.empty and 'os_time' in clinical.columns and 'os_status' in clinical.columns:
@@ -212,12 +228,12 @@ def create_dataset_specific_content(dataset_id: str, dataset_info: Dict,
     elif content_type == 'expression_heatmap':
         # Get expression data for heatmap
         data = data_loader.load_dataset(dataset_id, dataset_info)
-        if 'expression' not in data:
+        if 'expression_data' not in data:
             return {'error': 'No expression data available'}
         
         # Get top variable genes
         top_genes = data_loader.get_top_genes(dataset_id, dataset_info, 50)
-        expr_subset = data['expression'].loc[top_genes['gene']]
+        expr_subset = data['expression_data'].loc[top_genes['gene']]
         
         return {
             'expression_matrix': expr_subset.values.tolist(),

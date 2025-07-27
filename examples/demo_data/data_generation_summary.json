@@ -1,0 +1,53 @@
+{
+  "data_generation_info": {
+    "date": "2025-07-27 11:37:12",
+    "n_samples": 200,
+    "n_genes": 5000,
+    "n_essential_genes": 220
+  },
+  "gene_sets_included": {
+    "icafs_markers": 28,
+    "mycafs_markers": 30,
+    "apcafs_markers": 30,
+    "m1_markers": 25,
+    "m2_markers": 25,
+    "tregs_markers": 25,
+    "cd8t_exhaustion": 10,
+    "cd8t_cytotoxic": 10,
+    "oncogenes": 10,
+    "tumor_suppressors": 10,
+    "housekeeping": 10,
+    "other_immune": 15,
+    "collagen_synthesis": 10,
+    "matrix_remodeling": 15,
+    "angiogenesis": 10
+  },
+  "clinical_features": [
+    "age",
+    "gender",
+    "stage",
+    "os_time",
+    "os_status",
+    "risk_score",
+    "tumor_size",
+    "afp",
+    "alt",
+    "ast",
+    "hbv",
+    "hcv",
+    "surgery",
+    "chemotherapy",
+    "targeted_therapy"
+  ],
+  "sample_groups": {
+    "CAFs_subtypes": {
+      "iCAFs_dominant": 66,
+      "myCAFs_dominant": 66,
+      "apCAFs_dominant": 68
+    },
+    "TAMs_polarization": {
+      "M1_dominant": 100,
+      "M2_dominant": 100
+    }
+  }
+}
