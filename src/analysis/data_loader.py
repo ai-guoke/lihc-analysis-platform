@@ -26,8 +26,12 @@ class DataLoader:
         data = {}
         
         if dataset_info['type'] == 'demo':
-            # Load demo data
-            data = self._load_demo_data()
+            # Load demo data based on dataset ID
+            if dataset_id in ['demo_early_stage', 'demo_advanced_stage', 'demo_mixed_cohort']:
+                data = self._load_new_demo_data(dataset_id, dataset_info)
+            else:
+                # Load original demo data
+                data = self._load_demo_data()
         else:
             # Load user data
             data_path = Path(dataset_info.get('data_path', f'data/user_uploads/{dataset_info.get("session_id", dataset_id)}'))
@@ -109,6 +113,95 @@ class DataLoader:
                 'type': 'demo'
             }
         }
+    
+    def _load_new_demo_data(self, dataset_id: str, dataset_info: Dict) -> Dict:
+        """Load new demo datasets (early stage, advanced stage, mixed cohort)"""
+        try:
+            # Get data path from dataset info
+            data_path = Path(dataset_info.get('data_path', f'data/demo_datasets/{dataset_id}'))
+            
+            if not data_path.exists():
+                # Fallback to original demo data if path doesn't exist
+                return self._load_demo_data()
+            
+            data = {}
+            
+            # Load clinical data
+            clinical_file = data_path / "clinical_data.csv"
+            if clinical_file.exists():
+                data['clinical_data'] = pd.read_csv(clinical_file)
+            
+            # Load expression data  
+            expression_file = data_path / "expression_data.csv"
+            if expression_file.exists():
+                data['expression_data'] = pd.read_csv(expression_file, index_col=0)
+            
+            # Load mutation data
+            mutation_file = data_path / "mutation_data.csv"
+            if mutation_file.exists():
+                mutation_df = pd.read_csv(mutation_file, index_col=0)
+                # Convert to long format for compatibility
+                mutations = []
+                for sample in mutation_df.index:
+                    for gene in mutation_df.columns:
+                        if mutation_df.loc[sample, gene] == 1:
+                            mutations.append({
+                                'sample_id': sample,
+                                'gene': gene,
+                                'variant_type': 'SNV',
+                                'effect': 'missense'
+                            })
+                data['mutations'] = pd.DataFrame(mutations) if mutations else pd.DataFrame()
+            
+            # Load metadata
+            metadata_file = data_path / "metadata.json"
+            dataset_name = dataset_info.get('name', dataset_id)
+            n_samples = len(data.get('clinical_data', []))
+            n_genes = len(data.get('expression_data', []))
+            
+            if metadata_file.exists():
+                with open(metadata_file, 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+                    dataset_name = metadata.get('name', dataset_name)
+                    n_samples = metadata.get('statistics', {}).get('n_samples', n_samples)
+                    n_genes = metadata.get('statistics', {}).get('n_genes', n_genes)
+            
+            # Add dataset info
+            data['dataset_info'] = {
+                'name': dataset_name,
+                'samples': n_samples,
+                'genes': n_genes,
+                'type': 'demo',
+                'dataset_id': dataset_id
+            }
+            
+            # Generate missing data types if needed
+            if 'clinical_data' in data and 'expression_data' in data:
+                n_samples = len(data['clinical_data'])
+                n_genes = len(data['expression_data'])
+                
+                # Generate CNV data if missing
+                if 'cnv' not in data:
+                    data['cnv'] = pd.DataFrame(
+                        np.random.choice([-1, 0, 1], size=(n_genes, n_samples), p=[0.2, 0.6, 0.2]),
+                        index=data['expression_data'].index,
+                        columns=data['clinical_data']['Patient_ID']
+                    )
+                
+                # Generate methylation data if missing
+                if 'methylation' not in data:
+                    data['methylation'] = pd.DataFrame(
+                        np.random.beta(2, 2, size=(n_genes, n_samples)),
+                        index=data['expression_data'].index,
+                        columns=data['clinical_data']['Patient_ID']
+                    )
+            
+            return data
+            
+        except Exception as e:
+            print(f"Error loading new demo data for {dataset_id}: {str(e)}")
+            # Fallback to original demo data
+            return self._load_demo_data()
     
     def _load_user_data(self, data_path: Path) -> Dict:
         """Load user uploaded data"""

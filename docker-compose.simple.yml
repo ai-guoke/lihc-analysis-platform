@@ -1,0 +1,61 @@
+services:
+  # ultrathink v2.7 Main Dashboard
+  ultrathink-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: ultrathink-dashboard
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - ULTRATHINK_VERSION=2.7.0
+    command: python src/visualization/professional_dashboard.py
+    restart: unless-stopped
+    networks:
+      - ultrathink-network
+
+  # ultrathink v2.7 Unified API System
+  ultrathink-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: development
+    container_name: ultrathink-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./results:/app/results
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - ULTRATHINK_VERSION=2.7.0
+    command: uvicorn src.api.unified_api_system:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    networks:
+      - ultrathink-network
+
+  # Redis for API task queue and caching
+  redis:
+    image: redis:7-alpine
+    container_name: ultrathink-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ultrathink-network
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+networks:
+  ultrathink-network:
+    driver: bridge

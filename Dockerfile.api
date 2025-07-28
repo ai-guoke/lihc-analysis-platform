@@ -1,0 +1,94 @@
+# ultrathink v2.7 API Server Dockerfile
+# 统一API端点系统
+
+FROM python:3.9-slim as base
+
+# 设置环境变量
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PIP_NO_CACHE_DIR=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PYTHONPATH=/app
+
+# 创建非root用户
+RUN groupadd -r ultrathink && useradd -r -g ultrathink ultrathink
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libffi-dev \
+    libssl-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制requirements文件
+COPY requirements.txt ./
+
+# 安装Python依赖
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Development stage
+FROM base as development
+
+# 安装开发依赖
+RUN pip install pytest pytest-cov black isort flake8 mypy pre-commit
+
+# 复制源代码
+COPY . .
+
+# 创建必要的目录
+RUN mkdir -p logs temp data results cache \
+    data/raw data/processed data/external data/user_uploads \
+    results/tables results/networks results/linchpins results/figures \
+    results/user_analyses
+
+# 设置权限
+RUN chown -R ultrathink:ultrathink /app
+
+# 切换到非root用户
+USER ultrathink
+
+# 暴露API端口
+EXPOSE 8000
+
+# 开发环境启动命令
+CMD ["uvicorn", "src.api.unified_api_system:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# Production stage
+FROM base as production
+
+# 只复制必要文件
+COPY src/ ./src/
+COPY requirements.txt ./
+COPY API_USAGE_GUIDE.md ./
+COPY pyproject.toml ./
+
+# 创建必要的目录
+RUN mkdir -p logs temp data results cache \
+    data/raw data/processed data/external data/user_uploads \
+    results/tables results/networks results/linchpins results/figures \
+    results/user_analyses
+
+# 创建优化的Python缓存
+RUN python -m compileall src/
+
+# 设置权限
+RUN chown -R ultrathink:ultrathink /app
+
+# 切换到非root用户
+USER ultrathink
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# 暴露API端口
+EXPOSE 8000
+
+# 生产环境启动命令
+CMD ["uvicorn", "src.api.unified_api_system:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
