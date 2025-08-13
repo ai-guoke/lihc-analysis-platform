@@ -181,17 +181,21 @@ $RECYCLE.BIN/
 *.swo
 *~
 
-# Project specific
-logs/
-results/
-data/
-*.csv
-*.xlsx
-*.xls
-*.h5
-*.hdf5
-*.pkl
-*.pickle
+# Project specific - keep structure, ignore content
+data/user_uploads/*
+!data/user_uploads/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/batch_results/*
+!data/batch_results/.gitkeep
+data/analysis_results/*
+!data/analysis_results/.gitkeep
+data/history/*
+!data/history/history_log.json
+results/user_analyses/*
+!results/user_analyses/.gitkeep
+logs/*
+!logs/.gitkeep
 
 # Temporary files
 temp/
@@ -203,9 +207,9 @@ tmp/
 *_old.*
 *_backup.*
 
-# Test files
+# Test files (keep tests directory)
 test_*.py
-demo_*.py
+!tests/test_*.py
 junit.xml
 
 # PDF reports
@@ -218,10 +222,13 @@ docker-volumes/
 # Grafana data
 grafana-storage/
 
-# SSL certificates
-ssl/*.pem
-ssl/*.key
-ssl/*.crt
+# SSL certificates (keep examples)
+ssl/certs/*.pem
+ssl/certs/*.key
+ssl/certs/*.crt
+!ssl/certs/README.md
+!ssl/certs/lihc.key
+!ssl/certs/lihc.crt
 
 # Additional temporary files
 uploads/
@@ -232,10 +239,14 @@ cache/
 *_SUMMARY.md
 ANALYSIS_*.md
 TODO.md
-功能特性*.md
-开发者*.md
-待开发*.md
-用户使用*.md
+
+# GitHub script outputs
+github-secrets-summary.txt
+
+# Environment files
+.env.local
+.env.*.local
+!.env.example
 
 # Keep important directories
 !data/.gitkeep
