@@ -315,7 +315,7 @@ class ProfessionalDashboard:
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                 <style>
-                ''' + self.get_professional_css() + '''
+                ''' + self.get_apple_glassmorphism_css() + self.get_professional_css() + '''
                 </style>
             </head>
             <body>
@@ -578,6 +578,324 @@ class ProfessionalDashboard:
             # Hidden store removed (already exists above)
         ])
     
+    def get_apple_glassmorphism_css(self):
+        """Apple-inspired glassmorphism CSS"""
+        return """
+        /* Apple Glassmorphism Variables */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --glass-shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.12);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        /* Main Content Gradient Background */
+        .main-wrapper {
+            background: linear-gradient(180deg, 
+                #f8f9fa 0%, 
+                rgba(102, 126, 234, 0.03) 50%, 
+                #f5f6fa 100%);
+        }
+        
+        /* Glass Effect for Cards */
+        .card, .dash-table-container {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle at 20% 30%,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 50%
+            );
+            animation: floatPattern 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes floatPattern {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+        
+        .card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--glass-shadow-hover);
+        }
+        
+        /* Enhanced Sidebar Glass Effect */
+        .sidebar {
+            background: linear-gradient(180deg, 
+                rgba(255, 255, 255, 0.92) 0%, 
+                rgba(248, 249, 252, 0.88) 100%);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar-item {
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 4px 8px;
+        }
+        
+        .sidebar-item i {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-item:hover i {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 100%;
+            background: var(--gradient-primary);
+            transform: translateY(-50%);
+            transition: width 0.3s;
+            z-index: -1;
+        }
+        
+        .sidebar-item:hover::before {
+            width: 5px;
+            border-radius: 0 3px 3px 0;
+        }
+        
+        .sidebar-item:hover {
+            background: linear-gradient(90deg, 
+                rgba(102, 126, 234, 0.08) 0%, 
+                rgba(102, 126, 234, 0.03) 100%);
+            padding-left: 25px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+        
+        .sidebar-item.active {
+            background: linear-gradient(135deg, 
+                rgba(102, 126, 234, 0.15) 0%, 
+                rgba(118, 75, 162, 0.12) 100%);
+            color: #667eea;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+        }
+        
+        .sidebar-item.active i {
+            color: #667eea;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Button Animations */
+        .btn-primary, .primary-button {
+            background: var(--gradient-primary) !important;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+        
+        .btn-primary::after, .primary-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+        
+        .btn-primary:active::after, .primary-button:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary:hover, .primary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            filter: brightness(1.1);
+        }
+        
+        /* Metric Cards Animation */
+        .metric-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition-bounce);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+        
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Float Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .metric-card h3 {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Banner Animations */
+        @keyframes bannerFloat {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 0.2;
+            }
+            25% { 
+                transform: translate(50px, -30px) scale(1.1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translate(-30px, 20px) scale(0.95);
+                opacity: 0.15;
+            }
+            75% { 
+                transform: translate(30px, 30px) scale(1.05);
+                opacity: 0.25;
+            }
+        }
+        
+        /* Pulse Animation for Icons */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Banner CTA Button Hover */
+        .banner-cta-btn:hover {
+            transform: translateY(-2px) scale(1.05) !important;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4) !important;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+            filter: brightness(1.1);
+        }
+        
+        .banner-cta-btn:active {
+            transform: translateY(0) scale(0.98) !important;
+        }
+        
+        /* Glass Banner Extra Effects */
+        .glass-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.5);
+        }
+        
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        """
+    
     def get_professional_css(self):
         """Professional CSS with modern design"""
         return """
@@ -611,19 +929,23 @@ class ProfessionalDashboard:
             color: var(--text-primary);
         }
         
-        /* Top Navigation Bar */
+        /* Top Navigation Bar - Apple Glassmorphism Style */
         .top-navbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: var(--topbar-height);
-            background: var(--dark-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
             z-index: 1000;
             display: flex;
             align-items: center;
             padding: 0 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .sidebar-toggle {
@@ -639,7 +961,9 @@ class ProfessionalDashboard:
         .brand {
             font-size: 1.5rem;
             font-weight: bold;
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-right: auto;
         }
         
@@ -650,25 +974,50 @@ class ProfessionalDashboard:
         }
         
         .nav-item {
+            position: relative;
             padding: 8px 16px;
-            color: white;
-            background: none;
-            border: none;
+            color: #333;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             cursor: pointer;
-            transition: background 0.3s;
-            border-radius: 5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
             font-size: 0.95rem;
             display: flex;
             align-items: center;
             gap: 5px;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .nav-item:hover::before {
+            width: 300%;
+            height: 300%;
         }
         
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
         }
         
         .nav-item.active {
-            background: var(--secondary-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .language-switcher {
@@ -681,15 +1030,21 @@ class ProfessionalDashboard:
         
         .lang-btn {
             padding: 5px 15px;
-            background: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             border: none;
-            color: white;
+            color: #333;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .lang-btn.active {
-            background: var(--secondary-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
         
         /* Sidebar Navigation */
@@ -717,11 +1072,28 @@ class ProfessionalDashboard:
         
         .sidebar-section-title {
             padding: 0 20px 10px 20px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            opacity: 0.9;
+            position: relative;
+        }
+        
+        .sidebar-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(102, 126, 234, 0.3) 50%, 
+                transparent 100%);
         }
         
         .sidebar-item {
@@ -4447,23 +4819,83 @@ Linchpin Score = 0.4 × 预后评分 +
         total_modules = n_basic_modules + n_advanced_modules + n_precision_modules
         
         return html.Div([
-            # 顶部横幅
+            # 顶部横幅 - 增强的Apple风格渐变
             html.Div([
+                # 动态背景效果
+                html.Div(className="banner-bg-animation", style={
+                    'position': 'absolute',
+                    'top': '0',
+                    'left': '0',
+                    'right': '0',
+                    'bottom': '0',
+                    'background': 'radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
+                    'animation': 'bannerFloat 15s ease-in-out infinite'
+                }),
                 html.Div([
-                    html.H1("LIHC 肝癌多维度预后分析平台", style={'marginBottom': '10px'}),
+                    html.Div([
+                        html.I(className="fas fa-dna fa-3x pulse-animation", 
+                              style={'marginBottom': '20px', 
+                                    'background': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    '-webkit-background-clip': 'text',
+                                    '-webkit-text-fill-color': 'transparent'}),
+                    ], style={'textAlign': 'center'}),
+                    html.H1("LIHC 肝癌多维度预后分析平台", 
+                           style={'marginBottom': '15px', 'fontWeight': '700', 
+                                 'letterSpacing': '-1px', 'fontSize': '2.5rem',
+                                 'background': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                 '-webkit-background-clip': 'text',
+                                 '-webkit-text-fill-color': 'transparent'}),
                     html.P("整合多组学数据 · 解析肿瘤微环境 · 识别关键靶点 · 指导精准治疗", 
-                          style={'fontSize': '1.2rem', 'color': '#6c757d'})
-                ], style={'textAlign': 'center', 'padding': '40px 0'})
-            ], className="card", style={'background': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 'color': 'white'}),
+                          style={'fontSize': '1.2rem', 'color': '#5a6c7d', 
+                                'fontWeight': '400', 'letterSpacing': '0.5px'}),
+                    html.Div([
+                        html.Button("开始分析", className="banner-cta-btn", 
+                                   style={
+                                       'marginTop': '25px',
+                                       'padding': '12px 35px',
+                                       'fontSize': '1.1rem',
+                                       'fontWeight': '500',
+                                       'background': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                       'color': 'white',
+                                       'border': 'none',
+                                       'borderRadius': '30px',
+                                       'cursor': 'pointer',
+                                       'transition': 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                       'boxShadow': '0 4px 20px rgba(102, 126, 234, 0.3)'
+                                   }),
+                    ], style={'textAlign': 'center'})
+                ], style={'textAlign': 'center', 'padding': '60px 20px', 'position': 'relative', 'zIndex': '1'})
+            ], className="card main-banner glass-banner", 
+               style={
+                   'background': 'linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%)',
+                   'color': '#2c3e50',
+                   'border': '1px solid rgba(102, 126, 234, 0.1)',
+                   'boxShadow': '0 10px 40px rgba(102, 126, 234, 0.08)',
+                   'position': 'relative',
+                   'overflow': 'hidden',
+                   'backdropFilter': 'blur(10px)'
+               }),
             
             # 关键指标卡片
             html.Div([
                 html.Div([
                     html.Div([
-                        html.I(className="fas fa-database fa-2x", style={'color': '#3498db', 'marginBottom': '10px'}),
-                        html.H3(str(n_datasets), style={'color': '#2c3e50', 'marginBottom': '5px'}),
-                        html.P("数据集", style={'color': '#7f8c8d', 'marginBottom': '0'})
-                    ], className="metric-card", style={'textAlign': 'center'}),
+                        html.Div([
+                            html.I(className="fas fa-database fa-2x icon-animated", 
+                                  style={'background': 'linear-gradient(135deg, #667eea 0%, #4facfe 100%)',
+                                        '-webkit-background-clip': 'text',
+                                        '-webkit-text-fill-color': 'transparent',
+                                        'marginBottom': '15px'}),
+                        ], style={'height': '50px'}),
+                        html.H3(str(n_datasets), 
+                               style={'color': '#2c3e50', 'marginBottom': '5px', 'fontWeight': '700'}),
+                        html.P("数据集", style={'color': '#7f8c8d', 'marginBottom': '0', 'fontSize': '0.9rem'})
+                    ], className="metric-card glass-card", 
+                       style={'textAlign': 'center', 
+                             'background': 'rgba(255, 255, 255, 0.8)',
+                             'backdropFilter': 'blur(10px)',
+                             'border': '1px solid rgba(255, 255, 255, 0.3)',
+                             'boxShadow': '0 8px 32px rgba(0, 0, 0, 0.08)'}),
                     
                     html.Div([
                         html.I(className="fas fa-chart-bar fa-2x", style={'color': '#27ae60', 'marginBottom': '10px'}),
