@@ -21,12 +21,16 @@ sys.path.insert(0, str(current_dir))
 
 try:
     from utils.common import PathManager, ConfigManager, DataGenerator
-    from analysis.stage1_multidimensional import Stage1Analyzer
-    from analysis.stage2_network import Stage2Analyzer
-    from analysis.stage3_linchpin import Stage3Analyzer
+    from analysis.stage1_multidimensional import MultiDimensionalAnalysis as Stage1Analyzer
+    from analysis.stage2_network import CrossDimensionalNetwork as Stage2Analyzer
+    from analysis.stage3_linchpin import LinchpinIdentifier as Stage3Analyzer
 except ImportError as e:
     print(f"Warning: Could not import analysis modules: {e}")
     print("Some functionality may be limited.")
+    # Define placeholder classes
+    Stage1Analyzer = None
+    Stage2Analyzer = None
+    Stage3Analyzer = None
 
 
 class LIHCAnalysisPipeline:

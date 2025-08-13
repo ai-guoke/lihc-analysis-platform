@@ -20,7 +20,7 @@ sys.path.insert(0, str(src_dir))
 try:
     from utils.common import PathManager, ConfigManager, DataGenerator
     from run_pipeline import LIHCAnalysisPipeline
-    from visualization.unified_dashboard import UnifiedLIHCDashboard
+    from visualization.professional_dashboard import ProfessionalDashboard
 except ImportError as e:
     print(f"❌ Error: Could not import required modules: {e}")
     print("Please ensure all dependencies are installed:")
@@ -111,26 +111,15 @@ class LIHCPlatform:
             return False
     
     def launch_dashboard(self, args) -> None:
-        """Launch the dashboard (unified or professional)"""
-        if args.professional:
-            print("🌐 Launching Professional LIHC Dashboard...")
-            try:
-                from visualization.professional_dashboard import ProfessionalDashboard
-                dashboard = ProfessionalDashboard()
-                dashboard.run(debug=args.debug, port=args.port)
-            except KeyboardInterrupt:
-                print("\\n👋 Dashboard stopped by user")
-            except Exception as e:
-                print(f"❌ Dashboard error: {e}")
-        else:
-            print("🌐 Launching LIHC Analysis Dashboard...")
-            try:
-                dashboard = UnifiedLIHCDashboard(results_dir=args.results_dir)
-                dashboard.run(debug=args.debug, port=args.port)
-            except KeyboardInterrupt:
-                print("\\n👋 Dashboard stopped by user")
-            except Exception as e:
-                print(f"❌ Dashboard error: {e}")
+        """Launch the professional dashboard"""
+        print("🌐 Launching Professional LIHC Dashboard...")
+        try:
+            dashboard = ProfessionalDashboard()
+            dashboard.run(debug=args.debug, port=args.port)
+        except KeyboardInterrupt:
+            print("\\n👋 Dashboard stopped by user")
+        except Exception as e:
+            print(f"❌ Dashboard error: {e}")
     
     def show_status(self, args) -> None:
         """Show platform status and available data"""
@@ -258,11 +247,6 @@ Examples:
         "--debug", 
         action="store_true", 
         help="Run dashboard in debug mode"
-    )
-    parser.add_argument(
-        "--professional", 
-        action="store_true", 
-        help="Use professional dashboard layout with top + sidebar navigation"
     )
     
     args = parser.parse_args()

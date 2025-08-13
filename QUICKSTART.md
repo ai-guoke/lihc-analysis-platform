@@ -6,10 +6,10 @@
 
 ```bash
 # 使用Docker启动（推荐）
-docker-compose -f docker-compose.professional.yml up -d
+docker-compose up -d
 
 # 或使用Python直接运行
-python main.py --professional
+python main.py --dashboard
 ```
 
 ### 2. 访问Web界面

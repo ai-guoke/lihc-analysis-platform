@@ -1,19 +1,19 @@
-# ultrathink v2.7 API Server Dockerfile
-# 统一API端点系统
+# LIHC Platform API Server Dockerfile
+# Unified API System
 
 FROM python:3.9-slim as base
 
-# 设置环境变量
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PIP_NO_CACHE_DIR=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PYTHONPATH=/app
 
-# 创建非root用户
-RUN groupadd -r ultrathink && useradd -r -g ultrathink ultrathink
+# Create non-root user
+RUN groupadd -r lihc && useradd -r -g lihc lihc
 
-# 安装系统依赖
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -22,73 +22,73 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 设置工作目录
+# Set work directory
 WORKDIR /app
 
-# 复制requirements文件
+# Copy requirements file
 COPY requirements.txt ./
 
-# 安装Python依赖
+# Install Python dependencies
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 # Development stage
 FROM base as development
 
-# 安装开发依赖
+# Install development dependencies
 RUN pip install pytest pytest-cov black isort flake8 mypy pre-commit
 
-# 复制源代码
+# Copy source code
 COPY . .
 
-# 创建必要的目录
+# Create necessary directories
 RUN mkdir -p logs temp data results cache \
     data/raw data/processed data/external data/user_uploads \
     results/tables results/networks results/linchpins results/figures \
     results/user_analyses
 
-# 设置权限
-RUN chown -R ultrathink:ultrathink /app
+# Set permissions
+RUN chown -R lihc:lihc /app
 
-# 切换到非root用户
-USER ultrathink
+# Switch to non-root user
+USER lihc
 
-# 暴露API端口
+# Expose API port
 EXPOSE 8000
 
-# 开发环境启动命令
+# Development start command
 CMD ["uvicorn", "src.api.unified_api_system:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # Production stage
 FROM base as production
 
-# 只复制必要文件
+# Copy only necessary files
 COPY src/ ./src/
 COPY requirements.txt ./
 COPY API_USAGE_GUIDE.md ./
 COPY pyproject.toml ./
 
-# 创建必要的目录
+# Create necessary directories
 RUN mkdir -p logs temp data results cache \
     data/raw data/processed data/external data/user_uploads \
     results/tables results/networks results/linchpins results/figures \
     results/user_analyses
 
-# 创建优化的Python缓存
+# Create optimized Python cache
 RUN python -m compileall src/
 
-# 设置权限
-RUN chown -R ultrathink:ultrathink /app
+# Set permissions
+RUN chown -R lihc:lihc /app
 
-# 切换到非root用户
-USER ultrathink
+# Switch to non-root user
+USER lihc
 
-# 健康检查
+# Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# 暴露API端口
+# Expose API port
 EXPOSE 8000
 
-# 生产环境启动命令
+# Production start command
 CMD ["uvicorn", "src.api.unified_api_system:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

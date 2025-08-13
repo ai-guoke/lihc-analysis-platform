@@ -56,7 +56,7 @@ from src.api.api_client_sdk import LIHCAPIClient
 # 创建客户端
 client = LIHCAPIClient(
     base_url="http://localhost:8000",
-    api_token="ultrathink_api_token_2025"
+    api_token="lihc_api_token_2025"
 )
 
 # 健康检查
@@ -69,11 +69,11 @@ print(f"API状态: {health.message}")
 API使用Bearer Token认证方式：
 
 ```http
-Authorization: Bearer ultrathink_api_token_2025
+Authorization: Bearer lihc_api_token_2025
 ```
 
 **可用令牌**:
-- `ultrathink_api_token_2025` - 管理员权限（所有功能）
+- `lihc_api_token_2025` - 管理员权限（所有功能）
 - `research_token_2025` - 研究员权限（分析和报告）
 
 ### 📋 API端点详解
