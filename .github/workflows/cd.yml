@@ -1,0 +1,323 @@
+name: CD Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build and push Docker image
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom
+          path: sbom.spdx.json
+
+  # Security scanning
+  security-scan:
+    name: Security Scanning
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ needs.build-and-push.outputs.image-tag }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ needs.build-and-push.outputs.image-tag }}
+          args: --severity-threshold=high
+
+  # Deploy to staging
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [build-and-push, security-scan]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging' || github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    environment:
+      name: staging
+      url: https://staging.lihc-platform.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to staging server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            # Pull latest image
+            docker pull ${{ needs.build-and-push.outputs.image-tag }}
+            
+            # Stop existing container
+            docker stop lihc-platform || true
+            docker rm lihc-platform || true
+            
+            # Run new container
+            docker run -d \
+              --name lihc-platform \
+              --restart unless-stopped \
+              -p 8050:8050 \
+              -v /data:/app/data \
+              -v /logs:/app/logs \
+              --env-file /opt/lihc/.env.staging \
+              ${{ needs.build-and-push.outputs.image-tag }}
+            
+            # Health check
+            sleep 10
+            curl -f http://localhost:8050/health || exit 1
+
+      - name: Run smoke tests
+        run: |
+          # Wait for deployment
+          sleep 30
+          
+          # Run smoke tests
+          curl -f https://staging.lihc-platform.com/health
+          curl -f https://staging.lihc-platform.com/api/health
+
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Staging deployment ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+  # Deploy to production
+  deploy-production:
+    name: Deploy to Production
+    needs: [build-and-push, security-scan, deploy-staging]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' || github.event_name == 'push' && contains(github.ref, 'refs/tags/v')
+    environment:
+      name: production
+      url: https://lihc-platform.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create GitHub deployment
+        uses: chrnorm/deployment-action@v2
+        id: deployment
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: production
+          auto-merge: false
+
+      - name: Deploy to production Kubernetes
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          # Setup kubectl
+          echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
+          
+          # Update deployment
+          kubectl set image deployment/lihc-platform \
+            lihc-platform=${{ needs.build-and-push.outputs.image-tag }} \
+            -n production
+          
+          # Wait for rollout
+          kubectl rollout status deployment/lihc-platform -n production
+          
+          # Verify deployment
+          kubectl get pods -n production
+
+      - name: Run production tests
+        run: |
+          # Run production smoke tests
+          curl -f https://lihc-platform.com/health
+          curl -f https://lihc-platform.com/api/health
+          
+          # Run synthetic monitoring
+          npm install -g @datadog/synthetics-ci-cli
+          datadog-ci synthetics run-tests --public-id ${{ secrets.DATADOG_PUBLIC_ID }}
+
+      - name: Update deployment status
+        uses: chrnorm/deployment-status@v2
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: ${{ job.status }}
+          environment-url: https://lihc-platform.com
+
+      - name: Create release notes
+        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            sbom.spdx.json
+            CHANGELOG.md
+
+      - name: Notify team
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Production deployment ${{ job.status }}
+            Version: ${{ github.ref_name }}
+            Deployed by: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+  # Rollback on failure
+  rollback:
+    name: Rollback Deployment
+    needs: [deploy-production]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+      - name: Rollback Kubernetes deployment
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
+          
+          # Rollback to previous version
+          kubectl rollout undo deployment/lihc-platform -n production
+          kubectl rollout status deployment/lihc-platform -n production
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "⚠️ Production deployment rolled back",
+              attachments: [{
+                color: 'warning',
+                text: 'Automatic rollback triggered due to deployment failure'
+              }]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Post-deployment monitoring
+  monitor:
+    name: Post-Deployment Monitoring
+    needs: [deploy-production]
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+      - name: Wait for metrics
+        run: sleep 300  # Wait 5 minutes for metrics to stabilize
+
+      - name: Check error rates
+        run: |
+          # Check error rates using monitoring API
+          # This is a placeholder - implement with your monitoring solution
+          echo "Checking error rates..."
+
+      - name: Check performance metrics
+        run: |
+          # Check response times and throughput
+          # This is a placeholder - implement with your monitoring solution
+          echo "Checking performance metrics..."
+
+      - name: Alert on anomalies
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "⚠️ Post-deployment anomalies detected",
+              attachments: [{
+                color: 'danger',
+                text: 'Please check the production metrics dashboard'
+              }]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}

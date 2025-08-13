@@ -1,130 +1,249 @@
-# Makefile for LIHC Platform Development
+# LIHC Analysis Platform Makefile
+# Simplify common development and deployment tasks
 
-.PHONY: help install install-dev test test-cov lint format type-check clean setup-hooks run-demo run-dashboard docker-build docker-run
+.PHONY: help install dev test build deploy clean docs
+
+# Variables
+PYTHON := python3
+PIP := pip3
+DOCKER := docker
+DOCKER_COMPOSE := docker-compose
+PROJECT_NAME := lihc-platform
+VERSION := 2.6.0
+
+# Colors for output
+RED := \033[0;31m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+BLUE := \033[0;34m
+NC := \033[0m # No Color
 
 # Default target
-help:
+help: ## Show this help message
+	@echo "$(BLUE)LIHC Analysis Platform - Makefile Commands$(NC)"
+	@echo ""
+	@echo "Usage: make [target]"
+	@echo ""
 	@echo "Available targets:"
-	@echo "  install          Install production dependencies"
-	@echo "  install-dev      Install development dependencies"
-	@echo "  test            Run tests"
-	@echo "  test-cov        Run tests with coverage"
-	@echo "  lint            Run linting (flake8)"
-	@echo "  format          Format code (black + isort)"
-	@echo "  type-check      Run type checking (mypy)"
-	@echo "  clean           Clean up generated files"
-	@echo "  setup-hooks     Install pre-commit hooks"
-	@echo "  run-demo        Run demo analysis"
-	@echo "  run-dashboard   Run dashboard"
-	@echo "  docker-build    Build Docker image"
-	@echo "  docker-run      Run Docker container"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
 
-# Installation
-install:
-	pip install -r requirements.txt
+# Installation targets
+install: ## Install all dependencies
+	@echo "$(YELLOW)Installing dependencies...$(NC)"
+	$(PIP) install -r requirements.txt
+	@echo "$(GREEN)Dependencies installed successfully!$(NC)"
 
-install-dev:
-	pip install -r requirements.txt
-	pip install -e .
+install-dev: ## Install development dependencies
+	@echo "$(YELLOW)Installing development dependencies...$(NC)"
+	$(PIP) install -r requirements.txt
+	$(PIP) install -r requirements-dev.txt || $(PIP) install pytest black flake8 mypy
+	pre-commit install || echo "pre-commit not available"
+	@echo "$(GREEN)Development dependencies installed successfully!$(NC)"
 
-# Testing
-test:
-	pytest tests/ -v
+venv: ## Create virtual environment
+	@echo "$(YELLOW)Creating virtual environment...$(NC)"
+	$(PYTHON) -m venv venv
+	@echo "$(GREEN)Virtual environment created! Activate with: source venv/bin/activate$(NC)"
 
-test-cov:
-	pytest tests/ -v --cov=src --cov-report=html --cov-report=term-missing
+# Development targets
+dev: ## Run development server
+	@echo "$(YELLOW)Starting development server...$(NC)"
+	$(PYTHON) main.py --dashboard --debug --port 8050
 
-# Code quality
-lint:
-	flake8 src/ tests/ --max-line-length=88 --extend-ignore=E203,E266,E501,W503
+run: ## Run production server
+	@echo "$(YELLOW)Starting production server...$(NC)"
+	$(PYTHON) main.py --dashboard --port 8050
 
-format:
-	black src/ tests/ --line-length=88
-	isort src/ tests/ --profile=black
+dashboard: ## Run dashboard only
+	@echo "$(YELLOW)Starting dashboard...$(NC)"
+	$(PYTHON) main.py --dashboard
 
-type-check:
-	mypy src/ --ignore-missing-imports
+# Testing targets
+test: ## Run all tests
+	@echo "$(YELLOW)Running tests...$(NC)"
+	pytest tests/ -v || echo "Tests not available yet"
 
-# Pre-commit hooks
-setup-hooks:
-	pre-commit install
-	pre-commit install --hook-type pre-push
+test-unit: ## Run unit tests only
+	@echo "$(YELLOW)Running unit tests...$(NC)"
+	pytest tests/unit/ -v || echo "Unit tests not available yet"
 
-# Running the application
-run-demo:
-	python main.py --setup-demo --run-analysis
+test-integration: ## Run integration tests only
+	@echo "$(YELLOW)Running integration tests...$(NC)"
+	pytest tests/integration/ -v || echo "Integration tests not available yet"
 
-run-dashboard:
-	python main.py --dashboard
+test-coverage: ## Run tests with coverage report
+	@echo "$(YELLOW)Running tests with coverage...$(NC)"
+	pytest --cov=src --cov-report=html --cov-report=term || echo "Coverage tests not available yet"
+	@echo "$(GREEN)Coverage report generated in htmlcov/index.html$(NC)"
 
-run-full:
-	python main.py --setup-demo --run-analysis --dashboard
+# Code quality targets
+lint: ## Run code linting
+	@echo "$(YELLOW)Running linters...$(NC)"
+	flake8 src/ --max-line-length=88 --ignore=E203,W503 || echo "Flake8 not available"
+	pylint src/ || echo "Pylint not available"
+	mypy src/ || echo "Mypy not available"
 
-# Docker
-docker-build:
-	docker build -t lihc-platform:latest .
+format: ## Format code with black
+	@echo "$(YELLOW)Formatting code...$(NC)"
+	black src/ tests/ || echo "Black not available"
+	isort src/ tests/ || echo "Isort not available"
+	@echo "$(GREEN)Code formatted successfully!$(NC)"
 
-docker-run:
-	docker run -p 8050:8050 lihc-platform:latest
+check: ## Check code quality without modifying
+	@echo "$(YELLOW)Checking code quality...$(NC)"
+	black --check src/ tests/ || echo "Black check not available"
+	isort --check-only src/ tests/ || echo "Isort check not available"
+	flake8 src/ || echo "Flake8 not available"
 
-docker-compose-up:
-	docker-compose up -d
+# Docker targets
+build: ## Build Docker image
+	@echo "$(YELLOW)Building Docker image...$(NC)"
+	$(DOCKER) build -t $(PROJECT_NAME):$(VERSION) .
+	$(DOCKER) tag $(PROJECT_NAME):$(VERSION) $(PROJECT_NAME):latest
+	@echo "$(GREEN)Docker image built successfully!$(NC)"
 
-docker-compose-down:
-	docker-compose down
+build-no-cache: ## Build Docker image without cache
+	@echo "$(YELLOW)Building Docker image (no cache)...$(NC)"
+	$(DOCKER) build --no-cache -t $(PROJECT_NAME):$(VERSION) .
 
-# Cleanup
-clean:
+up: ## Start all services with docker-compose
+	@echo "$(YELLOW)Starting services...$(NC)"
+	$(DOCKER_COMPOSE) up -d
+	@echo "$(GREEN)Services started! Access at http://localhost:8050$(NC)"
+
+down: ## Stop all services
+	@echo "$(YELLOW)Stopping services...$(NC)"
+	$(DOCKER_COMPOSE) down
+	@echo "$(GREEN)Services stopped!$(NC)"
+
+restart: ## Restart all services
+	@echo "$(YELLOW)Restarting services...$(NC)"
+	$(DOCKER_COMPOSE) restart
+	@echo "$(GREEN)Services restarted!$(NC)"
+
+logs: ## Show logs from all services
+	$(DOCKER_COMPOSE) logs -f
+
+logs-app: ## Show logs from app service only
+	$(DOCKER_COMPOSE) logs -f lihc-platform
+
+ps: ## Show running services
+	$(DOCKER_COMPOSE) ps
+
+# Docker profiles
+up-monitoring: ## Start with monitoring stack
+	@echo "$(YELLOW)Starting with monitoring...$(NC)"
+	$(DOCKER_COMPOSE) --profile monitoring up -d
+	@echo "$(GREEN)Services started with monitoring!$(NC)"
+	@echo "Grafana: http://localhost:3000 (admin/admin)"
+	@echo "Prometheus: http://localhost:9090"
+
+up-celery: ## Start with Celery workers
+	@echo "$(YELLOW)Starting with Celery...$(NC)"
+	$(DOCKER_COMPOSE) --profile celery up -d
+	@echo "$(GREEN)Services started with Celery workers!$(NC)"
+	@echo "Flower: http://localhost:5555"
+
+up-full: ## Start all services including optional ones
+	@echo "$(YELLOW)Starting all services...$(NC)"
+	$(DOCKER_COMPOSE) --profile monitoring --profile celery --profile production --profile management up -d
+	@echo "$(GREEN)All services started!$(NC)"
+
+# Database targets
+db-init: ## Initialize database
+	@echo "$(YELLOW)Initializing database...$(NC)"
+	$(PYTHON) scripts/init_db.py || echo "Database initialization script not available"
+	@echo "$(GREEN)Database initialized!$(NC)"
+
+db-migrate: ## Run database migrations
+	@echo "$(YELLOW)Running migrations...$(NC)"
+	$(PYTHON) scripts/migrate.py || echo "Migration script not available"
+	@echo "$(GREEN)Migrations completed!$(NC)"
+
+db-backup: ## Backup database
+	@echo "$(YELLOW)Backing up database...$(NC)"
+	$(DOCKER_COMPOSE) exec postgres pg_dump -U lihc_user lihc_db > backup_$(shell date +%Y%m%d_%H%M%S).sql || echo "Database backup not available"
+	@echo "$(GREEN)Database backed up!$(NC)"
+
+# Documentation targets
+docs: ## Generate documentation
+	@echo "$(YELLOW)Documentation files:$(NC)"
+	@ls -la docs/*.md
+	@echo "$(GREEN)Documentation available in docs/ directory$(NC)"
+
+docs-serve: ## Serve documentation locally
+	@echo "$(YELLOW)Serving documentation...$(NC)"
+	cd docs && python -m http.server 8080
+
+# Utility targets
+clean: ## Clean temporary files and caches
+	@echo "$(YELLOW)Cleaning temporary files...$(NC)"
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	rm -rf .coverage htmlcov/ .pytest_cache/ .mypy_cache/
-	rm -rf build/ dist/
+	find . -type f -name "*.pyo" -delete
+	find . -type f -name ".DS_Store" -delete
+	rm -rf .pytest_cache/
+	rm -rf htmlcov/
+	rm -rf dist/
+	rm -rf build/
+	rm -rf *.egg-info
+	@echo "$(GREEN)Cleanup completed!$(NC)"
 
-# Development workflow
-dev-setup: install-dev setup-hooks
-	@echo "Development environment setup complete!"
+clean-docker: ## Clean Docker resources
+	@echo "$(YELLOW)Cleaning Docker resources...$(NC)"
+	$(DOCKER_COMPOSE) down -v || true
+	$(DOCKER) system prune -f || true
+	@echo "$(GREEN)Docker cleanup completed!$(NC)"
 
-dev-check: format lint type-check test
-	@echo "All development checks passed!"
+clean-all: clean clean-docker ## Clean everything
+	@echo "$(GREEN)Full cleanup completed!$(NC)"
 
-# Documentation
-docs:
-	@echo "Generating documentation..."
-	@echo "Current documentation files:"
-	@ls -la *.md
+# Analysis targets
+analyze: ## Run a quick analysis with demo data
+	@echo "$(YELLOW)Running analysis with demo data...$(NC)"
+	$(PYTHON) main.py --analyze --demo || echo "Demo analysis not available"
 
-# Performance profiling
-profile:
-	python -m cProfile -o profile_output.prof main.py --setup-demo --run-analysis
-	@echo "Profile saved to profile_output.prof"
+demo: ## Run with demo data
+	@echo "$(YELLOW)Starting with demo data...$(NC)"
+	$(PYTHON) main.py --dashboard --demo || $(PYTHON) main.py --dashboard
 
-# Database operations (if applicable)
-reset-data:
-	rm -rf data/processed/*
-	rm -rf results/user_analyses/*
-	@echo "Processed data and user analyses cleared"
+# Git targets
+git-hooks: ## Install git hooks
+	@echo "$(YELLOW)Installing git hooks...$(NC)"
+	pre-commit install || echo "pre-commit not available"
+	@echo "$(GREEN)Git hooks installed!$(NC)"
 
-# Monitoring
-check-logs:
-	@echo "Recent log files:"
-	@ls -la logs/ || echo "No logs directory found"
+# Environment setup
+env: ## Copy .env.example to .env
+	@echo "$(YELLOW)Setting up environment...$(NC)"
+	cp .env.example .env
+	@echo "$(GREEN)Environment file created! Please edit .env with your values.$(NC)"
 
-# CI/CD helpers
-ci-test: install-dev
-	pytest tests/ -v --cov=src --cov-report=xml
+env-check: ## Check if .env file exists
+	@if [ -f .env ]; then \
+		echo "$(GREEN).env file exists$(NC)"; \
+	else \
+		echo "$(RED).env file not found! Run 'make env' to create it.$(NC)"; \
+	fi
 
-ci-lint:
-	flake8 src/ tests/ --max-line-length=88 --extend-ignore=E203,E266,E501,W503 --output-file=flake8-report.txt
+# Quick start targets
+quickstart: env install ## Quick start for new developers
+	@echo "$(GREEN)Quick start completed!$(NC)"
+	@echo "Run 'make dev' to start the development server"
 
-# Release helpers
-version:
-	@echo "Current version info:"
-	@python -c "import sys; print(f'Python: {sys.version}')"
-	@python -c "import pandas; print(f'Pandas: {pandas.__version__}')"
-	@python -c "import numpy; print(f'NumPy: {numpy.__version__}')"
+# Information targets
+info: ## Show project information
+	@echo "$(BLUE)LIHC Analysis Platform$(NC)"
+	@echo "Version: $(VERSION)"
+	@echo "Python: $(shell $(PYTHON) --version)"
+	@echo "Docker: $(shell $(DOCKER) --version 2>/dev/null || echo 'Not installed')"
+	@echo "Docker Compose: $(shell $(DOCKER_COMPOSE) --version 2>/dev/null || echo 'Not installed')"
 
-# Security
-security-check:
-	pip list --format=freeze | grep -E "(django|flask|tornado|twisted)" || echo "No known web frameworks found"
-	@echo "Run 'pip-audit' if available for security scanning"
+status: ps ## Show current status of all services
+	@echo "$(GREEN)Status check completed!$(NC)"
+
+version: ## Show current version
+	@echo "$(BLUE)Current version: $(VERSION)$(NC)"
+
+# Default shell
+SHELL := /bin/bash

@@ -1,429 +1,354 @@
-# LIHC Analysis Platform 
-# 肝癌多维度预后分析平台
+# LIHC Analysis Platform 🧬
 
 <div align="center">
-  
+
 ![Version](https://img.shields.io/badge/version-2.6-blue)
-![Python](https://img.shields.io/badge/python-3.8+-green)
-![License](https://img.shields.io/badge/license-MIT-yellow)
-![Docker](https://img.shields.io/badge/docker-supported-blue)
-![UI](https://img.shields.io/badge/UI-Apple%20Glassmorphism-purple)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![Docker](https://img.shields.io/badge/docker-ready-brightgreen)
+![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-lightgrey)
 
-**基于多维度网络分析的肝癌精准医学平台**
+**基于多维度网络分析的肝癌预后分析平台**  
+**Multi-dimensional Network Analysis Platform for Hepatocellular Carcinoma Prognosis**
 
-[English](#english) | [中文](#chinese)
+[快速开始](#-快速开始) | [功能介绍](#-核心功能) | [部署文档](docs/DEPLOYMENT.md) | [开发指南](docs/DEVELOPMENT.md) | [English](README_EN.md)
+
+<img src="docs/images/platform_screenshot.png" alt="Platform Screenshot" width="800"/>
 
 </div>
 
 ---
 
-<a name="chinese"></a>
 ## 🌟 项目简介
 
-LIHC Analysis Platform 是一个专注于肝细胞癌(LIHC)的综合性生物信息学分析平台。该平台整合多组学数据，通过创新的五维度分析框架和AI算法，为肝癌研究提供全方位的数据分析和可视化解决方案。
+LIHC Analysis Platform 是一个专门针对肝细胞癌（Hepatocellular Carcinoma）的综合性生物信息学分析平台。平台整合了多组学数据，通过先进的网络分析和机器学习算法，为研究者提供全面的肝癌预后分析解决方案。
 
-### 核心特性
+### 🎯 核心价值
 
-- 🧬 **多组学数据整合** - 支持基因组、转录组、蛋白组等多层次数据
-- 🎯 **五维度分析框架** - 肿瘤、免疫、基质、ECM、细胞因子综合评估
-- 🤖 **AI驱动的分析** - 机器学习算法识别关键生物标志物
-- 📊 **交互式可视化** - 基于Plotly的动态图表和3D可视化
-- 🎨 **现代化UI设计** - Apple风格磨砂玻璃界面，优雅简洁
-- 🚀 **高性能计算** - 支持并行处理和批量分析
+- **🔬 科学创新**: 首创五维度肿瘤微环境综合分析方法
+- **💊 临床转化**: 识别具有完整机制解释的治疗靶点
+- **📊 数据整合**: 多组学数据融合分析
+- **🎨 用户体验**: Apple风格UI设计，操作简洁流畅
 
-### 最新更新 (v2.6)
+## ✨ 核心功能
 
-- ✨ Apple风格磨砂玻璃UI全面升级
-- 📊 多数据集切换功能
-- 🔧 Docker部署优化
-- 🎯 性能提升30%
+### 1. 五维度肿瘤微环境分析
+<details>
+<summary>点击展开详情</summary>
 
----
+- **肿瘤细胞维度**: 增殖、凋亡、EMT相关基因分析
+- **免疫细胞维度**: 28种免疫细胞浸润评估
+- **基质细胞维度**: CAFs活化状态评估
+- **细胞外基质维度**: ECM重塑相关分子分析
+- **细胞因子维度**: 炎症因子网络分析
+
+</details>
+
+### 2. Linchpin靶点识别
+<details>
+<summary>点击展开详情</summary>
+
+独创的Linchpin算法通过以下步骤识别关键治疗靶点：
+1. 构建多层生物网络
+2. 计算节点中心性指标
+3. 模拟基因扰动影响
+4. 评估靶点可成药性
+
+</details>
+
+### 3. AI生物标志物发现
+<details>
+<summary>点击展开详情</summary>
+
+- 机器学习特征选择（LASSO、Random Forest、SVM-RFE）
+- 深度学习预后模型（DeepSurv）
+- 多组学特征整合
+- 交叉验证与外部验证
+
+</details>
+
+### 4. 精准医学预测
+<details>
+<summary>点击展开详情</summary>
+
+- 药物敏感性预测
+- 免疫治疗响应评估
+- 分子分型识别
+- 个性化治疗方案推荐
+
+</details>
 
 ## 🚀 快速开始
 
-### 环境要求
+### 系统要求
 
-- Python 3.8+
-- 8GB+ RAM
-- 现代浏览器 (Chrome/Edge/Safari)
+- Python 3.8 或更高版本
+- 8GB RAM（推荐16GB）
+- 10GB 可用磁盘空间
+- 现代浏览器（Chrome 90+, Firefox 88+, Safari 14+, Edge 90+）
 
-### 安装步骤
+### 一键部署（Docker）
 
-#### 方式一：直接运行（推荐）
+```bash
+# 克隆项目
+git clone https://github.com/ai-guoke/lihc-analysis-platform.git
+cd lihc-analysis-platform
+
+# 使用Docker Compose启动
+docker-compose up -d
+
+# 访问平台
+open http://localhost:8050
+```
+
+### 本地安装
 
 ```bash
 # 1. 克隆项目
 git clone https://github.com/ai-guoke/lihc-analysis-platform.git
 cd lihc-analysis-platform
 
-# 2. 安装依赖
+# 2. 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或 Windows:
+# venv\Scripts\activate
+
+# 3. 安装依赖
 pip install -r requirements.txt
 
-# 3. 启动平台
-python main.py --dashboard
-
-# 4. 访问界面
-# 打开浏览器访问: http://localhost:8050
-```
-
-#### 方式二：Docker部署
-
-```bash
-# 1. 构建镜像
-docker build -t lihc-platform:latest .
-
-# 2. 运行容器
-docker run -d \
-  --name lihc-platform \
-  -p 8050:8050 \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/results:/app/results \
-  lihc-platform:latest
-
-# 3. 查看日志
-docker logs -f lihc-platform
-```
-
-#### 方式三：Docker Compose（生产环境）
-
-```bash
-# 启动所有服务
-docker-compose up -d
-
-# 停止服务
-docker-compose down
-```
-
----
-
-## 📚 功能模块
-
-### 1. 数据管理
-- **数据上传**: 支持CSV、Excel、TSV格式
-- **数据集管理**: 多数据集切换和版本控制
-- **数据预处理**: 自动质控和标准化
-
-### 2. 基础分析
-- **多维度分析**: 五个生物学维度综合评估
-- **网络分析**: 基因调控网络和蛋白互作网络
-- **生存分析**: Kaplan-Meier和Cox回归分析
-- **Linchpin靶点**: 识别关键治疗靶点
-
-### 3. 高级分析
-- **多组学整合**: 整合多层次组学数据
-- **AI生物标志物**: 机器学习识别预后标志物
-- **药物响应预测**: 预测药物敏感性
-- **单细胞分析**: 单细胞转录组数据分析
-
-### 4. 精准医学
-- **免疫微环境**: 免疫浸润和检查点分析
-- **分子分型**: 肿瘤亚型识别
-- **代谢分析**: 代谢通路活性评估
-- **药物组合**: 协同药物组合预测
-
----
-
-## 💻 使用指南
-
-### 基本工作流程
-
-1. **数据准备**
-   ```python
-   # 上传表达数据
-   expression_file = "data/expression_matrix.csv"
-   clinical_file = "data/clinical_data.csv"
-   ```
-
-2. **运行分析**
-   ```python
-   from src.analysis.five_dimension_prognostic import FiveDimensionPrognosticAnalyzer
-   
-   analyzer = FiveDimensionPrognosticAnalyzer()
-   results = analyzer.analyze(expression_data, clinical_data)
-   ```
-
-3. **查看结果**
-   - 访问 http://localhost:8050
-   - 导航到相应分析模块
-   - 交互式探索结果
-
-### 命令行参数
-
-```bash
-# 启动完整平台
+# 4. 启动平台
 python main.py --dashboard --port 8050
 
-# 仅运行分析
-python main.py --analyze --input data.csv --output results/
-
-# 批量处理
-python main.py --batch --config batch_config.json
-
-# 生成报告
-python main.py --report --format pdf --output report.pdf
+# 5. 访问平台
+open http://localhost:8050
 ```
 
----
-
-## 🎨 UI特性
-
-### Apple风格磨砂玻璃设计
-
-- **磨砂玻璃效果**: 真实的backdrop-filter模糊
-- **渐变配色**: 柔和的紫蓝渐变主题
-- **动画效果**: 流畅的过渡和交互动画
-- **响应式设计**: 自适应各种屏幕尺寸
-
-### 界面预览
+## 📁 项目结构
 
 ```
-┌─────────────────────────────────────┐
-│  🧬 LIHC Analysis Platform          │
-├─────────────────────────────────────┤
-│  ┌──────┐  ┌─────────────────────┐  │
-│  │ 导航 │  │    主要内容区域     │  │
-│  │      │  │                     │  │
-│  │ • 分析│  │   📊 交互式图表    │  │
-│  │ • 数据│  │   📈 动态可视化    │  │
-│  │ • 结果│  │   📋 数据表格      │  │
-│  └──────┘  └─────────────────────┘  │
-└─────────────────────────────────────┘
+lihc-analysis-platform/
+├── 📂 src/                        # 源代码目录
+│   ├── 📊 analysis/              # 核心分析模块
+│   │   ├── survival_analysis.py      # 生存分析
+│   │   ├── network_analysis.py       # 网络分析
+│   │   ├── five_dimension_prognostic.py  # 五维度分析
+│   │   ├── ai_biomarker.py          # AI生物标志物
+│   │   └── linchpin_target.py       # Linchpin靶点
+│   ├── 🎨 visualization/         # 可视化模块
+│   │   └── professional_dashboard.py # 主仪表板
+│   ├── 📤 data_processing/       # 数据处理
+│   │   ├── data_upload_manager.py   # 数据上传
+│   │   └── data_preprocessor.py     # 数据预处理
+│   └── 🔧 utils/                # 工具函数
+├── 📂 data/                     # 数据目录
+│   ├── demo/                   # 演示数据
+│   ├── cache/                  # 缓存数据
+│   └── user/                   # 用户上传数据
+├── 📂 results/                  # 分析结果
+├── 📂 docs/                     # 文档
+│   ├── DEPLOYMENT.md           # 部署指南
+│   ├── DEVELOPMENT.md          # 开发文档
+│   └── API.md                  # API文档
+├── 📂 tests/                    # 测试代码
+├── 📂 docker/                   # Docker配置
+├── 📄 requirements.txt          # Python依赖
+├── 📄 docker-compose.yml        # Docker Compose配置
+├── 📄 Dockerfile               # Docker镜像定义
+└── 📄 main.py                  # 主程序入口
 ```
-
----
-
-## 📊 数据格式
-
-### 表达数据格式
-
-```csv
-Gene,Sample1,Sample2,Sample3
-TP53,10.5,8.3,12.1
-EGFR,5.2,6.8,4.9
-...
-```
-
-### 临床数据格式
-
-```csv
-Sample,OS_time,OS_status,Age,Stage
-Sample1,365,1,65,III
-Sample2,730,0,58,II
-...
-```
-
-### 输出结果格式
-
-结果保存在 `results/` 目录：
-- `analysis_results.csv` - 分析结果表格
-- `figures/` - 可视化图片
-- `report.html` - 交互式报告
-
----
 
 ## 🔧 配置说明
 
-### 系统配置
+### 基础配置
 
-创建 `config/config.yaml` 文件：
+创建 `.env` 文件配置环境变量：
 
-```yaml
+```env
+# 应用配置
+APP_ENV=production
+APP_DEBUG=false
+SECRET_KEY=your-secret-key-here
+
 # 服务器配置
-server:
-  host: 0.0.0.0
-  port: 8050
-  debug: false
+HOST=0.0.0.0
+PORT=8050
 
-# 数据库配置
-database:
-  type: sqlite
-  path: data/lihc.db
+# 数据配置
+DATA_DIR=./data
+RESULTS_DIR=./results
+MAX_UPLOAD_SIZE=100MB
 
-# 分析参数
-analysis:
-  n_jobs: 4
-  cache: true
-  timeout: 3600
+# 分析配置
+PARALLEL_WORKERS=4
+ANALYSIS_TIMEOUT=3600
 
-# UI配置
-ui:
-  theme: glassmorphism
-  language: zh
+# 缓存配置（可选）
+CACHE_TYPE=redis
+REDIS_URL=redis://localhost:6379/0
 ```
 
-### 环境变量
+### 高级配置
 
-```bash
-# 设置环境变量
-export LIHC_DATA_PATH=/path/to/data
-export LIHC_RESULTS_PATH=/path/to/results
-export LIHC_CACHE_ENABLED=true
-```
-
----
-
-## 🐳 Docker部署详解
-
-### Dockerfile配置
-
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-EXPOSE 8050
-CMD ["python", "main.py", "--dashboard"]
-```
-
-### Docker Compose配置
+编辑 `config/config.yaml` 自定义分析参数：
 
 ```yaml
-version: '3.8'
-services:
-  lihc-platform:
-    build: .
-    ports:
-      - "8050:8050"
-    volumes:
-      - ./data:/app/data
-      - ./results:/app/results
-    environment:
-      - PYTHONUNBUFFERED=1
-    restart: unless-stopped
+analysis:
+  survival:
+    min_samples: 20
+    p_value_threshold: 0.05
+    confidence_interval: 0.95
+  
+  network:
+    correlation_method: pearson
+    correlation_threshold: 0.6
+    min_node_degree: 3
+  
+  dimension_weights:
+    tumor: 0.3
+    immune: 0.25
+    stromal: 0.2
+    ecm: 0.15
+    cytokine: 0.1
 ```
 
-### 生产环境部署
+## 📊 使用指南
 
-1. **使用Nginx反向代理**
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
+### 1. 数据准备
+
+支持的数据格式：
+- **表达矩阵**: CSV/TSV格式，行为基因，列为样本
+- **临床数据**: 包含生存时间(OS.time)和状态(OS)列
+- **突变数据**: MAF格式或简化的突变矩阵
+
+示例数据结构：
+```
+# 表达矩阵 (expression_matrix.csv)
+Gene_Symbol,Sample1,Sample2,Sample3,...
+TP53,10.5,8.3,12.1,...
+EGFR,5.2,6.8,4.9,...
+
+# 临床数据 (clinical_data.csv)
+Sample_ID,OS.time,OS,Age,Stage,...
+Sample1,365,1,65,III,...
+Sample2,730,0,58,II,...
+```
+
+### 2. 运行分析
+
+1. **上传数据**: 点击"数据上传"，选择相应文件
+2. **选择分析**: 在左侧导航栏选择分析模块
+3. **设置参数**: 根据需要调整分析参数
+4. **开始分析**: 点击"开始分析"按钮
+5. **查看结果**: 分析完成后查看交互式结果
+
+### 3. 结果解读
+
+- **生存曲线**: Kaplan-Meier曲线展示不同组别生存差异
+- **网络图**: 基因/蛋白相互作用网络，节点大小表示重要性
+- **热图**: 基因表达模式可视化
+- **评分表**: 各维度得分及综合评分
+
+## 🧬 科学原理
+
+### Linchpin算法原理
+
+```python
+def identify_linchpin_targets(network, expression_data):
+    """
+    识别网络中的关键调控节点
     
-    location / {
-        proxy_pass http://localhost:8050;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
+    原理：
+    1. 拓扑重要性 = 度中心性 × 介数中心性 × 紧密中心性
+    2. 生物学重要性 = 表达变异度 × 生存相关性
+    3. Linchpin得分 = 拓扑重要性 × 生物学重要性 × 可成药性
+    """
+    pass
 ```
 
-2. **使用Gunicorn**
-```bash
-gunicorn -w 4 -b 0.0.0.0:8050 main:server
+### 五维度评分算法
+
+```python
+def calculate_five_dimension_score(sample_data):
+    """
+    计算样本的五维度综合评分
+    
+    Score = Σ(Di × Wi)
+    其中：
+    - Di: 第i个维度的标准化得分
+    - Wi: 第i个维度的权重（通过Cox回归优化）
+    """
+    pass
 ```
-
----
-
-## 📈 性能优化
-
-### 推荐配置
-
-- **开发环境**: 4核CPU, 8GB RAM
-- **生产环境**: 8核CPU, 16GB RAM
-- **大数据处理**: 16核CPU, 32GB RAM
-
-### 优化建议
-
-1. **启用缓存**
-   ```python
-   app.config['CACHE_TYPE'] = 'redis'
-   ```
-
-2. **并行处理**
-   ```python
-   from multiprocessing import Pool
-   with Pool(processes=4) as pool:
-       results = pool.map(analyze, datasets)
-   ```
-
-3. **数据库索引**
-   ```sql
-   CREATE INDEX idx_gene ON expression(gene_id);
-   CREATE INDEX idx_sample ON clinical(sample_id);
-   ```
-
----
 
 ## 🤝 贡献指南
 
-欢迎贡献代码！请遵循以下步骤：
+我们欢迎各种形式的贡献！
+
+### 如何贡献
 
 1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+5. 开启 Pull Request
 
-### 代码规范
+### 开发规范
 
-- 使用 Black 格式化 Python 代码
-- 遵循 PEP 8 编码规范
-- 添加适当的注释和文档
-- 编写单元测试
+- 代码风格：遵循 PEP 8
+- 提交信息：使用语义化版本控制
+- 文档：为新功能添加文档
+- 测试：确保测试覆盖率 > 80%
 
----
+## 📚 文档
 
-## 📝 许可证
+- [部署指南](docs/DEPLOYMENT.md) - 详细的部署说明
+- [开发文档](docs/DEVELOPMENT.md) - 开发者指南
+- [API文档](docs/API.md) - API接口说明
+- [算法文档](docs/ALGORITHMS.md) - 核心算法详解
+- [常见问题](docs/FAQ.md) - 常见问题解答
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+## 🔬 引用
 
----
+如果您在研究中使用了本平台，请引用：
+
+```bibtex
+@software{lihc_platform_2024,
+  title = {LIHC Analysis Platform: A Multi-dimensional Network Analysis System for Hepatocellular Carcinoma},
+  author = {Your Research Group},
+  year = {2024},
+  url = {https://github.com/ai-guoke/lihc-analysis-platform},
+  version = {2.6}
+}
+```
+
+## 📄 许可证
+
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
 
 ## 🙏 致谢
 
-- 中国科学院大学杭州高等研究院
-- TCGA数据库提供数据支持
-- 所有贡献者和用户
+- **数据来源**: TCGA, GEO, ICGC数据库
+- **算法参考**: NetworkX, scikit-learn, lifelines
+- **UI框架**: Dash, Plotly, Bootstrap
+- **开发支持**: 中国科学院大学杭州高等研究院
 
----
+## 📧 联系我们
 
-## 📧 联系方式
+- 📧 Email: your.email@example.com
+- 🐛 Issues: [GitHub Issues](https://github.com/ai-guoke/lihc-analysis-platform/issues)
+- 💬 讨论: [GitHub Discussions](https://github.com/ai-guoke/lihc-analysis-platform/discussions)
 
-- **项目主页**: https://github.com/ai-guoke/lihc-analysis-platform
-- **问题反馈**: [GitHub Issues](https://github.com/ai-guoke/lihc-analysis-platform/issues)
-- **邮箱**: support@lihc-platform.com
+## 🌟 Star History
 
----
-
-<a name="english"></a>
-## 🌟 Project Overview (English)
-
-LIHC Analysis Platform is a comprehensive bioinformatics analysis platform focused on Hepatocellular Carcinoma (LIHC). It integrates multi-omics data and provides comprehensive data analysis and visualization solutions for liver cancer research through innovative five-dimensional analysis framework and AI algorithms.
-
-### Quick Start
-
-```bash
-# Clone repository
-git clone https://github.com/ai-guoke/lihc-analysis-platform.git
-cd lihc-analysis-platform
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start platform
-python main.py --dashboard
-
-# Access UI at http://localhost:8050
-```
-
-### Docker Deployment
-
-```bash
-# Build image
-docker build -t lihc-platform:latest .
-
-# Run container
-docker run -d -p 8050:8050 lihc-platform:latest
-```
-
-For detailed documentation, please refer to the Chinese section above.
+[![Star History Chart](https://api.star-history.com/svg?repos=ai-guoke/lihc-analysis-platform&type=Date)](https://star-history.com/#ai-guoke/lihc-analysis-platform&Date)
 
 ---
 
 <div align="center">
-  <b>LIHC Analysis Platform v2.6</b><br>
-  Made with ❤️ by UCAS Hangzhou Institute for Advanced Study
+
+**Made with ❤️ for Cancer Research**
+
+[返回顶部](#lihc-analysis-platform-)
+
 </div>
