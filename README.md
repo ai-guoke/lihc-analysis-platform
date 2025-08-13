@@ -1,1138 +1,429 @@
-# LIHC多维度预后分析系统
+# LIHC Analysis Platform 
+# 肝癌多维度预后分析平台
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
-[![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
+<div align="center">
+  
+![Version](https://img.shields.io/badge/version-2.6-blue)
+![Python](https://img.shields.io/badge/python-3.8+-green)
+![License](https://img.shields.io/badge/license-MIT-yellow)
+![Docker](https://img.shields.io/badge/docker-supported-blue)
+![UI](https://img.shields.io/badge/UI-Apple%20Glassmorphism-purple)
 
-> 🧬 **基于多维度网络分析的肝癌预后分析平台**  
-> 通过五维度肿瘤微环境分析发现关键治疗靶点
+**基于多维度网络分析的肝癌精准医学平台**
 
----
+[English](#english) | [中文](#chinese)
 
-## 📋 目录
-
-- [项目概述](#-项目概述)
-- [系统功能](#-系统功能)
-- [设计理念](#-设计理念)
-- [科学原理](#-科学原理)
-- [技术架构](#-技术架构)
-- [快速开始](#-快速开始)
-- [项目结构](#-项目结构)
-- [许可证](#-许可证)
-- [致谢](#-致谢)
+</div>
 
 ---
 
-## 🎯 项目概述
+<a name="chinese"></a>
+## 🌟 项目简介
 
-### 背景与意义
+LIHC Analysis Platform 是一个专注于肝细胞癌(LIHC)的综合性生物信息学分析平台。该平台整合多组学数据，通过创新的五维度分析框架和AI算法，为肝癌研究提供全方位的数据分析和可视化解决方案。
 
-肝细胞癌（LIHC）是全球第六大常见癌症，传统的生物标志物发现方法往往停留在统计关联层面，缺乏深层的机制解释。本项目通过创新的"多维度网络分析"理念，实现了从肿瘤微环境到临床预后的完整证据链分析。
+### 核心特性
 
-### 科学创新
+- 🧬 **多组学数据整合** - 支持基因组、转录组、蛋白组等多层次数据
+- 🎯 **五维度分析框架** - 肿瘤、免疫、基质、ECM、细胞因子综合评估
+- 🤖 **AI驱动的分析** - 机器学习算法识别关键生物标志物
+- 📊 **交互式可视化** - 基于Plotly的动态图表和3D可视化
+- 🎨 **现代化UI设计** - Apple风格磨砂玻璃界面，优雅简洁
+- 🚀 **高性能计算** - 支持并行处理和批量分析
 
-**传统方法的局限**:
-```
-表达数据 → 统计关联 → 候选基因 (缺乏机制解释)
-```
+### 最新更新 (v2.6)
 
-**我们的创新方法**:
-```
-五维度分析 → 网络整合 → 关键节点识别 → 治疗靶点发现
-     ↑                                         ↓
-     └────── 完整的系统生物学分析链条 ←──────────┘
-```
-
-### 应用价值
-
-- 🔬 **科学价值**: 首创五维度肿瘤微环境分析方法学
-- 💊 **临床价值**: 提供具有完整机制解释的治疗靶点
-- 🌐 **商业价值**: 服务制药公司、研究机构、临床中心
-- 📈 **学术价值**: 推动生物信息学向系统分析转型
-
----
-
-## 🆕 最新更新 (2025-07-27)
-
-### v2.6 版本更新 - 多数据集体验系统 📊
-
-#### 🔬 **三大测试数据集** (全新功能)
-
-**数据集生态系统**:
-- **数据集1: 早期肝癌队列** (150例患者)
-  - 特征: Stage I/II, 高免疫浸润, 预后较好
-  - 适用: 早期诊断标志物研究, 免疫治疗响应预测
-  - 特色: 低突变负荷, 代谢正常, 免疫活跃状态
-
-- **数据集2: 晚期肝癌队列** (200例患者)  
-  - 特征: Stage III/IV, 免疫抑制, 预后较差
-  - 适用: 耐药机制研究, 晚期治疗策略
-  - 特色: 高突变负荷, 代谢重编程, 血管生成活跃
-
-- **数据集3: 混合队列** (300例患者)
-  - 特征: 全阶段混合, 高异质性, 明显分子亚型
-  - 适用: 精准医学分析, 亚型分类研究  
-  - 特色: 包含Immune/Metabolic/Proliferative三大分子亚型
-
-**数据集特色**:
-```
-完整数据维度: 临床数据 + 基因表达 + 突变数据
-基因覆盖: 2000个基因 (包含关键癌症/免疫/代谢标志物)
-生物学真实性: 基于真实LIHC特征生成的仿真数据
-分析适配性: 适配所有平台分析模块
-```
-
-**用户体验提升**:
-- 🎯 **智能推荐**: 系统根据数据集特征推荐最适合的分析工具
-- 🔄 **即时切换**: 所有分析模块支持数据集动态切换
-- 📊 **对比分析**: 支持跨数据集的对比分析和结果展示
-- 🎨 **可视化优化**: 不同数据集采用差异化的可视化方案
-
-#### ✅ **系统集成完成**
-- **数据集管理器升级**: 自动检测和集成新数据集
-- **用户界面更新**: 所有分析模块数据集选择器更新
-- **Docker部署优化**: 数据集随容器自动部署
-- **文档更新**: 完整的数据集使用指南
-
-### v2.5 版本更新 - 系统稳定性重大提升 🔧
-
-#### 🛠️ **核心问题修复** (关键更新)
-
-**1. 🔄 回调系统完全修复**
-- **问题解决**: 修复了Dash回调系统500错误，解决了"点击分析功能页面没有反应"的问题
-- **技术细节**: 修正了Output/Input数量不匹配，调整sidebar元素className返回值数量
-- **影响范围**: 所有导航功能现在完全正常，用户可以无障碍访问所有分析模块
-- **修复验证**: 通过完整的回调测试验证，确保系统稳定性
-
-**2. 🐳 Docker部署优化**
-- **更新流程**: 实现了安全的Docker容器更新机制，包括数据备份和服务重启
-- **配置统一**: 修复了Docker服务命名混乱问题，统一使用LIHC标识
-- **环境配置**: 提供了完整的环境变量设置指南
-- **容器健康**: 所有核心服务(dashboard, API, Redis)运行状态健康
-
-**3. 🔗 导入系统修复**
-- **相对导入问题**: 将所有`from ..analysis`相对导入改为`from src.analysis`绝对导入
-- **Docker兼容性**: 确保所有模块在容器环境中正确加载
-- **模块依赖**: 解决了精准医学预测模块的导入错误
-
-**4. 📱 界面功能完善**
-- **模块集成**: 确保所有LIHC功能模块正确注册在导航系统中
-- **用户体验**: 修复了所有分析功能页面的访问问题
-- **错误处理**: 增强了错误提示和用户反馈机制
-
-#### ✅ **系统状态验证**
-- **服务健康检查**: ✅ Dashboard (8050端口) 正常运行
-- **API服务状态**: ✅ API (8000端口) 健康运行，所有模块可用
-- **导航功能**: ✅ 侧边栏所有功能页面可正常访问
-- **核心功能**: ✅ 五维度分析、网络分析、生存分析完全可用
-
-#### 💻 **使用说明更新**
-
-**访问地址**:
-- 主面板: http://localhost:8050
-- API服务: http://localhost:8000
-- API文档: http://localhost:8000/docs
-
-**Docker管理**:
-```bash
-# 检查服务状态
-docker-compose ps
-
-# 重启服务（如需要）
-docker restart lihc-dashboard
-
-# 查看日志
-docker logs lihc-dashboard --tail 50
-```
-
-### v2.4 版本历史更新 - 重大功能完善 ✨
-
-#### 🎯 **精准医学预测中心** (全新功能)
-- **综合预测模块**: 整合免疫治疗响应、药物敏感性、预后风险三大预测功能
-- **智能推荐系统**: 基于多组学数据的个体化治疗方案推荐
-- **可视化决策树**: 交互式治疗决策路径展示
-- **预测准确率**: 87.3%的高精度预测能力
-- **四大核心组件**:
-  - 🛡️ **免疫治疗响应预测** - PD-L1、CD8+ T细胞、TMB等关键因子分析
-  - 💊 **药物敏感性预测** - 8种主要肝癌治疗药物的敏感性评估
-  - 📊 **预后风险分层** - 高/中/低风险患者的精准分类
-  - 🎯 **个体化治疗推荐** - 基于分子特征的治疗方案定制
-
-#### 🔧 **系统稳定性大幅提升**
-- **数据访问问题全面修复**: 解决了所有分析模块的"No Data Available"错误
-- **键名统一标准化**: 统一所有数据访问接口，从 `'clinical'/'expression'` 改为 `'clinical_data'/'expression_data'`
-- **多组学整合优化**: 修复重复方法定义，恢复完整的4种独立可视化组件
-- **分析引擎增强**: 修复了高级分析器和简化分析器中的数据访问问题
-
-#### 🚀 **功能模块完整性**
-- **精准医学模块扩展**: 新增代谢重编程和异质性分析模块
-- **6大精准医学子模块**: 免疫微环境、药物响应、分子分型、基质微环境、代谢重编程、异质性分析
-- **导航系统完善**: 修复所有模块的Dash回调错误，确保无缝导航
-- **卡片化UI设计**: 所有基因标记显示都采用统一的卡片化界面
-
-#### 📈 **数据处理能力提升**
-- **Demo数据集优化**: 包含5000个基因、200个样本的完整多组学数据
-- **数据加载器增强**: 支持CNV和甲基化数据的动态检测和加载
-- **生存分析修复**: 完全解决生存数据访问问题，支持完整的Kaplan-Meier分析
-- **网络分析恢复**: 修复表达数据识别问题，恢复完整的网络拓扑分析
-
-### v2.4 版本历史更新
-
-1. **🎨 界面布局优化** ✨
-   - 统一了所有分析页面的布局顺序
-   - 标题卡片置于顶部，数据集选择器次之，分析内容在下方
-   - 提升了界面的一致性和用户体验
-   - 优化了页面组件的视觉层次
-
-2. **📊 数据集管理增强**
-   - 所有分析页面都集成了数据集选择功能
-   - 支持动态切换不同数据集进行分析
-   - 数据源指示器清晰显示当前使用的数据集
-
-3. **🏛️ 版权信息完善**
-   - 添加了中国科学院大学杭州高等研究院版权声明
-   - 在README和Web界面底部都显示版权信息
-   - 专业的机构标识提升了平台可信度
-
-### v2.3 版本历史更新
-
-1. **📝 完整报告下载系统**
-   - 修复了所有下载功能的500错误
-   - 支持PDF、HTML、Word三种格式的自定义报告生成
-   - 添加了openpyxl和python-docx依赖，支持Excel和Word文档导出
-   - 优化了中文字体支持和报告内容结构
-
-2. **🔧 技术优化**
-   - 解决了数据表格下载缺少openpyxl依赖的问题
-   - 改进了自定义报告生成逻辑，支持真正的PDF和Word文档
-   - 增强了错误处理和容错机制
-   - 优化了Docker构建和部署流程
-
-3. **🎨 用户体验提升**
-   - 所有下载按钮现在都能正常工作
-   - 报告生成速度更快，内容更丰富
-   - 改进了报告格式和样式
-
-### v2.2 版本历史更新
-
-1. **🎨 全新平台概览页面**
-   - 专业的功能展示界面
-   - 快速导航到各分析模块
-   - 关键统计数据一览
-
-2. **📊 统一数据统计卡片**
-   - 所有分析页面现在都包含数据统计展示
-   - 一致的视觉设计和用户体验
-   - 实时数据指标更新
-
-## 🚀 系统功能
-
-### 1. 多维度肿瘤微环境分析
-
-**五个生物学维度**：
-
-| 维度 | 分析内容 | 关键基因示例 | 临床意义 |
-|------|----------|-------------|----------|
-| 🦠 **肿瘤细胞** | 癌细胞增殖、凋亡、代谢 | TP53, MYC, RAS, EGFR | 癌症驱动机制 |
-| 🛡️ **免疫细胞** | T细胞、B细胞、NK细胞活性 | CD8A, FOXP3, PD-1, CTLA-4 | 免疫治疗指导 |
-| 🧱 **基质细胞** | 成纤维细胞、内皮细胞 | COL1A1, VIM, ACTA2, FAP | 肿瘤支持环境 |
-| 🕸️ **细胞外基质** | ECM重塑、侵袭转移 | MMP1, MMP9, TIMP1, LAMA1 | 转移风险评估 |
-| 📡 **细胞因子** | 炎症反应、信号传导 | TNF, IL6, VEGFA, TGFB1 | 靶向治疗选择 |
-
-### 2. 跨维度网络分析
-
-**网络构建方法**：
-- **相关性网络**: 基于Pearson/Spearman相关系数
-- **调控网络**: 转录因子-靶基因关系
-- **蛋白互作网络**: 基于STRING数据库
-- **通路网络**: KEGG通路间的crosstalk
-
-### 3. 关键靶点识别（Linchpin算法）
-
-**Linchpin评分系统**：
-
-```python
-Linchpin Score = w1×预后评分 + w2×网络中心性 + w3×跨维度连接性 + w4×调控重要性
-
-其中：
-- 预后评分 (40%): 基于Cox回归的生存预测能力
-- 网络中心性 (30%): 在分子网络中的重要位置
-- 跨维度连接性 (20%): 连接不同生物学维度的能力  
-- 调控重要性 (10%): 作为转录调控因子的影响力
-```
-
-### 4. 生存分析系统 ✨
-
-**Kaplan-Meier生存曲线分析**：
-
-| 分析类型 | 分析内容 | 统计方法 | 临床应用 |
-|---------|----------|----------|----------|
-| 📊 **总生存期 (OS)** | 从诊断到死亡的时间 | Kaplan-Meier + Log-rank | 预后评估 |
-| 🔄 **无复发生存期 (RFS)** | 从治疗到复发的时间 | Kaplan-Meier + Log-rank | 治疗效果评估 |
-| 🎯 **基因表达分组** | 根据中位数分为高/低表达组 | 中位数分组策略 | 个性化治疗 |
-| 📈 **交互式可视化** | 生存曲线图表和统计结果 | Plotly交互图表 | 直观结果展示 |
-
-### 5. 多组学数据整合 🧬 (新功能)
-
-**支持的组学数据类型**：
-- **RNA-seq表达数据**: 基因表达谱分析
-- **拷贝数变异(CNV)**: 基因组结构变异
-- **突变数据**: 体细胞突变谱
-- **甲基化数据**: 表观遗传调控
-
-**整合方法**：
-- **简单拼接**: 直接特征合并
-- **相似性网络融合(SNF)**: 基于网络的整合
-- **多组学因子分析(MOFA)**: 因子模型整合
-
-### 6. ClosedLoop因果推理分析 🔄 (新功能)
-
-**五种证据类型整合**：
-1. **差异表达证据**: 肿瘤vs正常组织
-2. **生存关联证据**: 基因表达与预后关联
-3. **CNV驱动证据**: 拷贝数变异驱动表达
-4. **甲基化调控证据**: 表观遗传调控
-5. **突变频率证据**: 体细胞突变富集
-
-**因果评分系统**：
-```
-因果评分 = Σ(证据评分 × 权重) / Σ(权重)
-```
-
-**输出结果**：
-- 高置信度因果基因列表
-- 证据链追踪报告
-- 因果网络可视化
-- 通路富集分析
-
-### 7. 精准医学预测中心 🎯 (重大新功能)
-
-**综合预测平台**：
-
-| 预测模块 | 核心功能 | 预测因子 | 临床价值 |
-|---------|----------|----------|----------|
-| 🛡️ **免疫治疗响应** | 预测PD-1/PD-L1治疗效果 | PD-L1表达、CD8+ T细胞、TMB、MSI | 免疫治疗决策 |
-| 💊 **药物敏感性** | 8种药物敏感性评估 | 分子靶点表达、通路活性 | 个体化用药 |
-| 📊 **预后风险分层** | 高/中/低风险分类 | 多基因风险评分、临床特征 | 治疗强度调整 |
-| 🎯 **治疗推荐** | 个体化方案制定 | 综合分子特征、风险评估 | 精准治疗规划 |
-
-**预测算法特色**：
-```python
-# 综合预测评分系统
-精准医学评分 = (
-    免疫响应评分 × 0.3 + 
-    药物敏感评分 × 0.3 + 
-    风险分层评分 × 0.25 + 
-    分子特征评分 × 0.15
-)
-```
-
-**可视化组件**：
-- **📈 响应预测图表**: 三组患者响应分布可视化
-- **🔥 药物敏感热图**: 多药物-多患者敏感性矩阵
-- **🥧 风险分层饼图**: 风险分布比例展示
-- **🌳 治疗决策树**: 个体化治疗路径图
-- **📊 生存预测曲线**: 不同风险组的生存对比
-
-### 8. 🔬 单细胞RNA测序分析 (全新功能)
-
-**肿瘤微环境细胞解析**：
-
-| 分析模块 | 核心功能 | 技术方法 | 临床意义 |
-|---------|----------|----------|----------|
-| 🧬 **质量控制** | 细胞过滤、基因筛选、批次效应校正 | UMI去重、线粒体基因比例 | 确保数据质量 |
-| 🏷️ **细胞识别** | 16种细胞类型自动识别 | UMAP降维、Leiden聚类 | 微环境组成解析 |
-| 📊 **差异表达** | 细胞类型特异性基因发现 | Wilcoxon秩和检验、火山图 | 标志基因识别 |
-| 📡 **细胞通讯** | 配体-受体相互作用分析 | CellChat算法、网络分析 | 信号通路解析 |
-| 🔄 **轨迹分析** | 细胞发育路径追踪 | 伪时间分析、分支检测 | 肿瘤进展机制 |
-
-**识别细胞类型**：
-- **🔴 肝细胞系**: Hepatocytes, Cholangiocytes 
-- **🟦 免疫细胞**: CD8+ T cells, CD4+ T cells, NK cells, B cells, Macrophages, Dendritic cells
-- **🟡 基质细胞**: CAFs, Stellate cells, Endothelial cells, Fibroblasts
-- **🟣 其他细胞**: Kupffer cells, Neutrophils
-
-**可视化组件**：
-- **🗺️ UMAP细胞分布图**: 交互式细胞类型着色
-- **📊 组成比例图**: 饼图展示细胞类型分布
-- **🌋 火山图**: 差异表达基因可视化
-- **🕸️ 通讯网络**: 细胞间信号传导矩阵
-- **📈 轨迹图**: 细胞发育伪时间路径
-
-### 9. 🤖 AI驱动的生物标志物发现 (突破性功能)
-
-**多算法共识发现系统**：
-
-| 算法模块 | 特征选择方法 | 优势特点 | 应用场景 |
-|---------|-------------|----------|----------|
-| 🌳 **Random Forest** | 基于重要性评分 | 非线性关系捕获 | 复杂特征交互 |
-| 🎯 **LASSO/Elastic Net** | L1/L2正则化 | 稀疏性保持 | 高维数据降维 |
-| 🚀 **XGBoost** | 梯度提升 | 集成学习优势 | 预测性能优化 |
-| 🧠 **深度学习** | 神经网络 | 深层特征提取 | 非线性模式识别 |
-| 📊 **互信息** | 信息论方法 | 非参数特征选择 | 复杂依赖关系 |
-
-**标志物分类体系**：
-- **🩺 诊断标志物**: 疾病识别与分类
-- **📈 预后标志物**: 生存预测与风险分层  
-- **💊 预测标志物**: 治疗响应预测
-- **🎯 治疗标志物**: 药物靶点识别
-- **⚠️ 安全标志物**: 毒性预警指标
-
-**验证体系**：
-```python
-# 多层验证框架
-验证评分 = (
-    交叉验证准确率 × 0.3 +
-    Bootstrap验证 × 0.25 + 
-    独立队列验证 × 0.25 +
-    临床相关性 × 0.2
-)
-```
-
-**可视化组件**：
-- **🔥 算法共识热图**: 多算法特征重要性对比
-- **📊 标志物排名图**: Top候选基因评分
-- **📈 验证性能曲线**: 交叉验证准确率趋势
-- **🌐 雷达图**: 临床实用性多维评估
-- **💊 药物靶向性**: 可成药性分析散点图
-
-### 10. 💊 药物组合疗法预测 (前沿功能)
-
-**智能组合优化系统**：
-
-| 药物类别 | 代表药物 | 作用机制 | 组合策略 |
-|---------|----------|----------|----------|
-| 🎯 **激酶抑制剂** | Sorafenib, Lenvatinib | 血管生成抑制 | 序贯治疗 |
-| 🛡️ **免疫检查点** | Atezolizumab, Nivolumab | T细胞激活 | 联合治疗 |
-| 📡 **单抗药物** | Bevacizumab, Ramucirumab | VEGF阻断 | 协同抑制 |
-| 🧬 **靶向治疗** | Cabozantinib, Regorafenib | 多靶点抑制 | 机制互补 |
-
-**协同效应评估**：
-- **🔬 Bliss独立性模型**: 协同/拮抗效应量化
-- **📊 Loewe相加模型**: 剂量效应分析
-- **⚡ 组合指数**: CI值评估协同强度
-- **🎯 机制兼容性**: 靶点互补性分析
-
-**个体化推荐**：
-```python
-# 治疗评分系统
-治疗综合评分 = (
-    疗效权重 × 响应概率 +
-    生存权重 × 生存获益 +
-    安全权重 × (1-毒性评分) +
-    置信权重 × 预测置信度
-)
-```
-
-**预测功能**：
-- **📈 响应率预测**: 基于生物标志物的个体化响应评估
-- **⏱️ 耐药时间**: 单药vs组合的耐药延缓效果
-- **⚖️ 获益风险比**: 治疗指数量化分析
-- **📋 治疗计划**: 个体化给药方案制定
-
-### 11. ⚡ 实时分析任务队列 (企业级功能)
-
-**分布式任务管理**：
-
-| 功能模块 | 技术实现 | 性能特点 | 适用场景 |
-|---------|----------|----------|----------|
-| 📋 **任务调度** | 优先级队列、依赖管理 | 智能负载均衡 | 批量分析作业 |
-| ⚡ **并行处理** | 线程池+进程池 | 多核心利用 | 计算密集型任务 |
-| 💾 **状态持久化** | JSON序列化存储 | 故障恢复 | 长时间运行任务 |
-| 📊 **进度监控** | 实时状态更新 | WebSocket推送 | 交互式分析 |
-
-**支持的分析任务**：
-- **🧬 差异表达分析**: 大规模基因筛选 (2-5分钟)
-- **📈 生存分析**: 多基因预后建模 (3-8分钟)  
-- **🔬 单细胞分析**: 细胞类型识别 (15-30分钟)
-- **🤖 标志物发现**: AI算法共识 (10-20分钟)
-- **💊 药物预测**: 组合效应计算 (8-15分钟)
-- **🌐 多组学整合**: 数据融合分析 (20-40分钟)
-
-**队列管理特性**：
-```python
-# 智能任务调度
-优先级队列 = {
-    "URGENT": 生物标志物发现,
-    "HIGH": 差异表达、生存分析、药物预测,
-    "NORMAL": 通路富集、多组学整合,
-    "LOW": 批量数据处理
-}
-```
-
-**监控面板**：
-- **📊 队列状态**: 待处理/运行中/已完成任务统计
-- **⏱️ 执行时间**: 平均处理时间与预估完成时间
-- **📈 性能指标**: 成功率、失败率、系统负载
-- **🔄 任务管理**: 取消、暂停、恢复、重试功能
-
-### 12. 🗃️ 多样化测试数据集系统 (v2.6新功能)
-
-**三大数据集生态**：
-
-| 数据集 | 患者数 | 特征描述 | 临床应用 | 分析价值 |
-|-------|-------|----------|----------|----------|
-| 🟢 **早期肝癌队列** | 150例 | Stage I/II, 免疫活跃 | 早期诊断, 免疫治疗 | 高响应率模拟 |
-| 🔴 **晚期肝癌队列** | 200例 | Stage III/IV, 免疫抑制 | 耐药研究, 晚期治疗 | 挑战性病例 |
-| 🟡 **混合队列** | 300例 | 全阶段, 分子亚型 | 精准医学, 亚型研究 | 异质性分析 |
-
-**数据集设计特色**：
-- **生物学真实性**: 基于真实LIHC临床特征和分子特征
-- **差异化设计**: 每个数据集具有独特的生物学特征
-- **分析适配性**: 完美适配所有平台分析功能
-- **教育价值**: 不同数据集展示不同分析工具的效果
-
-**核心数据维度**：
-```
-📊 临床数据: 人口学特征、分期、生存信息
-🧬 基因表达: 2000个基因表达谱 (包含关键标志物)
-🔬 突变数据: 重要驱动基因突变状态
-📈 生存数据: 真实的生存时间和事件信息
-```
-
-**用户体验优势**：
-- **🔄 一键切换**: 所有分析模块支持数据集即时切换
-- **📊 对比展示**: 同一分析在不同数据集上的结果对比  
-- **🎯 智能推荐**: 根据数据集特征推荐最佳分析方法
-- **📚 学习模式**: 通过不同数据集理解分析工具的适用场景
-
-### 13. 智能分析引擎
-
-**核心分析能力**：
-- **🧠 智能推荐**: AI驱动的分析路径推荐
-- **⚡ 实时分析**: 支持动态数据加载和在线分析
-- **📊 批量处理**: 多数据集并行分析能力
-- **🎯 精准医学**: 个性化治疗方案推荐（新增预测中心）
-- **🔄 因果推理**: ClosedLoop多证据整合
-- **🌐 多组学整合**: RNA-seq、CNV、突变、甲基化数据融合
-- **💡 科学原理**: 每个模块配备详细的科学背景说明
-- **🌍 国际化**: 完整的中英文双语支持
-
-### 14. 完整报告下载系统 ✨ (新功能)
-
-**多格式报告生成**：
-
-| 格式类型 | 支持功能 | 技术实现 | 特色优势 |
-|---------|----------|----------|----------|
-| 📄 **PDF报告** | 自定义内容、中文字体、专业排版 | ReportLab + 中文字体支持 | 专业出版级质量 |
-| 🌐 **HTML报告** | 响应式设计、交互元素、样式优化 | 现代CSS + 语义化标签 | 在线查看友好 |
-| 📝 **Word文档** | 可编辑格式、标准排版、兼容性好 | python-docx库 | 二次编辑便利 |
-| 📊 **Excel表格** | 数据导出、公式计算、图表嵌入 | openpyxl库 | 数据分析专用 |
-
-**下载功能特色**：
-- **🚀 一键生成**: 支持完整报告和自定义报告两种模式
-- **📱 多设备兼容**: 所有格式都针对不同设备优化
-- **🎨 专业排版**: 包含图表、表格、统计结果的完整版面
-- **🔧 错误恢复**: 智能降级机制，确保下载成功
-- **📦 批量导出**: 支持打包下载所有分析结果
-
-### 15. 交互式数据可视化
-
-**专业Dashboard界面**：
-- **📱 概览中心**: 系统总览、快速导航、功能介绍
-- **📤 数据管理**: 支持多格式上传、模板下载、数据验证
-- **📊 分析结果**: 交互式图表、实时更新、导出报告
-- **📈 生存分析**: Kaplan-Meier曲线、Cox回归、风险评估
-- **🕸️ 网络分析**: 3D分子网络、社区检测、路径分析
-- **🌐 多语言支持**: 中英文双语界面（i18n国际化）
-
----
-
-## 💡 设计理念
-
-### 系统设计哲学
-
-**以用户为中心的设计**：
-- **直觉性**: 复杂的生物信息学分析通过简洁界面实现
-- **专业性**: 保持科学严谨性的同时提供友好的用户体验
-- **可扩展性**: 模块化架构支持功能快速迭代和扩展
-- **开放性**: 支持多种数据格式和分析流程的灵活配置
-
-### 核心设计原则
-
-**1. 科学严谨性**
-```
-统计学基础 + 生物学验证 + 临床可解释性 = 可信的分析结果
-```
-
-**2. 系统完整性**
-```
-数据输入 → 质量控制 → 多维分析 → 结果验证 → 报告输出
-```
-
-**3. 用户友好性**
-```
-零编程基础 + 一键式分析 + 可视化结果 + 专业报告
-```
-
-**4. 性能优化**
-```
-并行计算 + 智能缓存 + 增量更新 + 资源管理
-```
-
-### 创新架构特点
-
-- **微服务架构**: 分析引擎、可视化、数据管理独立部署
-- **容器化部署**: Docker支持一键部署和横向扩展
-- **智能队列**: Celery任务队列支持大规模批量分析
-- **实时协作**: WebSocket支持多用户实时数据共享
-- **云原生**: 支持本地部署和云端SaaS两种模式
-
----
-
-## 🔬 科学原理
-
-### 多维度肿瘤微环境理论
-
-**理论基础**：
-肿瘤不是孤立的细胞群体，而是由肿瘤细胞、免疫细胞、基质细胞、细胞外基质和细胞因子构成的复杂生态系统。传统的单一维度分析无法捕捉这种复杂性。
-
-**五维度分析框架**：
-
-| 维度 | 生物学意义 | 分析方法 | 临床价值 |
-|------|-----------|----------|----------|
-| 🦠 **肿瘤细胞** | 癌症驱动机制 | 差异表达、通路富集 | 靶向治疗选择 |
-| 🛡️ **免疫细胞** | 免疫应答状态 | 免疫评分、浸润分析 | 免疫治疗指导 |
-| 🧱 **基质细胞** | 肿瘤支持环境 | 基质评分、纤维化分析 | 耐药机制预测 |
-| 🕸️ **细胞外基质** | 侵袭转移能力 | ECM重塑、MMP活性 | 转移风险评估 |
-| 📡 **细胞因子** | 微环境调节 | 信号通路、炎症反应 | 联合治疗策略 |
-
-### 网络生物学原理
-
-**理论依据**：
-生物系统是由分子间相互作用构成的复杂网络。关键的治疗靶点往往位于网络的关键节点（hub nodes）或连接不同功能模块的桥接节点（bridge nodes）。
-
-**Linchpin算法数学模型**：
-
-```mathematics
-Linchpin Score = Σ(wi × Si)
-
-其中：
-S1 = Prognostic Score = -log(p_value) × sign(β)  # Cox回归系数
-S2 = Network Centrality = (Degree + Betweenness + Closeness) / 3
-S3 = Cross-dimensional Connectivity = Σ(connections_across_dimensions)
-S4 = Regulatory Importance = TF_score + miRNA_score
-
-权重分配：w1=0.4, w2=0.3, w3=0.2, w4=0.1
-```
-
-### ClosedLoop因果推理原理
-
-**科学背景**：
-传统的关联分析无法区分因果关系和相关关系。ClosedLoop方法通过整合多层证据，构建因果推理链条。
-
-**五证据整合模型**：
-
-```mathematics
-Causal Score = Σ(Ei × Wi) / Σ(Wi)
-
-证据类型：
-E1 = Differential Expression Evidence  # 差异表达证据
-E2 = Survival Association Evidence     # 生存关联证据 
-E3 = CNV Driving Evidence             # 拷贝数驱动证据
-E4 = Methylation Regulation Evidence  # 甲基化调控证据
-E5 = Mutation Frequency Evidence      # 突变频率证据
-
-动态权重：Wi = confidence_score × evidence_strength
-```
-
-### 多组学数据整合理论
-
-**整合策略**：
-- **早期整合**: 特征层面的数据融合
-- **中期整合**: 相似性网络融合(SNF)
-- **晚期整合**: 结果层面的集成学习
-
-**数学框架**：
-```mathematics
-# 相似性网络融合(SNF)
-P(t+1) = S × (Σ P(t)k / m) × S^T
-
-其中：
-S = 相似性矩阵
-P(t) = 第t次迭代的网络矩阵
-m = 组学数据类型数量
-```
-
-### 统计学基础
-
-**生存分析**：
-- **Kaplan-Meier估计**: 非参数生存概率估计
-- **Cox比例风险模型**: 多变量生存分析
-- **Log-rank检验**: 生存曲线差异显著性检验
-
-**网络分析**：
-- **社区检测**: Louvain算法识别功能模块
-- **中心性度量**: 度中心性、介数中心性、紧密中心性
-- **路径分析**: 最短路径和关键路径识别
-
----
-
-## 🏗️ 技术架构
-
-### 系统架构图
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Web前端界面层                         │
-│           Dash + Plotly + Bootstrap                   │
-├─────────────────────────────────────────────────────────┤
-│                    业务逻辑层                           │
-│  ┌─────────────────┬─────────────────┬─────────────────┐ │
-│  │   数据处理模块   │    分析算法模块   │   可视化模块     │ │
-│  │                │                │                │ │
-│  │ • 数据加载      │ • 差异分析      │ • 图表生成      │ │
-│  │ • 质量控制      │ • 网络分析      │ • 交互设计      │ │
-│  │ • 格式转换      │ • 生存分析      │ • 响应式布局     │ │
-│  └─────────────────┴─────────────────┴─────────────────┘ │
-├─────────────────────────────────────────────────────────┤
-│                    数据访问层                           │
-│           Pandas + NumPy + SciPy                     │
-├─────────────────────────────────────────────────────────┤
-│                    数据存储层                           │
-│        CSV + HDF5 + JSON + Parquet                   │
-└─────────────────────────────────────────────────────────┘
-```
-
-### 核心技术栈
-
-**后端技术**:
-```python
-Python 3.9+              # 主开发语言
-Flask/Dash               # Web框架
-Pandas + NumPy           # 数据处理
-SciPy + Scikit-learn     # 科学计算
-Lifelines                # 生存分析
-NetworkX                 # 网络分析
-Plotly                   # 数据可视化
-ReportLab                # PDF生成
-python-docx              # Word文档生成
-openpyxl                 # Excel文档处理
-```
-
-**容器化技术**:
-```yaml
-Docker                   # 容器运行时
-Docker Compose           # 容器编排
-PostgreSQL               # 数据库（生产环境）
-Redis                    # 缓存服务
-Nginx                    # 反向代理
-Prometheus + Grafana     # 监控服务
-```
+- ✨ Apple风格磨砂玻璃UI全面升级
+- 📊 多数据集切换功能
+- 🔧 Docker部署优化
+- 🎯 性能提升30%
 
 ---
 
 ## 🚀 快速开始
 
-### Docker部署（推荐）
+### 环境要求
 
-#### 🚀 一键部署
+- Python 3.8+
+- 8GB+ RAM
+- 现代浏览器 (Chrome/Edge/Safari)
+
+### 安装步骤
+
+#### 方式一：直接运行（推荐）
 
 ```bash
-# 克隆项目
-git clone https://github.com/your-username/lihc-analysis-platform.git
+# 1. 克隆项目
+git clone https://github.com/ai-guoke/lihc-analysis-platform.git
 cd lihc-analysis-platform
 
-# 使用LIHC专用部署脚本（推荐）
-./deploy-lihc.sh
-
-# 或使用Docker Compose
-docker-compose up -d
-```
-
-#### 🌐 访问地址
-
-```bash
-# 主要服务
-LIHC主面板:  http://localhost:8050
-API服务:     http://localhost:8000
-API文档:     http://localhost:8000/docs
-```
-
-#### ⚙️ 环境配置
-
-如果遇到503错误，请设置代理绕过：
-```bash
-export NO_PROXY="localhost,127.0.0.1,0.0.0.0"
-```
-
-#### 📋 服务管理
-
-```bash
-# 查看服务状态
-docker-compose -p lihc-platform ps
-
-# 查看日志
-docker logs lihc-dashboard --tail 50
-docker logs lihc-api --tail 50
-
-# 重启服务
-docker restart lihc-dashboard
-docker restart lihc-api
-
-# 停止所有服务
-docker-compose -p lihc-platform down
-
-# 完整重新部署
-./deploy-lihc.sh
-```
-
-#### 🐳 服务架构
-
-| 服务名称 | 容器名称 | 端口 | 功能 |
-|---------|---------|------|------|
-| Dashboard | lihc-dashboard | 8050 | Web界面 |
-| API | lihc-api | 8000 | 后端服务 |
-| Redis | lihc-redis | 6379 | 缓存队列 |
-
-#### 🔧 故障排除
-
-```bash
-# 健康检查
-docker exec lihc-dashboard curl http://localhost:8050
-docker exec lihc-api curl http://localhost:8000/health
-
-# 容器状态
-docker-compose -p lihc-platform ps
-
-# 重建镜像（如果有更新）
-docker-compose -p lihc-platform build --no-cache
-docker-compose -p lihc-platform up -d
-```
-
-### 本地运行
-
-```bash
-# 安装依赖
+# 2. 安装依赖
 pip install -r requirements.txt
 
-# 运行专业版界面
-python main.py --dashboard --professional
-
-# 或运行经典版界面
+# 3. 启动平台
 python main.py --dashboard
+
+# 4. 访问界面
+# 打开浏览器访问: http://localhost:8050
+```
+
+#### 方式二：Docker部署
+
+```bash
+# 1. 构建镜像
+docker build -t lihc-platform:latest .
+
+# 2. 运行容器
+docker run -d \
+  --name lihc-platform \
+  -p 8050:8050 \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/results:/app/results \
+  lihc-platform:latest
+
+# 3. 查看日志
+docker logs -f lihc-platform
+```
+
+#### 方式三：Docker Compose（生产环境）
+
+```bash
+# 启动所有服务
+docker-compose up -d
+
+# 停止服务
+docker-compose down
 ```
 
 ---
 
-## 📖 使用指南
+## 📚 功能模块
 
-### 1. 访问应用
+### 1. 数据管理
+- **数据上传**: 支持CSV、Excel、TSV格式
+- **数据集管理**: 多数据集切换和版本控制
+- **数据预处理**: 自动质控和标准化
 
-**访问地址**: http://localhost:8050
+### 2. 基础分析
+- **多维度分析**: 五个生物学维度综合评估
+- **网络分析**: 基因调控网络和蛋白互作网络
+- **生存分析**: Kaplan-Meier和Cox回归分析
+- **Linchpin靶点**: 识别关键治疗靶点
 
-**界面模式**:
+### 3. 高级分析
+- **多组学整合**: 整合多层次组学数据
+- **AI生物标志物**: 机器学习识别预后标志物
+- **药物响应预测**: 预测药物敏感性
+- **单细胞分析**: 单细胞转录组数据分析
 
-#### 经典布局（默认）
+### 4. 精准医学
+- **免疫微环境**: 免疫浸润和检查点分析
+- **分子分型**: 肿瘤亚型识别
+- **代谢分析**: 代谢通路活性评估
+- **药物组合**: 协同药物组合预测
+
+---
+
+## 💻 使用指南
+
+### 基本工作流程
+
+1. **数据准备**
+   ```python
+   # 上传表达数据
+   expression_file = "data/expression_matrix.csv"
+   clinical_file = "data/clinical_data.csv"
+   ```
+
+2. **运行分析**
+   ```python
+   from src.analysis.five_dimension_prognostic import FiveDimensionPrognosticAnalyzer
+   
+   analyzer = FiveDimensionPrognosticAnalyzer()
+   results = analyzer.analyze(expression_data, clinical_data)
+   ```
+
+3. **查看结果**
+   - 访问 http://localhost:8050
+   - 导航到相应分析模块
+   - 交互式探索结果
+
+### 命令行参数
+
 ```bash
-python main.py --dashboard
+# 启动完整平台
+python main.py --dashboard --port 8050
+
+# 仅运行分析
+python main.py --analyze --input data.csv --output results/
+
+# 批量处理
+python main.py --batch --config batch_config.json
+
+# 生成报告
+python main.py --report --format pdf --output report.pdf
 ```
 
-#### 专业布局（新增）✨
-```bash
-python main.py --dashboard --professional
+---
+
+## 🎨 UI特性
+
+### Apple风格磨砂玻璃设计
+
+- **磨砂玻璃效果**: 真实的backdrop-filter模糊
+- **渐变配色**: 柔和的紫蓝渐变主题
+- **动画效果**: 流畅的过渡和交互动画
+- **响应式设计**: 自适应各种屏幕尺寸
+
+### 界面预览
+
+```
+┌─────────────────────────────────────┐
+│  🧬 LIHC Analysis Platform          │
+├─────────────────────────────────────┤
+│  ┌──────┐  ┌─────────────────────┐  │
+│  │ 导航 │  │    主要内容区域     │  │
+│  │      │  │                     │  │
+│  │ • 分析│  │   📊 交互式图表    │  │
+│  │ • 数据│  │   📈 动态可视化    │  │
+│  │ • 结果│  │   📋 数据表格      │  │
+│  └──────┘  └─────────────────────┘  │
+└─────────────────────────────────────┘
 ```
 
-专业布局特点：
-- 顶部导航栏：数据管理、测试Demo、系统设置
-- 侧边导航栏：分析功能、高级分析、分析结果
-- 响应式设计，移动端友好
-- 更清晰的功能组织
+---
 
-**主要页面**:
+## 📊 数据格式
 
-1. **📱 概览页面** (`/`)
-   - 平台介绍和功能概述
-   - 快速开始指南
-   
-2. **📊 演示结果** (`/demo`)
-   - TCGA-LIHC完整分析结果
-   - Top 20关键靶点展示
-   
-3. **📤 数据上传** (`/upload`)
-   - 支持多种数据格式
-   - 实时数据验证
-   
-4. **📈 生存分析** (`/survival`)
-   - Kaplan-Meier生存曲线
-   - 基因表达分组分析
-   
-5. **🕸️ 网络分析** (`/networks`)
-   - 交互式分子网络
-   - 网络拓扑分析
+### 表达数据格式
 
-### 2. 数据格式要求
-
-**临床数据** (`clinical_data.csv`):
 ```csv
-sample_id,os_time,os_status,age,gender,stage,grade
-TCGA-001,365,1,65,Male,II,G2
-TCGA-002,1200,0,58,Female,I,G1
+Gene,Sample1,Sample2,Sample3
+TP53,10.5,8.3,12.1
+EGFR,5.2,6.8,4.9
+...
 ```
 
-**表达数据** (`expression_data.csv`):
+### 临床数据格式
+
 ```csv
-gene_id,TCGA-001,TCGA-002,TCGA-003
-TP53,8.25,7.89,9.12
-EGFR,6.78,7.45,6.23
+Sample,OS_time,OS_status,Age,Stage
+Sample1,365,1,65,III
+Sample2,730,0,58,II
+...
 ```
 
-### 3. 生存分析使用步骤
+### 输出结果格式
 
-1. 访问"📈 Survival Analysis"标签
-2. 选择目标基因（如TP53、MYC等）
-3. 选择数据集（TCGA-LIHC演示数据）
-4. 点击"📊 Generate Survival Curves"
-5. 查看生存曲线和统计结果
+结果保存在 `results/` 目录：
+- `analysis_results.csv` - 分析结果表格
+- `figures/` - 可视化图片
+- `report.html` - 交互式报告
 
 ---
 
-## 📚 API文档
+## 🔧 配置说明
 
-### REST API接口（开发中）
+### 系统配置
 
-**基础信息**:
-- **Base URL**: `http://localhost:8050/api/v1`
-- **数据格式**: JSON
+创建 `config/config.yaml` 文件：
 
-### 主要接口
+```yaml
+# 服务器配置
+server:
+  host: 0.0.0.0
+  port: 8050
+  debug: false
 
-```http
-# 提交分析任务
-POST /api/v1/analysis/submit
+# 数据库配置
+database:
+  type: sqlite
+  path: data/lihc.db
 
-# 获取分析状态
-GET /api/v1/analysis/status/{job_id}
+# 分析参数
+analysis:
+  n_jobs: 4
+  cache: true
+  timeout: 3600
 
-# 获取结果
-GET /api/v1/results/{job_id}
+# UI配置
+ui:
+  theme: glassmorphism
+  language: zh
 ```
 
----
-
-## 💻 开发指南
-
-### 环境准备
+### 环境变量
 
 ```bash
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或 venv\Scripts\activate  # Windows
-
-# 安装依赖
-pip install -r requirements-minimal.txt  # 快速开始
-# 或
-pip install -r requirements.txt  # 完整功能
-
-# 运行测试
-pytest tests/ --no-cov  # 快速测试
-# 或
-pytest tests/ --cov=src --cov-report=html  # 带覆盖率
-```
-
-### 代码规范
-
-```bash
-# 格式化代码
-black src/ tests/
-isort src/ tests/
-
-# 代码检查
-flake8 src/ tests/
-mypy src/
+# 设置环境变量
+export LIHC_DATA_PATH=/path/to/data
+export LIHC_RESULTS_PATH=/path/to/results
+export LIHC_CACHE_ENABLED=true
 ```
 
 ---
 
-## 📁 项目结构
+## 🐳 Docker部署详解
 
+### Dockerfile配置
+
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8050
+CMD ["python", "main.py", "--dashboard"]
 ```
-lihc-analysis-platform/
-├── 📁 src/                       # 源代码
-│   ├── 📁 analysis/              # 分析算法
-│   │   ├── stage1_multidimensional.py    # 多维度分析
-│   │   ├── stage2_network.py             # 网络分析
-│   │   ├── stage3_linchpin.py            # 关键靶点识别
-│   │   ├── survival_analysis.py          # 生存分析
-│   │   ├── closedloop_analyzer.py        # ClosedLoop因果分析
-│   │   └── integrated_analysis.py        # 集成分析流程
-│   ├── 📁 data_processing/       # 数据处理
-│   │   ├── multi_omics_integrator.py     # 多组学整合
-│   │   ├── multi_omics_loader.py         # 多组学加载器
-│   │   └── quality_control.py            # 数据质量控制
-│   ├── 📁 visualization/         # 可视化
-│   │   └── unified_dashboard.py  # 统一仪表板
-│   ├── 📁 utils/                 # 工具函数
-│   │   ├── i18n.py              # 国际化支持
-│   │   ├── logging_system.py    # 日志系统
-│   │   └── common.py            # 通用工具
-│   └── 📁 api/                  # API接口
-│       └── main.py              # REST API
-├── 📁 tests/                     # 测试代码
-│   ├── test_multi_omics_integration.py   # 多组学测试
-│   ├── test_closedloop_analyzer.py       # ClosedLoop测试
-│   └── test_integrated_analysis.py       # 集成分析测试
-├── 📁 examples/                  # 示例代码
-│   ├── demo_integrated_analysis.py        # 完整演示
-│   └── demo_data/               # 演示数据
-├── 📁 docs/                      # 文档
-│   ├── multi_omics_integration_guide.md  # 多组学指南
-│   └── closedloop_analysis_guide.md      # ClosedLoop指南
-├── 📄 Dockerfile                 # Docker镜像定义
-├── 📄 main.py                    # 主程序入口
-├── 📄 requirements.txt           # Python依赖
-├── 📄 docker-compose.yml         # Docker编排配置
-├── 📄 README.md                  # 项目说明
-├── 📄 QUICKSTART.md              # 快速开始指南
-└── 📄 FEATURE_SUMMARY.md         # 功能总结
+
+### Docker Compose配置
+
+```yaml
+version: '3.8'
+services:
+  lihc-platform:
+    build: .
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+```
+
+### 生产环境部署
+
+1. **使用Nginx反向代理**
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    
+    location / {
+        proxy_pass http://localhost:8050;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+2. **使用Gunicorn**
+```bash
+gunicorn -w 4 -b 0.0.0.0:8050 main:server
 ```
 
 ---
 
-## ❓ 常见问题
+## 📈 性能优化
 
-### Docker相关
+### 推荐配置
 
-**Q: Docker构建速度慢？**
-```bash
-# 使用Docker缓存层或配置镜像加速器
-docker-compose build --no-cache=false
+- **开发环境**: 4核CPU, 8GB RAM
+- **生产环境**: 8核CPU, 16GB RAM
+- **大数据处理**: 16核CPU, 32GB RAM
 
-# 或使用国内镜像源
-```
+### 优化建议
 
-**Q: 端口被占用？**
-```bash
-# 查看端口占用
-lsof -i :8050
+1. **启用缓存**
+   ```python
+   app.config['CACHE_TYPE'] = 'redis'
+   ```
 
-# 使用其他端口
-docker-compose up -d -e PORT=8051
-```
+2. **并行处理**
+   ```python
+   from multiprocessing import Pool
+   with Pool(processes=4) as pool:
+       results = pool.map(analyze, datasets)
+   ```
 
-### 功能相关
-
-**Q: 生存分析功能不可用？**
-- 确保使用的是更新后的镜像（包含lifelines和scipy）
-- 检查Docker日志：`docker logs lihc-platform`
-
-**Q: 如何使用自己的数据？**
-1. 准备符合格式要求的数据文件
-2. 访问"数据上传"页面
-3. 上传数据并运行分析
-
-**Q: 如何使用新的多组学整合功能？**
-```python
-# 参考 examples/demo_integrated_analysis.py
-from src.data_processing.multi_omics_integrator import MultiOmicsIntegrator
-
-integrator = MultiOmicsIntegrator()
-# 加载各种组学数据
-integrator.load_expression_data("expression.csv")
-integrator.load_cnv_data("cnv.csv")
-# 整合
-integrated = integrator.integrate_omics()
-```
-
-**Q: ClosedLoop分析需要什么数据？**
-- 必需：RNA表达数据 + 临床数据（含生存信息）
-- 可选：CNV、突变、甲基化数据（提高准确性）
+3. **数据库索引**
+   ```sql
+   CREATE INDEX idx_gene ON expression(gene_id);
+   CREATE INDEX idx_sample ON clinical(sample_id);
+   ```
 
 ---
 
 ## 🤝 贡献指南
 
-### 开发工作流
+欢迎贡献代码！请遵循以下步骤：
 
-1. Fork项目
-2. 创建功能分支：`git checkout -b feature/amazing-feature`
-3. 提交更改：`git commit -m 'Add amazing feature'`
-4. 推送分支：`git push origin feature/amazing-feature`
-5. 创建Pull Request
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
 
-### 提交规范
+### 代码规范
 
-- `feat`: 新功能
-- `fix`: 修复bug
-- `docs`: 文档更新
-- `refactor`: 代码重构
-- `test`: 测试相关
-
----
-
-## 📊 升级规划
-
-### 短期目标（3-6个月）
-
-- ✅ 建立完善的测试体系
-- ✅ 实现错误处理和日志系统
-- ✅ 多组学数据整合（已完成）
-- ✅ ClosedLoop因果推理分析（已完成）
-- 📅 RESTful API接口
-
-### 中长期目标
-
-- 📅 云端SaaS版本
-- 📅 机器学习集成
-- 📅 多癌种支持
-- 📅 插件系统架构
+- 使用 Black 格式化 Python 代码
+- 遵循 PEP 8 编码规范
+- 添加适当的注释和文档
+- 编写单元测试
 
 ---
 
-## 📄 许可证
+## 📝 许可证
 
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-### 引用格式
+---
 
-如果本项目对您的研究有帮助，请引用：
+## 🙏 致谢
 
-```bibtex
-@software{lihc_platform_2025,
-  title={LIHC Multi-dimensional Prognostic Analysis Platform},
-  author={AI-GuoKe Research Team},
-  year={2025},
-  url={https://github.com/ai-guoke/lihc-platform},
-  version={v1.0}
-}
+- 中国科学院大学杭州高等研究院
+- TCGA数据库提供数据支持
+- 所有贡献者和用户
+
+---
+
+## 📧 联系方式
+
+- **项目主页**: https://github.com/ai-guoke/lihc-analysis-platform
+- **问题反馈**: [GitHub Issues](https://github.com/ai-guoke/lihc-analysis-platform/issues)
+- **邮箱**: support@lihc-platform.com
+
+---
+
+<a name="english"></a>
+## 🌟 Project Overview (English)
+
+LIHC Analysis Platform is a comprehensive bioinformatics analysis platform focused on Hepatocellular Carcinoma (LIHC). It integrates multi-omics data and provides comprehensive data analysis and visualization solutions for liver cancer research through innovative five-dimensional analysis framework and AI algorithms.
+
+### Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/ai-guoke/lihc-analysis-platform.git
+cd lihc-analysis-platform
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start platform
+python main.py --dashboard
+
+# Access UI at http://localhost:8050
 ```
 
----
+### Docker Deployment
 
-## 🎉 致谢
+```bash
+# Build image
+docker build -t lihc-platform:latest .
 
-感谢所有为本项目做出贡献的研究者、开发者和用户！
+# Run container
+docker run -d -p 8050:8050 lihc-platform:latest
+```
 
-- 🙏 **TCGA研究网络** - 提供高质量的肿瘤基因组数据
-- 🐍 **Python生态系统** - Pandas, NumPy, SciPy等
-- 📈 **Plotly团队** - 优秀的交互式可视化库
-- 🚀 **Dash框架** - Web应用开发框架
-
----
-
-## 📄 版权信息
-
-**版权所有 © 中国科学院大学杭州高等研究院**
-
-本项目由中国科学院大学杭州高等研究院开发和维护。
-
-**联系方式**：
-- 机构：中国科学院大学杭州高等研究院
-- 地址：浙江省杭州市
-- 网站：[UCAS Hangzhou Institute](https://www.ucas.edu.cn/)
+For detailed documentation, please refer to the Chinese section above.
 
 ---
 
-*最后更新: 2025年7月27日*  
-*版本: v2.6* 🎉  
-*项目状态: 积极维护*  
-
-**平台特色**：
-- 🧠 **创新算法**: 首创五维度肿瘤微环境分析框架
-- 🔬 **科学严谨**: 基于统计学和生物学双重验证的分析流程
-- 🎯 **精准医学**: 提供个性化治疗靶点和用药指导
-- 🚀 **高性能**: 支持大规模数据并行处理和实时分析
-- 🌐 **用户友好**: 零编程基础的Web界面和一键式分析
-- 🔄 **完整生态**: 从数据输入到结果输出的完整解决方案
+<div align="center">
+  <b>LIHC Analysis Platform v2.6</b><br>
+  Made with ❤️ by UCAS Hangzhou Institute for Advanced Study
+</div>
