@@ -32,7 +32,7 @@ psutil>=5.9.0,<6.1.0
 jupyter>=1.0.0,<1.1.0
 
 # API and database dependencies
-fastapi>=0.100.0,<0.112.0
+fastapi>=0.100.0,<0.120.0
 uvicorn>=0.20.0,<0.31.0
 pydantic>=2.0.0,<2.8.0
 sqlalchemy>=2.0.0,<2.1.0
